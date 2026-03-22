@@ -23,7 +23,7 @@ typedef struct
     control_vector_t dem;
 } TransferFunction;
 
-void InitSystem();
+void ControlSystemInit();
 
 control_vector_t CoeffVector(float *coeffs, size_t size);
 

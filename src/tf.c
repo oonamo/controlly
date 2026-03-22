@@ -13,7 +13,6 @@
 #define CONTROL_SCRATCH_MEMORY_SIZE 1024
 #endif
 
-
 /*
  * TODO: 2 different api's
  * 1. Embedded targets
@@ -47,6 +46,9 @@ void ControlSystemInit()
               CONTROL_PERSISTENT_MEMORY_SIZE);
 }
 
+#define NULL_VECTOR                                                            \
+    (control_vector_t) { .capacity = 0, .size = 0, .coeffs = NULL }
+
 CONTROL_PRIVATE_API control_vector_t __CreateVectorInArena(Arena *a,
                                                            size_t capacity)
 {
@@ -55,5 +57,29 @@ CONTROL_PRIVATE_API control_vector_t __CreateVectorInArena(Arena *a,
     v.size = 0;
 
     v.coeffs = (float *)ArenaAlloc(a, capacity * sizeof(float));
+    return v;
+}
+
+/**
+ * @brief Creates a vector of polynomial coefficients
+ *
+ * @param coeffs Polynomial coefficients starting from n -> 0
+ * @param size size of coefficients
+ * @return Vector representation
+ */
+control_vector_t PolyCoeffVector(float *coeffs, size_t size)
+{
+    if (coeffs == NULL || size <= 0)
+    {
+        return NULL_VECTOR;
+    }
+
+    control_vector_t v = __CreateVectorInArena(&persistent_arena, size);
+
+    for (size_t i = 0; i < size; i++)
+    {
+        v.coeffs[i] = coeffs[i];
+    }
+
     return v;
 }
