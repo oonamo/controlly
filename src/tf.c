@@ -89,44 +89,174 @@ control_vector_t PolyCoeffVector(float *coeffs, size_t size)
     return v;
 }
 
-CONTROL_PRIVATE_API char __UnsafeControlsIntToChar(int i)
+CONTROL_PRIVATE_API char __ControlsUnsafeIntToChar(int i)
 {
     return (char)(i + '0');
 }
 
 CONTROL_INLINE_API CONTROL_PRIVATE_API int
-__ControlsAppendChar(char c, char *buffer, size_t buffer_size)
+__ControlsSetChar(char c, char *buffer, size_t buffer_size)
 {
-    if (buffer_size + 1 < buffer_size)
+    if ((buffer + 1) > (buffer + buffer_size))
     {
         return 0;
     }
-    *(buffer + 1) = c;
+
+    *buffer = c;
     return 1;
+}
+
+CONTROL_PRIVATE_API int __ControlsUnsafeAppendStr(char *buffer, size_t buflen,
+                                                  char *src)
+{
+    int last_result = 1;
+    int i = 0;
+    while (last_result && src[i] != '\0')
+    {
+        last_result = __ControlsSetChar(src[i], buffer + i, buflen);
+        i++;
+    }
+
+    return i;
+}
+
+CONTROL_INLINE_API CONTROL_PRIVATE_API int
+__ControlsAppendStr(char *buffer, size_t buflen, char *src, size_t srclen)
+{
+    int last_result = 1;
+    int i = 0;
+    while (last_result && i < srclen)
+    {
+        last_result = __ControlsSetChar(src[i++], buffer, buflen);
+    }
+    return i;
+}
+
+CONTROL_PRIVATE_API void __ControlReverseStr(char *buf, size_t len)
+{
+    int i = 0, j = len - 1, tmp;
+    while (i < j)
+    {
+        tmp = buf[i];
+        buf[i] = buf[j];
+        buf[j] = tmp;
+        i++;
+        j--;
+    }
+}
+
+CONTROL_PRIVATE_API int __ControlsIntToStr(int x, char *buffer, size_t ndigits)
+{
+    size_t i = 0;
+    if (x == 0)
+    {
+        buffer[i++] = '0';
+    }
+    while (x)
+    {
+        buffer[i++] = (x % 10) + '0';
+        x = x / 10;
+    }
+    while (i < ndigits)
+    {
+        buffer[i++] = '0';
+    }
+
+    __ControlReverseStr(buffer, i);
+    buffer[i] = '\0';
+    return i;
+}
+
+CONTROL_INLINE_API CONTROL_PRIVATE_API int __ControlsFTOA(float n, char *res,
+                                                          size_t precision)
+{
+    int isneg = 0;
+    int i = 0;
+
+    if (n < 0.0f)
+    {
+        n = -n;
+        isneg = 1;
+    }
+
+    int integral_part = (int)n;
+    float float_part = n - (float)integral_part;
+    int i_len = __ControlsIntToStr(integral_part, res + i, 0);
+    i += i_len;
+
+    if (precision != 0)
+    {
+        res[i++] = '.';
+
+        float multiplier = 1.0f;
+        for (size_t p = 0; p < precision; p++)
+        {
+            multiplier *= 10.0f;
+        }
+
+        int fractional_int = (int)(float_part * multiplier + 0.5f);
+
+        __ControlsIntToStr(fractional_int, res + i, precision);
+    }
+
+    return isneg;
 }
 
 int PolyCoeffVectorToStr(control_vector_t *coeffs, char var, char *buffer,
                          size_t buffer_size)
 {
-    int order = (int)(coeffs->size) - 1;
     size_t buffer_ptr = 0;
+    size_t coeff_size = coeffs->size;
+    int order = (int)(coeff_size)-1;
 
-    while (order >= 0 && buffer_ptr < buffer_size)
+    char float_buf[16];
+    char order_buf[16];
+
+    for (int i = 0; i < coeff_size; i++)
     {
-        buffer[buffer_ptr++] = var;
-        buffer[buffer_ptr++] = '^';
-        buffer[buffer_ptr++] = __UnsafeControlsIntToChar(order);
+        float coeff = coeffs->coeffs[i];
 
-        if (order != 0)
+        if (coeff == 0.0f && coeff_size != 1)
         {
-            buffer[buffer_ptr++] = '+';
+            continue;
         }
-        order--;
-    }
 
-    if (buffer_ptr < buffer_size)
-    {
-        buffer[buffer_ptr] = '\0';
+        if (i != 0 && coeff < 0)
+        {
+            buffer_ptr += __ControlsUnsafeAppendStr(buffer + buffer_ptr,
+                                                    buffer_size, " - ");
+        }
+        else if (i != 0)
+        {
+            buffer_ptr += __ControlsUnsafeAppendStr(buffer + buffer_ptr,
+                                                    buffer_size, " + ");
+        }
+
+        int isneg = __ControlsFTOA(coeff, float_buf, 2);
+        if (isneg && i == 0)
+        {
+            buffer_ptr += __ControlsUnsafeAppendStr(buffer + buffer_ptr,
+                                                    buffer_size, "-");
+        }
+
+        buffer_ptr += __ControlsUnsafeAppendStr(buffer + buffer_ptr,
+                                                buffer_size, float_buf);
+
+        if (order > 1)
+        {
+            buffer_ptr += __ControlsUnsafeAppendStr(buffer + buffer_ptr,
+                                                    buffer_size, "s^");
+            __ControlsIntToStr(order, order_buf, 0);
+            buffer_ptr += __ControlsUnsafeAppendStr(buffer + buffer_ptr,
+                                                    buffer_size, order_buf);
+        }
+        else if (order == 1)
+        {
+            buffer_ptr += __ControlsUnsafeAppendStr(buffer + buffer_ptr,
+                                                    buffer_size, "s");
+        }
+
+        order--;
     }
 
     return order != 0;
