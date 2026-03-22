@@ -1,5 +1,5 @@
-#include <stdint.h>
 #include "arena.h"
+#include <stdint.h>
 
 float derivative();
 float integrate();
@@ -25,7 +25,9 @@ typedef struct
 
 void ControlSystemInit();
 
-control_vector_t CoeffVector(float *coeffs, size_t size);
+control_vector_t PolyCoeffVector(float *coeffs, size_t size);
+int PolyCoeffVectorToStr(control_vector_t *coeffs, char var, char *buffer,
+                          size_t buffer_size);
 
 TransferFunction MultiplyTransferFunctrions(TransferFunction *G1,
                                             TransferFunction *G2);
