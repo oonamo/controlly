@@ -75,6 +75,7 @@ control_vector_t PolyCoeffVector(float *coeffs, size_t size)
     }
 
     control_vector_t v = __CreateVectorInArena(&persistent_arena, size);
+    v.size = size;
 
     for (size_t i = 0; i < size; i++)
     {
