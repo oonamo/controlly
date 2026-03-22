@@ -2,7 +2,11 @@
 #include "arena.h"
 
 #ifndef CONTROL_PRIVATE_API
-#define CONTROL_PRIVATE_API
+#define CONTROL_PRIVATE_API static
+#endif
+
+#ifndef CONTROL_INLINE_API
+#define CONTROL_INLINE_API inline
 #endif
 
 #ifndef CONTROL_PERSISTENT_MEMORY_SIZE
@@ -83,4 +87,47 @@ control_vector_t PolyCoeffVector(float *coeffs, size_t size)
     }
 
     return v;
+}
+
+CONTROL_PRIVATE_API char __UnsafeControlsIntToChar(int i)
+{
+    return (char)(i + '0');
+}
+
+CONTROL_INLINE_API CONTROL_PRIVATE_API int
+__ControlsAppendChar(char c, char *buffer, size_t buffer_size)
+{
+    if (buffer_size + 1 < buffer_size)
+    {
+        return 0;
+    }
+    *(buffer + 1) = c;
+    return 1;
+}
+
+int PolyCoeffVectorToStr(control_vector_t *coeffs, char var, char *buffer,
+                         size_t buffer_size)
+{
+    int order = (int)(coeffs->size) - 1;
+    size_t buffer_ptr = 0;
+
+    while (order >= 0 && buffer_ptr < buffer_size)
+    {
+        buffer[buffer_ptr++] = var;
+        buffer[buffer_ptr++] = '^';
+        buffer[buffer_ptr++] = __UnsafeControlsIntToChar(order);
+
+        if (order != 0)
+        {
+            buffer[buffer_ptr++] = '+';
+        }
+        order--;
+    }
+
+    if (buffer_ptr < buffer_size)
+    {
+        buffer[buffer_ptr] = '\0';
+    }
+
+    return order != 0;
 }
