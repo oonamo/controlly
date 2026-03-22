@@ -11,7 +11,7 @@ void ArenaInit(Arena *a, void *backing_buffer, size_t capacity)
 void *ArenaAlloc(Arena *a, size_t size)
 {
     size_t align_size = (size + 3) & ~3;
-    if (a->offset + align_size <= a->offset)
+    if (a->offset + align_size <= a->capacity)
     {
         void *ptr = &a->buffer[a->offset];
         a->offset += align_size;
