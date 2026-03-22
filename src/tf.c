@@ -259,5 +259,7 @@ int PolyCoeffVectorToStr(control_vector_t *coeffs, char var, char *buffer,
         order--;
     }
 
+    buffer[buffer_ptr] = '\0';
+
     return order != 0;
 }
