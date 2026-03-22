@@ -1,12 +1,13 @@
 #include <stdint.h>
+#include "arena.h"
 
 float derivative();
 float integrate();
 
 typedef enum
 {
-  POSITIVE = 1,
-  NEGATIVE = 1,
+    TF_UNITY_POSITIVE = 1,
+    TF_UNITY_NEGATIVE = 1,
 } TransferFunctionUnity;
 
 typedef struct
@@ -18,8 +19,15 @@ typedef struct
 
 typedef struct
 {
-    control_vector_t numerator;
-    control_vector_t denomator;
+    control_vector_t num;
+    control_vector_t dem;
 } TransferFunction;
 
-TransferFunction ClosedLoopTransferFunction(TransferFunction* G, float gain);
+void InitSystem();
+
+control_vector_t CoeffVector(float *coeffs, size_t size);
+
+TransferFunction MultiplyTransferFunctrions(TransferFunction *G1,
+                                            TransferFunction *G2);
+TransferFunction ClosedLoopTransferFunction(TransferFunction *G, float gain,
+                                            TransferFunctionUnity unity);
