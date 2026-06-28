@@ -263,3 +263,111 @@ int PolyCoeffVectorToStr(control_vector_t *coeffs, char var, char *buffer,
 
     return order != 0;
 }
+
+int TransferFunctionToStr(TransferFunction *tf, char var, char *buffer,
+                          size_t buffer_size)
+{
+    size_t i = 0;
+    __ControlsSetChar('(', buffer + i++, buffer_size);
+    PolyCoeffVectorToStr(&tf->num, var, buffer + i, buffer_size);
+    while (buffer[i] != '\0')
+    {
+        i++;
+    }
+    i += __ControlsUnsafeAppendStr(buffer + i, buffer_size, ")/(");
+    PolyCoeffVectorToStr(&tf->dem, var, buffer + i, buffer_size);
+    while (buffer[i] != '\0')
+    {
+        i++;
+    }
+    __ControlsSetChar(')', buffer + i++, buffer_size);
+
+    buffer[i] = '\0';
+
+    return 0;
+}
+
+control_vector_t AddCoeffVector(Arena *arena, control_vector_t *a,
+                                control_vector_t *b)
+{
+    size_t max_size = a->size > b->size ? a->size : b->size;
+    control_vector_t vec = __CreateVectorInArena(arena, max_size);
+
+    for (size_t i = 0; i < max_size; i++)
+    {
+        float sum = 0.0f;
+        if (i < a->size)
+        {
+            sum += a->coeffs[i];
+        }
+        if (i < b->size)
+        {
+            sum += a->coeffs[i];
+        }
+
+        vec.coeffs[i] = sum;
+    }
+
+    return vec;
+}
+
+control_vector_t ConvolveCoeffVector(Arena *arena, control_vector_t *a,
+                                     control_vector_t *b)
+{
+    size_t new_size = a->size + b->size - 1;
+
+    control_vector_t result = __CreateVectorInArena(arena, new_size);
+    result.size = new_size;
+
+    for (size_t i = 0; i < new_size; i++)
+    {
+        result.coeffs[i] = 0.0f;
+    }
+
+    for (size_t i = 0; i < a->size; i++)
+    {
+        for (size_t j = 0; j < b->size; j++)
+        {
+            result.coeffs[i + j] += a->coeffs[i] * b->coeffs[j];
+        }
+    }
+
+    return result;
+}
+
+TransferFunction TransferFunctionFromCoeffs(control_vector_t num,
+                                            control_vector_t dem)
+{
+    TransferFunction G = {
+        .num = num,
+        .dem = dem,
+    };
+    return G;
+}
+
+TransferFunction MultiplyTransferFunctrions(TransferFunction *G1,
+                                            TransferFunction *G2)
+{
+    control_vector_t conv_num =
+        ConvolveCoeffVector(&persistent_arena, &G1->num, &G2->num);
+    control_vector_t conv_dem =
+        ConvolveCoeffVector(&persistent_arena, &G1->dem, &G2->dem);
+
+    return TransferFunctionFromCoeffs(conv_num, conv_dem);
+}
+
+TransferFunction ClosedLoopTransferFunction(TransferFunction *G, float gain,
+                                            TransferFunctionUnity unity)
+{
+    /*
+     * G(s) = N(s)/D(s)
+     *
+     * H(s) = G(s)/(1 + G(s)) = (N(s)/D(s))/(1 + (N(s)/D(s))
+     * H(s) = N(s)/(D(s) + N(s))
+     */
+
+    control_vector_t denom =
+        AddCoeffVector(&persistent_arena, &G->dem, &G->num);
+
+    return TransferFunctionFromCoeffs(G->num, denom);
+}

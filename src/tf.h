@@ -27,7 +27,14 @@ void ControlSystemInit();
 
 control_vector_t PolyCoeffVector(float *coeffs, size_t size);
 int PolyCoeffVectorToStr(control_vector_t *coeffs, char var, char *buffer,
-                          size_t buffer_size);
+                         size_t buffer_size);
+
+TransferFunction TransferFunctionFromCoeffs(control_vector_t num,
+                                            control_vector_t dem);
+int TransferFunctionToStr(TransferFunction* tf, char var, char* buffer, size_t buffer_size);
+
+control_vector_t ConvolveCoeffVector(Arena *arena, control_vector_t *a,
+                                     control_vector_t *b);
 
 TransferFunction MultiplyTransferFunctrions(TransferFunction *G1,
                                             TransferFunction *G2);
