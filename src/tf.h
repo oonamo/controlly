@@ -1,6 +1,5 @@
 #include "arena.h"
 #include "matrix.h"
-#include "vec.h"
 #include <stdint.h>
 
 float derivative();
