@@ -1,4 +1,5 @@
 #include "arena.h"
+#include "vec.h"
 #include <stdint.h>
 
 float derivative();
@@ -10,12 +11,7 @@ typedef enum
     TF_UNITY_NEGATIVE = 1,
 } TransferFunctionUnity;
 
-typedef struct
-{
-    float *coeffs;
-    size_t size;
-    size_t capacity;
-} control_vector_t;
+typedef Vec control_vector_t;
 
 typedef struct
 {
