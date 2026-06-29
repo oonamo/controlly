@@ -36,7 +36,7 @@ int TransferFunctionToStr(TransferFunction* tf, char var, char* buffer, size_t b
 control_vector_t ConvolveCoeffVector(Arena *arena, control_vector_t *a,
                                      control_vector_t *b);
 
-TransferFunction MultiplyTransferFunctrions(TransferFunction *G1,
+TransferFunction MultiplyTransferFunctions(TransferFunction *G1,
                                             TransferFunction *G2);
-TransferFunction ClosedLoopTransferFunction(TransferFunction *G, float gain,
+TransferFunction UnityClosedLoop(TransferFunction *G, float gain,
                                             TransferFunctionUnity unity);

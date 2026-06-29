@@ -293,21 +293,25 @@ control_vector_t AddCoeffVector(Arena *arena, control_vector_t *a,
     size_t max_size = a->size > b->size ? a->size : b->size;
     control_vector_t vec = __CreateVectorInArena(arena, max_size);
 
+    size_t a_offset = max_size - a->size;
+    size_t b_offset = max_size - b->size;
+
     for (size_t i = 0; i < max_size; i++)
     {
         float sum = 0.0f;
-        if (i < a->size)
+        if (i >= a_offset)
         {
-            sum += a->coeffs[i];
+            sum += a->coeffs[i - a_offset];
         }
-        if (i < b->size)
+        if (i >= b_offset)
         {
-            sum += a->coeffs[i];
+            sum += b->coeffs[i - b_offset];
         }
 
         vec.coeffs[i] = sum;
     }
 
+    vec.size = max_size;
     return vec;
 }
 
@@ -345,8 +349,8 @@ TransferFunction TransferFunctionFromCoeffs(control_vector_t num,
     return G;
 }
 
-TransferFunction MultiplyTransferFunctrions(TransferFunction *G1,
-                                            TransferFunction *G2)
+TransferFunction MultiplyTransferFunctions(TransferFunction *G1,
+                                           TransferFunction *G2)
 {
     control_vector_t conv_num =
         ConvolveCoeffVector(&persistent_arena, &G1->num, &G2->num);
@@ -356,7 +360,7 @@ TransferFunction MultiplyTransferFunctrions(TransferFunction *G1,
     return TransferFunctionFromCoeffs(conv_num, conv_dem);
 }
 
-TransferFunction ClosedLoopTransferFunction(TransferFunction *G, float gain,
+TransferFunction UnityClosedLoop(TransferFunction *G, float gain,
                                             TransferFunctionUnity unity)
 {
     /*

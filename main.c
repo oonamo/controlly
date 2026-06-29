@@ -17,13 +17,20 @@ int main()
     char dem_buffer[64];
     PolyCoeffVectorToStr(&Gp.num, 's', num_buffer, 64);
     PolyCoeffVectorToStr(&Gp.dem, 's', dem_buffer, 64);
-    printf("(%s)/(%s)\n", num_buffer, dem_buffer);
 
     char buffer[64];
-    TransferFunction ForwardGain = MultiplyTransferFunctrions(&Gp, &Gc);
+    TransferFunction ForwardGain = MultiplyTransferFunctions(&Gp, &Gc);
     TransferFunctionToStr(&ForwardGain, 's', buffer, 64);
 
     printf("Forward Gain: %s\n", buffer);
 
+    char buf2[64];
+    char dem2[64];
+
+    TransferFunction ClosedLoop =
+        UnityClosedLoop(&ForwardGain, 1, TF_UNITY_POSITIVE);
+
+    TransferFunctionToStr(&ClosedLoop, 's', buf2, 64);
+    printf("Closed Loop Function: %s\n", buf2);
     return 0;
 }

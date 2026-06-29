@@ -1,5 +1,5 @@
-.PHONY: build run test
 CC = gcc
+.PHONY: build test
 
 all: test
 
