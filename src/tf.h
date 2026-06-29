@@ -1,4 +1,5 @@
 #include "arena.h"
+#include "matrix.h"
 #include "vec.h"
 #include <stdint.h>
 
@@ -11,7 +12,7 @@ typedef enum
     TF_UNITY_NEGATIVE = 1,
 } TransferFunctionUnity;
 
-typedef Vec control_vector_t;
+typedef vector_t control_vector_t;
 
 typedef struct
 {
