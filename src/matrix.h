@@ -2,18 +2,28 @@
 #define _MATRIX_H
 #include "arena.h"
 
-typedef struct {
-  float* coeffs;
-  size_t size;
-  size_t capacity;
+typedef struct
+{
+    size_t size;
+    size_t capacity;
+    float *coeffs;
 } vector_t;
 
 typedef struct
 {
-    float *rows;
-    float *cols;
-    size_t n_rows;
-    size_t n_cols;
+    size_t rows;
+    size_t cols;
+    float *data;
 } matrix_t;
 
+typedef matrix_t system_matrix_t;
+typedef vector_t input_matrix_t;
+typedef vector_t output_matrix_t;
+typedef vector_t feedback_matrix_t;
+
+vector_t ArenaAllocVec(Arena* a, size_t size);
+matrix_t ArenaAllocMatrix(Arena* a, size_t rows, size_t cols);
+vector_t VectorMulMatrix(Arena *a, const matrix_t *m, const vector_t *v);
+vector_t VectorAdd(Arena *a, vector_t *lhs, vector_t *rhs);
+vector_t VectorScalar(Arena *a, vector_t *v, float scalar);
 #endif

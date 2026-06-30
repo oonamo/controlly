@@ -1,5 +1,6 @@
 #include "tf.h"
 #include "arena.h"
+#include "matrix.h"
 
 #ifndef CONTROL_PRIVATE_API
 #define CONTROL_PRIVATE_API static
@@ -361,7 +362,7 @@ TransferFunction MultiplyTransferFunctions(TransferFunction *G1,
 }
 
 TransferFunction UnityClosedLoop(TransferFunction *G, float gain,
-                                            TransferFunctionUnity unity)
+                                 TransferFunctionUnity unity)
 {
     /*
      * G(s) = N(s)/D(s)
@@ -374,4 +375,71 @@ TransferFunction UnityClosedLoop(TransferFunction *G, float gain,
         AddCoeffVector(&persistent_arena, &G->dem, &G->num);
 
     return TransferFunctionFromCoeffs(G->num, denom);
+}
+
+struct StateSpace
+{
+    system_matrix_t A;
+    input_matrix_t B;
+    output_matrix_t C;
+    feedback_matrix_t D;
+
+    vector_t y;
+    vector_t u;
+};
+
+// Assume matrix is strictly proper
+static system_matrix_t generate_sys_matrix(TransferFunction *tf)
+{
+    size_t n = tf->dem.size - 1;
+    matrix_t A = ArenaAllocMatrix(&persistent_arena, n, n);
+
+    for (size_t i = 0; i < n - 1; i++)
+    {
+        A.data[i * n + (i + 1)] = 1;
+    }
+
+    size_t last_row_offset = (n - 1) * n;
+    for (size_t i = 0; i < n; i++)
+    {
+        A.data[(n - 1) * n + i] = -tf->num.coeffs[n - 1];
+    }
+
+    return A;
+}
+
+static input_matrix_t gen_input_matrix(TransferFunction *tf)
+{
+    size_t n = tf->dem.size - 1;
+    vector_t B = ArenaAllocVec(&persistent_arena, n);
+    B.coeffs[n - 1] = 1;
+    return B;
+}
+
+static output_matrix_t gen_output_matrix(TransferFunction *tf)
+{
+    size_t n = tf->dem.size - 1;
+    vector_t C = ArenaAllocVec(&persistent_arena, n);
+    size_t m = tf->num.size - 1;
+    for (int i = 0; i < m; i++)
+    {
+        C.coeffs[i] = tf->num.coeffs[m - 1];
+    }
+    return C;
+}
+
+StateSpace TransferFunctionToStateSpace(TransferFunction *tf)
+{
+    system_matrix_t A = generate_sys_matrix(tf);
+    input_matrix_t B = gen_input_matrix(tf);
+    output_matrix_t C = gen_output_matrix(tf);
+    feedback_matrix_t D = {0};
+
+    StateSpace s = {
+        .A = A,
+        .B = B,
+        .C = C,
+        .D = D,
+    };
+    return s;
 }

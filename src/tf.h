@@ -19,6 +19,9 @@ typedef struct
     control_vector_t dem;
 } TransferFunction;
 
+// Forward Declaration
+typedef struct StateSpace StateSpace;
+
 void ControlSystemInit();
 
 control_vector_t PolyCoeffVector(float *coeffs, size_t size);
@@ -36,3 +39,5 @@ TransferFunction MultiplyTransferFunctions(TransferFunction *G1,
                                             TransferFunction *G2);
 TransferFunction UnityClosedLoop(TransferFunction *G, float gain,
                                             TransferFunctionUnity unity);
+
+StateSpace TransferFunctionToStateSpace(TransferFunction* tf);
