@@ -1,4 +1,4 @@
-#include "arena.h"
+#include <ccontrol/arena.h>
 #include <stdint.h>
 
 void ArenaInit(Arena *a, void *backing_buffer, size_t capacity)

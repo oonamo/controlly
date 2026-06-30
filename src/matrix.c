@@ -1,4 +1,4 @@
-#include "matrix.h"
+#include <ccontrol/matrix.h>
 
 #define NULL_VECTOR (vector_t){.coeffs = NULL, .size = 0, .capacity = 0}
 

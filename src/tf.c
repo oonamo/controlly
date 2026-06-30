@@ -1,6 +1,6 @@
-#include "tf.h"
-#include "arena.h"
-#include "matrix.h"
+#include <ccontrol/tf.h>
+#include <ccontrol/arena.h>
+#include <ccontrol/matrix.h>
 
 #ifndef CONTROL_PRIVATE_API
 #define CONTROL_PRIVATE_API static

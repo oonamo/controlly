@@ -19,3 +19,24 @@ target_sources(controls
       include/ccontrol/arena.h
       include/ccontrol/matrix.h
 )
+
+include(FetchContent)
+FetchContent_Declare(
+    unity
+    GIT_REPOSITORY https://github.com/ThrowTheSwitch/Unity.git
+    GIT_TAG        v2.6.1
+)
+FetchContent_MakeAvailable(unity)
+
+add_executable(test_runner test/test_main.c)
+target_sources(test_runner PRIVATE
+  ${unity_SOURCE_DIR}/extras/fixture/src/unity_fixture.c
+)
+target_include_directories(test_runner PRIVATE
+  ${unity_SOURCE_DIR}/extras/fixture/src
+)
+
+target_compile_definitions(test_runner PRIVATE UNITY_FIXTURE_NO_EXTRAS)
+target_link_libraries(test_runner PRIVATE controls unity)
+enable_testing()
+add_test(NAME CoreMathTests COMMAND test_runner)
