@@ -407,17 +407,6 @@ TransferFunction UnityClosedLoop(ControlHandle *ctx, TransferFunction *G,
     return TransferFunctionFromCoeffs(&G->num, &denom);
 }
 
-struct StateSpace
-{
-    system_matrix_t A;
-    input_matrix_t B;
-    output_matrix_t C;
-    feedback_matrix_t D;
-
-    vector_t y;
-    vector_t u;
-};
-
 // Assume matrix is strictly proper
 static system_matrix_t
 __generate_sys_matrix_InPersistent(ControlArena *persistent,
@@ -434,7 +423,7 @@ __generate_sys_matrix_InPersistent(ControlArena *persistent,
     size_t last_row_offset = (n - 1) * n;
     for (size_t i = 0; i < n; i++)
     {
-        A.data[(n - 1) * n + i] = -tf->dem.coeffs[n - 1];
+        A.data[(n - 1) * n + i] = -tf->dem.coeffs[n - i];
     }
 
     return A;
@@ -456,12 +445,45 @@ __gen_output_matrix_InPersistent(ControlArena *persistent,
 {
     size_t n = tf->dem.size - 1;
     vector_t C = ArenaAllocVec(persistent, n);
+
     size_t m = tf->num.size - 1;
-    for (int i = 0; i < m; i++)
+
+    float b0 = 0.0f;
+    if (tf->num.size == tf->dem.size)
     {
-        C.coeffs[i] = tf->num.coeffs[m - i - 1];
+        b0 = tf->num.coeffs[0];
+    }
+
+    size_t offset = n - m;
+
+    for (int i = 0; i < n; i++)
+    {
+        size_t k = n - i; // Polynomial order
+
+        float ak = tf->dem.coeffs[k];
+
+        float bk = 0.0f;
+        if (k >= offset)
+        {
+            bk = tf->num.coeffs[k - offset];
+        }
+        C.coeffs[i] = bk - ak * b0;
     }
     return C;
+}
+
+static feedback_matrix_t __gen_feedthrough_matrix_InPersistent(ControlArena *persistent,
+                                                  const TransferFunction *tf)
+{
+    vector_t D = ArenaAllocVec(persistent, 1);
+    float b0 = 0.0f;
+    if (tf->num.size == tf->dem.size)
+    {
+        b0 = tf->num.coeffs[0];
+    }
+
+    D.coeffs[0] = b0;
+    return D;
 }
 
 StateSpace TransferFunctionToStateSpace(ControlHandle *ctx,
@@ -470,7 +492,7 @@ StateSpace TransferFunctionToStateSpace(ControlHandle *ctx,
     system_matrix_t A = __generate_sys_matrix_InPersistent(ctx->persistent, tf);
     input_matrix_t B = __gen_input_matrix_InPersistent(ctx->persistent, tf);
     output_matrix_t C = __gen_output_matrix_InPersistent(ctx->persistent, tf);
-    feedback_matrix_t D = {0};
+    feedback_matrix_t D = __gen_feedthrough_matrix_InPersistent(ctx->persistent, tf);
 
     StateSpace s = {
         .A = A,

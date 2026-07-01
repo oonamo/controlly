@@ -22,8 +22,16 @@ typedef struct
     control_vector_t dem;
 } TransferFunction;
 
-// Forward Declaration
-typedef struct StateSpace StateSpace;
+typedef struct
+{
+    system_matrix_t A;
+    input_matrix_t B;
+    output_matrix_t C;
+    feedback_matrix_t D;
+
+    vector_t y;
+    vector_t u;
+} StateSpace;
 
 void ControlSystem_InitHandle(ControlHandle *ctx, ControlArena *p,
                               ControlArena *s);

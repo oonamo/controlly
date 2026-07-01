@@ -56,6 +56,7 @@ target_sources(test_runner PRIVATE
   test/test_main.c
   test/test_polymath.c
   test/test_transferfunction.c
+  test/test_statespace.c
   test/test_generated.c
   test/matlab_test_data.h
 )
