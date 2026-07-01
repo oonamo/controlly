@@ -18,6 +18,8 @@ ControlArena *ControlArena_Create(void *backing_buffer, size_t capacity)
     return arena;
 }
 
+void ControlArena_Clear(ControlArena *arena) { arena->offset = 0; }
+
 void *ArenaAlloc(ControlArena *a, size_t size)
 {
     size_t align_size = (size + 3) & ~3;

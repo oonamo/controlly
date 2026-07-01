@@ -18,36 +18,17 @@
 #define CONTROL_SCRATCH_MEMORY_SIZE 1024
 #endif
 
-/*
- * TODO: 2 different api's
- * 1. Embedded targets
- *  a. Allows for specifying allocation technique
- *    i. If it has dynamic memory allocation, let user use it
- *    ii. Let user provide static allocation
- * 2. General Targets
- *  a. Allow user to specify allocation function
- *    i. Allows user to specify that they wish for dynamic alloctation
- */
 
-void ControlSystem_InitHandle(ControlHandle *hndl, ControlArena *p,
+void ControlSystem_InitHandle(ControlHandle *ctx, ControlArena *p,
                               ControlArena *s)
 {
-    hndl->persistent = p;
-    hndl->scratch = s;
+    ctx->persistent = p;
+    ctx->scratch = s;
 }
 
-void ControlSystemInit(void *persistentData, void *temporaryData)
-{
-    // Control_ArenaInit(&persistent_arena, persistentData,
-    //           CONTROL_PERSISTENT_MEMORY_SIZE);
-    // Control_ArenaInit(&scratch_arena, temporaryData,
-    // CONTROL_SCRATCH_MEMORY_SIZE);
-}
+void ControlSystemInit(void *persistentData, void *temporaryData) {}
 
-void ControlSystemDeInit(){
-    // ArenaReset(&persistent_arena);
-    // ArenaReset(&scratch_arena);
-}
+void ControlSystemDeInit(){}
 
 #define NULL_VECTOR                                                            \
     (control_vector_t) { .capacity = 0, .size = 0, .coeffs = NULL }
@@ -56,10 +37,19 @@ CONTROL_PRIVATE_API control_vector_t
     __CreateVectorInArena(ControlArena *a, size_t capacity)
 {
     control_vector_t v;
-    v.capacity = capacity;
+    v.capacity = 0;
     v.size = 0;
+    v.coeffs = NULL;
 
-    v.coeffs = (float *)ArenaAlloc(a, capacity * sizeof(float));
+    void *raw_mem = (float *)ArenaAlloc(a, capacity * sizeof(float));
+    if (raw_mem == NULL)
+    {
+        // TODO: Call handle and error
+        return v;
+    }
+
+    v.capacity = capacity;
+    v.coeffs = (float *)raw_mem;
     return v;
 }
 
@@ -70,7 +60,7 @@ CONTROL_PRIVATE_API control_vector_t
  * @param size size of coefficients
  * @return Vector representation
  */
-control_vector_t PolyCoeffVector(ControlHandle *hndl, float *coeffs,
+control_vector_t PolyCoeffVector(ControlHandle *ctx, float *coeffs,
                                  size_t size)
 {
     if (coeffs == NULL || size <= 0)
@@ -78,7 +68,7 @@ control_vector_t PolyCoeffVector(ControlHandle *hndl, float *coeffs,
         return NULL_VECTOR;
     }
 
-    control_vector_t v = __CreateVectorInArena(hndl->persistent, size);
+    control_vector_t v = __CreateVectorInArena(ctx->persistent, size);
     v.size = size;
 
     for (size_t i = 0; i < size; i++)
@@ -202,7 +192,7 @@ CONTROL_INLINE_API CONTROL_PRIVATE_API int __ControlsFTOA(float n, char *res,
     return isneg;
 }
 
-int PolyCoeffVectorToStr(control_vector_t *coeffs, char var, char *buffer,
+int PolyCoeffVectorToStr(const control_vector_t *coeffs, char var, char *buffer,
                          size_t buffer_size)
 {
     size_t buffer_ptr = 0;
@@ -287,8 +277,9 @@ int TransferFunctionToStr(TransferFunction *tf, char var, char *buffer,
     return 0;
 }
 
-control_vector_t AddCoeffVector(ControlArena *arena, control_vector_t *a,
-                                control_vector_t *b)
+static control_vector_t __PolyCoeffAdd_InArena(ControlArena *arena,
+                                               const control_vector_t *a,
+                                               const control_vector_t *b)
 {
     size_t max_size = a->size > b->size ? a->size : b->size;
     control_vector_t vec = __CreateVectorInArena(arena, max_size);
@@ -315,8 +306,15 @@ control_vector_t AddCoeffVector(ControlArena *arena, control_vector_t *a,
     return vec;
 }
 
-static control_vector_t ConvolveCoeffVector(ControlArena *arena, control_vector_t *a,
-                                     control_vector_t *b)
+control_vector_t AddCoeffVector(ControlHandle *ctx, const control_vector_t *a,
+                                const control_vector_t *b)
+{
+    return __PolyCoeffAdd_InArena(ctx->scratch, a, b);
+}
+
+static control_vector_t __MultiplyPoly_InArena(ControlArena *arena,
+                                               control_vector_t *a,
+                                               control_vector_t *b)
 {
     size_t new_size = a->size + b->size - 1;
 
@@ -339,35 +337,35 @@ static control_vector_t ConvolveCoeffVector(ControlArena *arena, control_vector_
     return result;
 }
 
-control_vector_t MultiplyPoly(ControlHandle *hndl, control_vector_t *a,
+control_vector_t MultiplyPoly(ControlHandle *ctx, control_vector_t *a,
                               control_vector_t *b)
 {
-    return ConvolveCoeffVector(hndl->persistent, a, b);
+    return __MultiplyPoly_InArena(ctx->scratch, a, b);
 }
 
-TransferFunction TransferFunctionFromCoeffs(control_vector_t num,
-                                            control_vector_t dem)
+TransferFunction TransferFunctionFromCoeffs(const control_vector_t *num,
+                                            const control_vector_t *dem)
 {
     TransferFunction G = {
-        .num = num,
-        .dem = dem,
+        .num = *num,
+        .dem = *dem,
     };
     return G;
 }
 
-TransferFunction MultiplyTransferFunctions(ControlHandle *hndl,
+TransferFunction MultiplyTransferFunctions(ControlHandle *ctx,
                                            TransferFunction *G1,
                                            TransferFunction *G2)
 {
     control_vector_t conv_num =
-        ConvolveCoeffVector(hndl->persistent, &G1->num, &G2->num);
+        __MultiplyPoly_InArena(ctx->persistent, &G1->num, &G2->num);
     control_vector_t conv_dem =
-        ConvolveCoeffVector(hndl->persistent, &G1->dem, &G2->dem);
+        __MultiplyPoly_InArena(ctx->persistent, &G1->dem, &G2->dem);
 
-    return TransferFunctionFromCoeffs(conv_num, conv_dem);
+    return TransferFunctionFromCoeffs(&conv_num, &conv_dem);
 }
 
-TransferFunction UnityClosedLoop(ControlHandle *hndl, TransferFunction *G,
+TransferFunction UnityClosedLoop(ControlHandle *ctx, TransferFunction *G,
                                  float gain, TransferFunctionUnity unity)
 {
     /*
@@ -377,9 +375,9 @@ TransferFunction UnityClosedLoop(ControlHandle *hndl, TransferFunction *G,
      * H(s) = N(s)/(D(s) + N(s))
      */
 
-    control_vector_t denom = AddCoeffVector(hndl->persistent, &G->dem, &G->num);
+    control_vector_t denom = AddCoeffVector(ctx, &G->dem, &G->num);
 
-    return TransferFunctionFromCoeffs(G->num, denom);
+    return TransferFunctionFromCoeffs(&G->num, &denom);
 }
 
 struct StateSpace
@@ -394,11 +392,11 @@ struct StateSpace
 };
 
 // Assume matrix is strictly proper
-static system_matrix_t generate_sys_matrix(ControlHandle *hndl,
+static system_matrix_t generate_sys_matrix(ControlHandle *ctx,
                                            TransferFunction *tf)
 {
     size_t n = tf->dem.size - 1;
-    matrix_t A = ArenaAllocMatrix(hndl->persistent, n, n);
+    matrix_t A = ArenaAllocMatrix(ctx->persistent, n, n);
 
     for (size_t i = 0; i < n - 1; i++)
     {
@@ -414,20 +412,20 @@ static system_matrix_t generate_sys_matrix(ControlHandle *hndl,
     return A;
 }
 
-static input_matrix_t gen_input_matrix(ControlHandle *hndl,
+static input_matrix_t gen_input_matrix(ControlHandle *ctx,
                                        TransferFunction *tf)
 {
     size_t n = tf->dem.size - 1;
-    vector_t B = ArenaAllocVec(hndl->persistent, n);
+    vector_t B = ArenaAllocVec(ctx->persistent, n);
     B.coeffs[n - 1] = 1;
     return B;
 }
 
-static output_matrix_t gen_output_matrix(ControlHandle *hndl,
+static output_matrix_t gen_output_matrix(ControlHandle *ctx,
                                          TransferFunction *tf)
 {
     size_t n = tf->dem.size - 1;
-    vector_t C = ArenaAllocVec(hndl->persistent, n);
+    vector_t C = ArenaAllocVec(ctx->persistent, n);
     size_t m = tf->num.size - 1;
     for (int i = 0; i < m; i++)
     {
@@ -436,12 +434,12 @@ static output_matrix_t gen_output_matrix(ControlHandle *hndl,
     return C;
 }
 
-StateSpace TransferFunctionToStateSpace(ControlHandle *hndl,
+StateSpace TransferFunctionToStateSpace(ControlHandle *ctx,
                                         TransferFunction *tf)
 {
-    system_matrix_t A = generate_sys_matrix(hndl, tf);
-    input_matrix_t B = gen_input_matrix(hndl, tf);
-    output_matrix_t C = gen_output_matrix(hndl, tf);
+    system_matrix_t A = generate_sys_matrix(ctx, tf);
+    input_matrix_t B = gen_input_matrix(ctx, tf);
+    output_matrix_t C = gen_output_matrix(ctx, tf);
     feedback_matrix_t D = {0};
 
     StateSpace s = {

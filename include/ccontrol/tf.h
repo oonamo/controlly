@@ -25,28 +25,31 @@ typedef struct
 // Forward Declaration
 typedef struct StateSpace StateSpace;
 
-void ControlSystem_InitHandle(ControlHandle *hndl, ControlArena *p,
+void ControlSystem_InitHandle(ControlHandle *ctx, ControlArena *p,
                               ControlArena *s);
 void ControlSystemDeInit();
 
-control_vector_t PolyCoeffVector(ControlHandle *hndl, float *coeffs,
+control_vector_t PolyCoeffVector(ControlHandle *ctx, float *coeffs,
                                  size_t size);
-int PolyCoeffVectorToStr(control_vector_t *coeffs, char var, char *buffer,
+int PolyCoeffVectorToStr(const control_vector_t *coeffs, char var, char *buffer,
                          size_t buffer_size);
 
-TransferFunction TransferFunctionFromCoeffs(control_vector_t num,
-                                            control_vector_t dem);
+control_vector_t AddCoeffVector(ControlHandle *ctx, const control_vector_t *a,
+                                const control_vector_t *b);
+
+TransferFunction TransferFunctionFromCoeffs(const control_vector_t *num,
+                                            const control_vector_t *dem);
 int TransferFunctionToStr(TransferFunction *tf, char var, char *buffer,
                           size_t buffer_size);
 
-control_vector_t MultiplyPoly(ControlHandle *hndl, control_vector_t *a,
+control_vector_t MultiplyPoly(ControlHandle *ctx, control_vector_t *a,
                               control_vector_t *b);
 
-TransferFunction MultiplyTransferFunctions(ControlHandle *hndl,
+TransferFunction MultiplyTransferFunctions(ControlHandle *ctx,
                                            TransferFunction *G1,
                                            TransferFunction *G2);
-TransferFunction UnityClosedLoop(ControlHandle *hndl, TransferFunction *G,
+TransferFunction UnityClosedLoop(ControlHandle *ctx, TransferFunction *G,
                                  float gain, TransferFunctionUnity unity);
 
-StateSpace TransferFunctionToStateSpace(ControlHandle *hndl,
+StateSpace TransferFunctionToStateSpace(ControlHandle *ctx,
                                         TransferFunction *tf);
