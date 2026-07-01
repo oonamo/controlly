@@ -1,6 +1,5 @@
 #include "arena.h"
 #include "matrix.h"
-#include <stddef.h>
 #include <stdint.h>
 
 typedef struct

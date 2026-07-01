@@ -1,6 +1,6 @@
 #ifndef _ARENA_H
 #define _ARENA_H
-#include <stddef.h>
+#include <stdint.h>
 
 typedef struct ControlArena ControlArena;
 
