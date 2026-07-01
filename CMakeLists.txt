@@ -34,6 +34,7 @@ target_sources(test_runner PRIVATE
   ${unity_SOURCE_DIR}/extras/fixture/src/unity_fixture.c
   test/test_main.c
   test/test_polymath.c
+  test/test_transferfunction.c
 )
 target_include_directories(test_runner PRIVATE
   ${unity_SOURCE_DIR}/extras/fixture/src
