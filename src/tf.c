@@ -315,7 +315,7 @@ control_vector_t AddCoeffVector(ControlArena *arena, control_vector_t *a,
     return vec;
 }
 
-control_vector_t ConvolveCoeffVector(ControlArena *arena, control_vector_t *a,
+static control_vector_t ConvolveCoeffVector(ControlArena *arena, control_vector_t *a,
                                      control_vector_t *b)
 {
     size_t new_size = a->size + b->size - 1;

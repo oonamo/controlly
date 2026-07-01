@@ -41,8 +41,6 @@ int TransferFunctionToStr(TransferFunction *tf, char var, char *buffer,
 
 control_vector_t MultiplyPoly(ControlHandle *hndl, control_vector_t *a,
                               control_vector_t *b);
-control_vector_t ConvolveCoeffVector(ControlArena *arena, control_vector_t *a,
-                                     control_vector_t *b);
 
 TransferFunction MultiplyTransferFunctions(ControlHandle *hndl,
                                            TransferFunction *G1,
