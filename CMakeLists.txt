@@ -38,8 +38,15 @@ if(MATLAB_EXE)
     DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/test/generate_test_data.m
     COMMENT "Generating MATLAB parity data"
   )
+  add_custom_command(
+    OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/test/test_generated.c
+    COMMAND ${MATLAB_EXE} -batch generate_tests
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/test
+    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/test/generate_tests.m
+    COMMENT "Generating MATLAB parity tests"
+  )
 else()
-  message(WARNING "MATLAB not found in PATH. Using existing matlab_vectors.h")
+  message(WARNING "MATLAB not found in PATH. Using pre-existing matlab files")
 endif()
 
 add_executable(test_runner)
@@ -49,6 +56,7 @@ target_sources(test_runner PRIVATE
   test/test_main.c
   test/test_polymath.c
   test/test_transferfunction.c
+  test/test_generated.c
   test/matlab_test_data.h
 )
 target_include_directories(test_runner PRIVATE

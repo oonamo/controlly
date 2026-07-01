@@ -7,6 +7,7 @@ static void runAllTests(void)
 {
     RUN_TEST_GROUP(PolyMath);
     RUN_TEST_GROUP(TransferFunction);
+    RUN_TEST_GROUP(GeneratedFuzz);
 }
 
 int main(int argc, const char *argv[])

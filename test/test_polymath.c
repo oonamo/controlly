@@ -26,7 +26,7 @@ TEST_SETUP(PolyMath)
 
 TEST_TEAR_DOWN(PolyMath)
 {
-    ControlSystemDeInit();
+    ControlSystem_DeInitHandle(&ctx);
     free(p_pool);
     free(s_pool);
 }
@@ -105,10 +105,23 @@ TEST(PolyMath, RepeatedMathDoesNotOOM)
     TEST_ASSERT_MESSAGE(true, "Survived 1000 loops without OOM");
 }
 
+TEST(PolyMath, CanonicalizeRemovesLeadingZeroes)
+{
+    float c[] = {0.0f, 0.0f, 1, 0.0f, 2};
+    float expected[] = {1, 0.0f, 2};
+
+    control_vector_t uncanon_vec = PolyCoeffVector_Scratch(&ctx, c, 5);
+
+    control_vector_t canon_vec = PolyCoeffVector_Cannonicalize(&uncanon_vec);
+    TEST_ASSERT_EQUAL_size_t(3, canon_vec.size);
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(expected, canon_vec.coeffs, 3);
+}
+
 TEST_GROUP_RUNNER(PolyMath)
 {
     RUN_TEST_CASE(PolyMath, PolynomialMultiplication);
     RUN_TEST_CASE(PolyMath, PolynomialAdditionSameSize);
     RUN_TEST_CASE(PolyMath, PolynomialAdditionDifferentSize);
     RUN_TEST_CASE(PolyMath, RepeatedMathDoesNotOOM);
+    RUN_TEST_CASE(PolyMath, CanonicalizeRemovesLeadingZeroes);
 }

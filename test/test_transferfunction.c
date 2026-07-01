@@ -22,7 +22,7 @@ TEST_SETUP(TransferFunction)
 
 TEST_TEAR_DOWN(TransferFunction)
 {
-    ControlSystemDeInit();
+    ControlSystem_DeInitHandle(&ctx);
     free(p_pool);
     free(s_pool);
 }

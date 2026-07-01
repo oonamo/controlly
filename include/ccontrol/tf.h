@@ -27,12 +27,13 @@ typedef struct StateSpace StateSpace;
 
 void ControlSystem_InitHandle(ControlHandle *ctx, ControlArena *p,
                               ControlArena *s);
-void ControlSystemDeInit();
+void ControlSystem_DeInitHandle(ControlHandle *ctx);
 
 control_vector_t PolyCoeffVector_Scratch(ControlHandle *ctx,
                                          const float *coeffs, size_t size);
 control_vector_t PolyCoeffVector_Persistent(ControlHandle *ctx,
                                             const float *coeffs, size_t size);
+control_vector_t PolyCoeffVector_Cannonicalize(const control_vector_t *v);
 int PolyCoeffVectorToStr(const control_vector_t *coeffs, char var, char *buffer,
                          size_t buffer_size);
 

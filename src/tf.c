@@ -19,7 +19,7 @@ void ControlSystem_InitHandle(ControlHandle *ctx, ControlArena *p,
 
 void ControlSystemInit(void *persistentData, void *temporaryData) {}
 
-void ControlSystemDeInit(){}
+void ControlSystem_DeInitHandle(ControlHandle *ctx){}
 
 #define NULL_VECTOR                                                            \
     (control_vector_t) { .capacity = 0, .size = 0, .coeffs = NULL }
@@ -61,6 +61,22 @@ __PolyCoeffVector_InArena(ControlArena *a, const float *coeffs, size_t size)
     }
 
     return v;
+}
+
+control_vector_t PolyCoeffVector_Cannonicalize(const control_vector_t *v)
+{
+    control_vector_t canon = *v;
+
+    size_t i = 0;
+    while (i < v->size - 1 && v->coeffs[i] == 0.0f)
+    {
+        i++;
+    }
+
+    canon.coeffs = &v->coeffs[i];
+    canon.size = v->size - i;
+
+    return canon;
 }
 
 /**
@@ -363,7 +379,10 @@ __MultiplyTransferFunctions_InArena(ControlArena *a, TransferFunction *G1,
     control_vector_t conv_num = __MultiplyPoly_InArena(a, &G1->num, &G2->num);
     control_vector_t conv_dem = __MultiplyPoly_InArena(a, &G1->dem, &G2->dem);
 
-    return TransferFunctionFromCoeffs(&conv_num, &conv_dem);
+    control_vector_t clean_num = PolyCoeffVector_Cannonicalize(&conv_num);
+    control_vector_t clean_dem = PolyCoeffVector_Cannonicalize(&conv_dem);
+
+    return TransferFunctionFromCoeffs(&clean_num, &clean_dem);
 }
 
 TransferFunction MultiplyTransferFunctions(ControlHandle *ctx,
