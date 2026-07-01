@@ -473,8 +473,9 @@ __gen_output_matrix_InPersistent(ControlArena *persistent,
     return C;
 }
 
-static feedback_matrix_t __gen_feedthrough_matrix_InPersistent(ControlArena *persistent,
-                                                  const TransferFunction *tf)
+static feedback_matrix_t
+__gen_feedthrough_matrix_InPersistent(ControlArena *persistent,
+                                      const TransferFunction *tf)
 {
     vector_t D = ArenaAllocVec(persistent, 1);
     float b0 = 0.0f;
@@ -493,7 +494,8 @@ StateSpace TransferFunctionToStateSpace(ControlHandle *ctx,
     system_matrix_t A = __generate_sys_matrix_InPersistent(ctx->persistent, tf);
     input_matrix_t B = __gen_input_matrix_InPersistent(ctx->persistent, tf);
     output_matrix_t C = __gen_output_matrix_InPersistent(ctx->persistent, tf);
-    feedback_matrix_t D = __gen_feedthrough_matrix_InPersistent(ctx->persistent, tf);
+    feedback_matrix_t D =
+        __gen_feedthrough_matrix_InPersistent(ctx->persistent, tf);
 
     StateSpace s = {
         .A = A,
@@ -502,4 +504,44 @@ StateSpace TransferFunctionToStateSpace(ControlHandle *ctx,
         .D = D,
     };
     return s;
+}
+
+#ifndef MAX_SYSTEM_ORDER
+#define MAX_SYSTEM_ORDER 10
+#endif
+
+void StateSpace_StepContinous(ControlHandle *ctx, StateSpace *ss, float dt)
+{
+    size_t n = ss->A.rows;
+    size_t m = ss->B.size;
+    size_t p = ss->C.size;
+
+    float x_dot[MAX_SYSTEM_ORDER] = {0.0f};
+    ss->y.coeffs[0] = 0.0f;
+
+    for (size_t i = 0; i < n; i++)
+    {
+        ss->y.coeffs[0] += ss->C.coeffs[i] * ss->x.coeffs[i];
+    }
+
+    ss->y.coeffs[0] += ss->D.coeffs[0] * ss->u.coeffs[0];
+
+    for (size_t i = 0; i < n; i++)
+    {
+        x_dot[i] = 0.0f;
+
+        // Matrix dot product: A row i * x vector
+        for (size_t j = 0; j < n; j++)
+        {
+            x_dot[i] += ss->A.data[i * n + j] * ss->x.coeffs[j];
+        }
+
+        // Vector scaling: B[i] * u[0]
+        x_dot[i] += ss->B.coeffs[i] * ss->u.coeffs[0];
+    }
+
+    for (size_t i = 0; i < n; i++)
+    {
+        ss->x.coeffs[i] = ss->x.coeffs[i] + (x_dot[i] * dt);
+    }
 }

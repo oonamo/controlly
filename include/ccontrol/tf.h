@@ -32,6 +32,7 @@ typedef struct
 
     vector_t y;
     vector_t u;
+    vector_t x;
 } StateSpace;
 
 void ControlSystem_InitHandle(ControlHandle *ctx, ControlArena *p,
@@ -65,3 +66,5 @@ TransferFunction UnityClosedLoop(ControlHandle *ctx, TransferFunction *G,
 
 StateSpace TransferFunctionToStateSpace(ControlHandle *ctx,
                                         TransferFunction *tf);
+
+void StateSpace_StepContinous(ControlHandle* ctx, StateSpace* ss, float dt);
