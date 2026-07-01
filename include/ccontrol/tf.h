@@ -2,8 +2,11 @@
 #include "matrix.h"
 #include <stdint.h>
 
-float derivative();
-float integrate();
+typedef struct
+{
+    ControlArena *persistent;
+    ControlArena *scratch;
+} ControlHandle;
 
 typedef enum
 {
@@ -22,22 +25,30 @@ typedef struct
 // Forward Declaration
 typedef struct StateSpace StateSpace;
 
-void ControlSystemInit();
+void ControlSystem_InitHandle(ControlHandle *hndl, ControlArena *p,
+                              ControlArena *s);
+void ControlSystemDeInit();
 
-control_vector_t PolyCoeffVector(float *coeffs, size_t size);
+control_vector_t PolyCoeffVector(ControlHandle *hndl, float *coeffs,
+                                 size_t size);
 int PolyCoeffVectorToStr(control_vector_t *coeffs, char var, char *buffer,
                          size_t buffer_size);
 
 TransferFunction TransferFunctionFromCoeffs(control_vector_t num,
                                             control_vector_t dem);
-int TransferFunctionToStr(TransferFunction* tf, char var, char* buffer, size_t buffer_size);
+int TransferFunctionToStr(TransferFunction *tf, char var, char *buffer,
+                          size_t buffer_size);
 
-control_vector_t ConvolveCoeffVector(Arena *arena, control_vector_t *a,
+control_vector_t MultiplyPoly(ControlHandle *hndl, control_vector_t *a,
+                              control_vector_t *b);
+control_vector_t ConvolveCoeffVector(ControlArena *arena, control_vector_t *a,
                                      control_vector_t *b);
 
-TransferFunction MultiplyTransferFunctions(TransferFunction *G1,
-                                            TransferFunction *G2);
-TransferFunction UnityClosedLoop(TransferFunction *G, float gain,
-                                            TransferFunctionUnity unity);
+TransferFunction MultiplyTransferFunctions(ControlHandle *hndl,
+                                           TransferFunction *G1,
+                                           TransferFunction *G2);
+TransferFunction UnityClosedLoop(ControlHandle *hndl, TransferFunction *G,
+                                 float gain, TransferFunctionUnity unity);
 
-StateSpace TransferFunctionToStateSpace(TransferFunction* tf);
+StateSpace TransferFunctionToStateSpace(ControlHandle *hndl,
+                                        TransferFunction *tf);

@@ -1,14 +1,24 @@
 #include <ccontrol/arena.h>
 #include <stdint.h>
 
-void ArenaInit(Arena *a, void *backing_buffer, size_t capacity)
+struct ControlArena
 {
-    a->buffer = (uint8_t *)backing_buffer;
-    a->capacity = capacity;
-    a->offset = 0;
+    uint8_t *buffer;
+    size_t capacity;
+    size_t offset;
+};
+
+ControlArena *ControlArena_Create(void *backing_buffer, size_t capacity)
+{
+    ControlArena *arena = (ControlArena *)backing_buffer;
+    arena->buffer = (uint8_t *)backing_buffer + sizeof(ControlArena);
+    arena->capacity = capacity - sizeof(ControlArena);
+    arena->offset = 0;
+
+    return arena;
 }
 
-void *ArenaAlloc(Arena *a, size_t size)
+void *ArenaAlloc(ControlArena *a, size_t size)
 {
     size_t align_size = (size + 3) & ~3;
     if (a->offset + align_size <= a->capacity)
@@ -21,4 +31,4 @@ void *ArenaAlloc(Arena *a, size_t size)
     return NULL;
 }
 
-void ArenaReset(Arena *a) { a->offset = 0; }
+void ArenaReset(ControlArena *a) { a->offset = 0; }

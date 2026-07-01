@@ -28,9 +28,12 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(unity)
 
-add_executable(test_runner test/test_main.c)
+add_executable(test_runner)
+
 target_sources(test_runner PRIVATE
   ${unity_SOURCE_DIR}/extras/fixture/src/unity_fixture.c
+  test/test_main.c
+  test/test_polymath.c
 )
 target_include_directories(test_runner PRIVATE
   ${unity_SOURCE_DIR}/extras/fixture/src

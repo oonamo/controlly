@@ -2,14 +2,9 @@
 #define _ARENA_H
 #include <stdint.h>
 
-typedef struct
-{
-    uint8_t *buffer;
-    size_t capacity;
-    size_t offset;
-} Arena;
+typedef struct ControlArena ControlArena;
 
-void ArenaInit(Arena *a, void *backing_buffer, size_t capacity);
-void *ArenaAlloc(Arena *a, size_t size);
-void ArenaReset(Arena *a);
+ControlArena *ControlArena_Create(void *backing_buffer, size_t capacity);
+void *ArenaAlloc(ControlArena *a, size_t size);
+void ArenaReset(ControlArena *a);
 #endif

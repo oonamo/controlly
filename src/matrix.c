@@ -2,7 +2,7 @@
 
 #define NULL_VECTOR (vector_t){.coeffs = NULL, .size = 0, .capacity = 0}
 
-vector_t ArenaAllocVec(Arena *a, size_t size)
+vector_t ArenaAllocVec(ControlArena *a, size_t size)
 {
     vector_t v;
     v.capacity = size;
@@ -16,7 +16,7 @@ vector_t ArenaAllocVec(Arena *a, size_t size)
     return v;
 }
 
-matrix_t ArenaAllocMatrix(Arena *a, size_t rows, size_t cols)
+matrix_t ArenaAllocMatrix(ControlArena *a, size_t rows, size_t cols)
 {
     matrix_t m;
 
@@ -34,7 +34,7 @@ matrix_t ArenaAllocMatrix(Arena *a, size_t rows, size_t cols)
     return m;
 }
 
-vector_t _CreateVectorInArena(Arena *a, size_t capacity)
+vector_t _CreateVectorInArena(ControlArena *a, size_t capacity)
 {
     vector_t v;
     v.capacity = capacity;
@@ -44,7 +44,7 @@ vector_t _CreateVectorInArena(Arena *a, size_t capacity)
     return v;
 }
 
-vector_t VectorMulMatrix(Arena *a, const matrix_t *m, const vector_t *v)
+vector_t VectorMulMatrix(ControlArena *a, const matrix_t *m, const vector_t *v)
 {
     if (!m || !v || m->cols != v->size)
     {
@@ -69,7 +69,7 @@ vector_t VectorMulMatrix(Arena *a, const matrix_t *m, const vector_t *v)
     return res;
 }
 
-vector_t VectorAdd(Arena *a, vector_t *lhs, vector_t *rhs)
+vector_t VectorAdd(ControlArena *a, vector_t *lhs, vector_t *rhs)
 {
     size_t max_size = lhs->size > rhs->size ? lhs->size : rhs->size;
 
@@ -94,7 +94,7 @@ vector_t VectorAdd(Arena *a, vector_t *lhs, vector_t *rhs)
     return res;
 }
 
-vector_t VectorScalar(Arena *a, vector_t *v, float scalar)
+vector_t VectorScalar(ControlArena *a, vector_t *v, float scalar)
 {
     vector_t res = _CreateVectorInArena(a, v->size);
     res.size = v->size;
