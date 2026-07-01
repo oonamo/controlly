@@ -3,7 +3,11 @@
 #include <unity.h>
 #include <unity_fixture.h>
 
-static void runAllTests(void) { RUN_TEST_GROUP(PolyMath); }
+static void runAllTests(void)
+{
+    RUN_TEST_GROUP(PolyMath);
+    RUN_TEST_GROUP(TransferFunction);
+}
 
 int main(int argc, const char *argv[])
 {

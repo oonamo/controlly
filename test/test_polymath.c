@@ -12,8 +12,6 @@ TEST_GROUP(PolyMath);
 static void *p_pool;
 static void *s_pool;
 static ControlHandle ctx;
-ControlArena *p;
-ControlArena *s;
 
 TEST_SETUP(PolyMath)
 {
@@ -22,7 +20,7 @@ TEST_SETUP(PolyMath)
     s_pool = malloc(sizeof(uint8_t) * MEMSIZE);
 
     ControlArena *p = ControlArena_Create(p_pool, MEMSIZE);
-    ControlArena *s = ControlArena_Create(p_pool, MEMSIZE);
+    ControlArena *s = ControlArena_Create(s_pool, MEMSIZE);
     ControlSystem_InitHandle(&ctx, p, s);
 }
 
@@ -41,8 +39,8 @@ TEST(PolyMath, PolynomialMultiplication)
     // s + 2
     float b[2] = {1, 2};
 
-    control_vector_t a_coeffs = PolyCoeffVector(&ctx, a, 3);
-    control_vector_t b_coeffs = PolyCoeffVector(&ctx, b, 2);
+    control_vector_t a_coeffs = PolyCoeffVector_Scratch(&ctx, a, 3);
+    control_vector_t b_coeffs = PolyCoeffVector_Scratch(&ctx, b, 2);
 
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(a, a_coeffs.coeffs, 3);
     TEST_ASSERT_EQUAL_size_t(3, a_coeffs.size);
@@ -63,8 +61,8 @@ TEST(PolyMath, PolynomialAdditionSameSize)
     float a[3] = {1.0f, 2.0f, 3.0f};
     float b[3] = {4.0f, 5.0f, 6.0f};
 
-    control_vector_t a_coeffs = PolyCoeffVector(&ctx, a, 3);
-    control_vector_t b_coeffs = PolyCoeffVector(&ctx, b, 3);
+    control_vector_t a_coeffs = PolyCoeffVector_Scratch(&ctx, a, 3);
+    control_vector_t b_coeffs = PolyCoeffVector_Scratch(&ctx, b, 3);
 
     control_vector_t result = AddCoeffVector(&ctx, &a_coeffs, &b_coeffs);
     float expected[] = {5.0f, 7.0f, 9.0f};
@@ -78,8 +76,8 @@ TEST(PolyMath, PolynomialAdditionDifferentSize)
     float a[3] = {1.0f, 2.0f, 3.0f};
     float b[2] = {4.0f, 5.0f};
 
-    control_vector_t a_coeffs = PolyCoeffVector(&ctx, a, 3);
-    control_vector_t b_coeffs = PolyCoeffVector(&ctx, b, 2);
+    control_vector_t a_coeffs = PolyCoeffVector_Scratch(&ctx, a, 3);
+    control_vector_t b_coeffs = PolyCoeffVector_Scratch(&ctx, b, 2);
 
     control_vector_t result = AddCoeffVector(&ctx, &a_coeffs, &b_coeffs);
 
@@ -94,8 +92,8 @@ TEST(PolyMath, RepeatedMathDoesNotOOM)
     float a[3] = {1.0f, 2.0f, 3.0f};
     float b[2] = {4.0f, 5.0f};
 
-    control_vector_t a_coeffs = PolyCoeffVector(&ctx, a, 3);
-    control_vector_t b_coeffs = PolyCoeffVector(&ctx, b, 2);
+    control_vector_t a_coeffs = PolyCoeffVector_Scratch(&ctx, a, 3);
+    control_vector_t b_coeffs = PolyCoeffVector_Scratch(&ctx, b, 2);
 
     // Loop 1000 times to ensure scratch wiping works
     for (int i = 0; i < 1000; i++)
