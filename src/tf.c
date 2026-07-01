@@ -1,7 +1,7 @@
 #include <ccontrol/arena.h>
 #include <ccontrol/matrix.h>
 #include <ccontrol/tf.h>
-#include <stdint.h>
+#include <stddef.h>
 
 #ifndef CONTROL_PRIVATE_API
 #define CONTROL_PRIVATE_API static
