@@ -49,9 +49,9 @@ TEST(StateSpace, CanConvertTransferFunction)
     float expected_D[] = {0.0f};
 
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(expected_A, sys.A.data, 4);
-    TEST_ASSERT_EQUAL_FLOAT_ARRAY(expected_B, sys.B.coeffs, 2);
-    TEST_ASSERT_EQUAL_FLOAT_ARRAY(expected_C, sys.C.coeffs, 2);
-    TEST_ASSERT_EQUAL_FLOAT_ARRAY(expected_D, sys.D.coeffs, 1);
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(expected_B, sys.B.data, 2);
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(expected_C, sys.C.data, 2);
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(expected_D, sys.D.data, 1);
 }
 
 TEST(StateSpace, ContinousRealizationWithStepResponse)

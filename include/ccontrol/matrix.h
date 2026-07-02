@@ -18,9 +18,9 @@ typedef struct
 } matrix_t;
 
 typedef matrix_t system_matrix_t;
-typedef vector_t input_matrix_t;
-typedef vector_t output_matrix_t;
-typedef vector_t feedback_matrix_t;
+typedef matrix_t input_matrix_t;
+typedef matrix_t output_matrix_t;
+typedef matrix_t feedback_matrix_t;
 
 vector_t ArenaAllocVec(ControlArena* a, size_t size);
 matrix_t ArenaAllocMatrix(ControlArena* a, size_t rows, size_t cols);

@@ -10,6 +10,9 @@ target_sources(controls
     src/tf.c
     src/arena.c
     src/matrix.c
+    src/statespace/mimo.c
+    src/statespace/siso.c
+    src/statespace/router.c
   PUBLIC
     FILE_SET HEADERS
     BASE_DIRS
@@ -18,6 +21,7 @@ target_sources(controls
       include/ccontrol/tf.h
       include/ccontrol/arena.h
       include/ccontrol/matrix.h
+      include/ccontrol/statespace.h
 )
 
 include(FetchContent)
