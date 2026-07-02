@@ -1,0 +1,98 @@
+#include <ccontrol/tf.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unity.h>
+#include <unity_fixture.h>
+
+TEST_GROUP(StateSpace);
+
+static void *p_pool;
+static void *s_pool;
+static ControlHandle ctx;
+
+TEST_SETUP(StateSpace)
+{
+    const static size_t MEMSIZE = 1024;
+    p_pool = malloc(sizeof(uint8_t) * MEMSIZE);
+    s_pool = malloc(sizeof(uint8_t) * MEMSIZE);
+
+    ControlArena *p = ControlArena_Create(p_pool, MEMSIZE);
+    ControlArena *s = ControlArena_Create(s_pool, MEMSIZE);
+    ControlSystem_InitHandle(&ctx, p, s);
+}
+
+TEST_TEAR_DOWN(StateSpace)
+{
+    ControlSystem_DeInitHandle(&ctx);
+    free(p_pool);
+    free(s_pool);
+}
+
+TEST(StateSpace, CanConvertTransferFunction)
+{
+    float n[] = {10.0f};
+    float d[] = {1.0f, 2.0f, 5.0f};
+
+    control_vector_t num = PolyCoeffVector_Persistent(&ctx, n, 1);
+    control_vector_t dem = PolyCoeffVector_Persistent(&ctx, d, 3);
+    TransferFunction tf  = TransferFunctionFromCoeffs(&num, &dem);
+
+    StateSpace sys = TransferFunctionToStateSpace(&ctx, &tf);
+
+    // 2x2 matrix
+    float expected_A[] = {0.0f, 1.0f, -5.0f, -2.0f};
+    // 2x1
+    float expected_B[] = {0.0f, 1.0f};
+    // 1x2
+    float expected_C[] = {10, 0};
+    // 1x1
+    float expected_D[] = {0.0f};
+
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(expected_A, sys.A.data, 4);
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(expected_B, sys.B.coeffs, 2);
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(expected_C, sys.C.coeffs, 2);
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(expected_D, sys.D.coeffs, 1);
+}
+
+TEST(StateSpace, ContinousRealizationWithStepResponse)
+{
+    float n[] = {10.0f};
+    float d[] = {1.0f, 2.0f, 5.0f};
+
+    control_vector_t num = PolyCoeffVector_Persistent(&ctx, n, 1);
+    control_vector_t dem = PolyCoeffVector_Persistent(&ctx, d, 3);
+    TransferFunction tf  = TransferFunctionFromCoeffs(&num, &dem);
+
+    StateSpace sys = TransferFunctionToStateSpace(&ctx, &tf);
+
+    float x_data[] = {0.0f, 0.0f}; // Initial states at 0
+    float u_data[] = {1.0f};       // Constant step input of 1.0
+    float y_data[] = {0.0f};       // Output buffer
+
+    sys.x = (vector_t){.size = 2, .capacity = 2, x_data};
+    sys.u = (vector_t){.size = 1, .capacity = 1, u_data};
+    sys.y = (vector_t){.size = 1, .capacity = 1, y_data};
+
+    float Ts = 0.1f;
+    for (int k = 0; k < 3; k++)
+    {
+        StateSpace_StepContinous(&ctx, &sys, Ts);
+    }
+
+
+    // NOTE: The y output is calculated at the BEGINNING of the 3rd tick (k=2).
+    // Therefore, y reflects the states from the end of the 2nd tick (x1 = 0.01,
+    // x2 = 0.18). y = (10 * 0.01) + (0 * 0.18) = 0.100f.
+    // Generated from MATLAB
+    float expected_x[] = {0.028f, 0.239f};
+    float expected_y[] = {0.100f};
+
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(expected_x, sys.x.coeffs, 2);
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(expected_y, sys.y.coeffs, 1);
+}
+
+TEST_GROUP_RUNNER(StateSpace)
+{
+    RUN_TEST_CASE(StateSpace, CanConvertTransferFunction);
+    RUN_TEST_CASE(StateSpace, ContinousRealizationWithStepResponse);
+}

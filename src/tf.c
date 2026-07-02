@@ -1,6 +1,7 @@
 #include <ccontrol/arena.h>
 #include <ccontrol/matrix.h>
 #include <ccontrol/tf.h>
+#include <stddef.h>
 
 #ifndef CONTROL_PRIVATE_API
 #define CONTROL_PRIVATE_API static
@@ -19,7 +20,7 @@ void ControlSystem_InitHandle(ControlHandle *ctx, ControlArena *p,
 
 void ControlSystemInit(void *persistentData, void *temporaryData) {}
 
-void ControlSystemDeInit(){}
+void ControlSystem_DeInitHandle(ControlHandle *ctx){}
 
 #define NULL_VECTOR                                                            \
     (control_vector_t) { .capacity = 0, .size = 0, .coeffs = NULL }
@@ -61,6 +62,22 @@ __PolyCoeffVector_InArena(ControlArena *a, const float *coeffs, size_t size)
     }
 
     return v;
+}
+
+control_vector_t PolyCoeffVector_Cannonicalize(const control_vector_t *v)
+{
+    control_vector_t canon = *v;
+
+    size_t i = 0;
+    while (i < v->size - 1 && v->coeffs[i] == 0.0f)
+    {
+        i++;
+    }
+
+    canon.coeffs = &v->coeffs[i];
+    canon.size = v->size - i;
+
+    return canon;
 }
 
 /**
@@ -363,7 +380,10 @@ __MultiplyTransferFunctions_InArena(ControlArena *a, TransferFunction *G1,
     control_vector_t conv_num = __MultiplyPoly_InArena(a, &G1->num, &G2->num);
     control_vector_t conv_dem = __MultiplyPoly_InArena(a, &G1->dem, &G2->dem);
 
-    return TransferFunctionFromCoeffs(&conv_num, &conv_dem);
+    control_vector_t clean_num = PolyCoeffVector_Cannonicalize(&conv_num);
+    control_vector_t clean_dem = PolyCoeffVector_Cannonicalize(&conv_dem);
+
+    return TransferFunctionFromCoeffs(&clean_num, &clean_dem);
 }
 
 TransferFunction MultiplyTransferFunctions(ControlHandle *ctx,
@@ -388,17 +408,6 @@ TransferFunction UnityClosedLoop(ControlHandle *ctx, TransferFunction *G,
     return TransferFunctionFromCoeffs(&G->num, &denom);
 }
 
-struct StateSpace
-{
-    system_matrix_t A;
-    input_matrix_t B;
-    output_matrix_t C;
-    feedback_matrix_t D;
-
-    vector_t y;
-    vector_t u;
-};
-
 // Assume matrix is strictly proper
 static system_matrix_t
 __generate_sys_matrix_InPersistent(ControlArena *persistent,
@@ -415,7 +424,7 @@ __generate_sys_matrix_InPersistent(ControlArena *persistent,
     size_t last_row_offset = (n - 1) * n;
     for (size_t i = 0; i < n; i++)
     {
-        A.data[(n - 1) * n + i] = -tf->dem.coeffs[n - 1];
+        A.data[(n - 1) * n + i] = -tf->dem.coeffs[n - i];
     }
 
     return A;
@@ -437,12 +446,46 @@ __gen_output_matrix_InPersistent(ControlArena *persistent,
 {
     size_t n = tf->dem.size - 1;
     vector_t C = ArenaAllocVec(persistent, n);
+
     size_t m = tf->num.size - 1;
-    for (int i = 0; i < m; i++)
+
+    float b0 = 0.0f;
+    if (tf->num.size == tf->dem.size)
     {
-        C.coeffs[i] = tf->num.coeffs[m - i - 1];
+        b0 = tf->num.coeffs[0];
+    }
+
+    size_t offset = n - m;
+
+    for (int i = 0; i < n; i++)
+    {
+        size_t k = n - i; // Polynomial order
+
+        float ak = tf->dem.coeffs[k];
+
+        float bk = 0.0f;
+        if (k >= offset)
+        {
+            bk = tf->num.coeffs[k - offset];
+        }
+        C.coeffs[i] = bk - ak * b0;
     }
     return C;
+}
+
+static feedback_matrix_t
+__gen_feedthrough_matrix_InPersistent(ControlArena *persistent,
+                                      const TransferFunction *tf)
+{
+    vector_t D = ArenaAllocVec(persistent, 1);
+    float b0 = 0.0f;
+    if (tf->num.size == tf->dem.size)
+    {
+        b0 = tf->num.coeffs[0];
+    }
+
+    D.coeffs[0] = b0;
+    return D;
 }
 
 StateSpace TransferFunctionToStateSpace(ControlHandle *ctx,
@@ -451,7 +494,8 @@ StateSpace TransferFunctionToStateSpace(ControlHandle *ctx,
     system_matrix_t A = __generate_sys_matrix_InPersistent(ctx->persistent, tf);
     input_matrix_t B = __gen_input_matrix_InPersistent(ctx->persistent, tf);
     output_matrix_t C = __gen_output_matrix_InPersistent(ctx->persistent, tf);
-    feedback_matrix_t D = {0};
+    feedback_matrix_t D =
+        __gen_feedthrough_matrix_InPersistent(ctx->persistent, tf);
 
     StateSpace s = {
         .A = A,
@@ -460,4 +504,44 @@ StateSpace TransferFunctionToStateSpace(ControlHandle *ctx,
         .D = D,
     };
     return s;
+}
+
+#ifndef MAX_SYSTEM_ORDER
+#define MAX_SYSTEM_ORDER 10
+#endif
+
+void StateSpace_StepContinous(ControlHandle *ctx, StateSpace *ss, float dt)
+{
+    size_t n = ss->A.rows;
+    size_t m = ss->B.size;
+    size_t p = ss->C.size;
+
+    float x_dot[MAX_SYSTEM_ORDER] = {0.0f};
+    ss->y.coeffs[0] = 0.0f;
+
+    for (size_t i = 0; i < n; i++)
+    {
+        ss->y.coeffs[0] += ss->C.coeffs[i] * ss->x.coeffs[i];
+    }
+
+    ss->y.coeffs[0] += ss->D.coeffs[0] * ss->u.coeffs[0];
+
+    for (size_t i = 0; i < n; i++)
+    {
+        x_dot[i] = 0.0f;
+
+        // Matrix dot product: A row i * x vector
+        for (size_t j = 0; j < n; j++)
+        {
+            x_dot[i] += ss->A.data[i * n + j] * ss->x.coeffs[j];
+        }
+
+        // Vector scaling: B[i] * u[0]
+        x_dot[i] += ss->B.coeffs[i] * ss->u.coeffs[0];
+    }
+
+    for (size_t i = 0; i < n; i++)
+    {
+        ss->x.coeffs[i] = ss->x.coeffs[i] + (x_dot[i] * dt);
+    }
 }
