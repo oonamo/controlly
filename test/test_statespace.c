@@ -4,6 +4,8 @@
 #include <unity.h>
 #include <unity_fixture.h>
 
+#include <ccontrol/statespace.h>
+
 TEST_GROUP(StateSpace);
 
 static void *p_pool;
@@ -35,7 +37,7 @@ TEST(StateSpace, CanConvertTransferFunction)
 
     control_vector_t num = PolyCoeffVector_Persistent(&ctx, n, 1);
     control_vector_t dem = PolyCoeffVector_Persistent(&ctx, d, 3);
-    TransferFunction tf  = TransferFunctionFromCoeffs(&num, &dem);
+    TransferFunction tf = TransferFunctionFromCoeffs(&num, &dem);
 
     StateSpace sys = TransferFunctionToStateSpace(&ctx, &tf);
 
@@ -54,14 +56,14 @@ TEST(StateSpace, CanConvertTransferFunction)
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(expected_D, sys.D.data, 1);
 }
 
-TEST(StateSpace, ContinousRealizationWithStepResponse)
+TEST(StateSpace, ContinousSISORealizationWithStepResponse)
 {
     float n[] = {10.0f};
     float d[] = {1.0f, 2.0f, 5.0f};
 
     control_vector_t num = PolyCoeffVector_Persistent(&ctx, n, 1);
     control_vector_t dem = PolyCoeffVector_Persistent(&ctx, d, 3);
-    TransferFunction tf  = TransferFunctionFromCoeffs(&num, &dem);
+    TransferFunction tf = TransferFunctionFromCoeffs(&num, &dem);
 
     StateSpace sys = TransferFunctionToStateSpace(&ctx, &tf);
 
@@ -79,7 +81,6 @@ TEST(StateSpace, ContinousRealizationWithStepResponse)
         StateSpace_StepContinous(&ctx, &sys, Ts);
     }
 
-
     // NOTE: The y output is calculated at the BEGINNING of the 3rd tick (k=2).
     // Therefore, y reflects the states from the end of the 2nd tick (x1 = 0.01,
     // x2 = 0.18). y = (10 * 0.01) + (0 * 0.18) = 0.100f.
@@ -91,8 +92,44 @@ TEST(StateSpace, ContinousRealizationWithStepResponse)
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(expected_y, sys.y.coeffs, 1);
 }
 
+TEST(StateSpace, ContinousMIMORealizationWithStepResponse)
+{
+    StateSpace sys;
+    float a_data[] = {-1.0f, 1.0f, -1.0f, -2.0f};
+    float b_data[] = {1.0f, 2.0f, 3.0f, 4.0f};
+    float c_data[] = {5.0f, 6.0f, 7.0f, 8.0f};
+    float d_data[] = {1.0f, 0.0f, 0.0f, 1.0f};
+
+    float x_data[] = {0.0f, 0.0f}; // 2 inputs
+    float u_data[] = {1.0f, 1.0f}; // 2 Constant step inputs
+    float y_data[] = {0.0f, 0.0f}; // 2 outputs
+
+    sys.x = (vector_t){.size = 2, .capacity = 2, .coeffs = x_data};
+    sys.u = (vector_t){.size = 1, .capacity = 1, .coeffs = u_data};
+    sys.y = (vector_t){.size = 1, .capacity = 1, .coeffs = y_data};
+
+    sys.A = (system_matrix_t){.data = a_data, .rows = 2, .cols = 2};
+    sys.B = (input_matrix_t){.data = b_data, .rows = 2, .cols = 2};
+    sys.C = (output_matrix_t){.data = c_data, .rows = 2, .cols = 2};
+    sys.D = (feedback_matrix_t){.data = d_data, .rows = 2, .cols = 2};
+
+    float dt = 0.1f;
+    for (int k = 0; k < 3; k++)
+    {
+        StateSpace_StepContinous(&ctx, &sys, dt);
+    }
+
+    // NOTE: The y output is calculated at the BEGINNING of the 3rd tick (k=2).
+    float expected_x[] = {0.999f, 1.620f};
+    float expected_y[] = {11.580f, 15.320f};
+
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(expected_x, sys.x.coeffs, 2);
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(expected_y, sys.y.coeffs, 2);
+}
+
 TEST_GROUP_RUNNER(StateSpace)
 {
     RUN_TEST_CASE(StateSpace, CanConvertTransferFunction);
-    RUN_TEST_CASE(StateSpace, ContinousRealizationWithStepResponse);
+    RUN_TEST_CASE(StateSpace, ContinousSISORealizationWithStepResponse);
+    RUN_TEST_CASE(StateSpace, ContinousMIMORealizationWithStepResponse);
 }

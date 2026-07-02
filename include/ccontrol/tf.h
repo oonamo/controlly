@@ -1,3 +1,5 @@
+#ifndef _TF
+#define _TF
 #include "arena.h"
 #include "matrix.h"
 #include <stddef.h>
@@ -68,3 +70,4 @@ StateSpace TransferFunctionToStateSpace(ControlHandle *ctx,
                                         TransferFunction *tf);
 
 void StateSpace_StepContinous(ControlHandle* ctx, StateSpace* ss, float dt);
+#endif
