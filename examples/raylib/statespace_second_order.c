@@ -4,6 +4,7 @@
 #include <ccontrol/statespace.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <string.h>
 
 typedef struct
 {
@@ -11,14 +12,32 @@ typedef struct
     char *name;
 } DampingProfile;
 
+#define SCREEN_WIDTH 850
+#define SCREEN_HEIGHT 450
+#define NATURAL_FREQUENCY 8.0f
+
+#define NUM_PROFILES 4
+
+static const DampingProfile profiles[NUM_PROFILES] = {
+    {0.0f, "Undamped (Marginal Stability)"},
+    {0.3f, "Undamped (Overshoot)"},
+    {1.0f, "Critically Damped"},
+    {3.0f, "Overdamped (Slow)"},
+};
+
+size_t current_profile = 1;
+
+float NextProfile(StateSpace *space);
+
 int main(void)
 {
     // 1. Raylib Initialization
-    const int screenWidth = 800;
-    const int screenHeight = 450;
+    const int screenWidth = SCREEN_WIDTH;
+    const int screenHeight = SCREEN_HEIGHT;
     InitWindow(screenWidth, screenHeight,
                "ccontrol + raylib : Mass-Spring-Damper");
     SetTargetFPS(60);
+    HideCursor();
 
     // 2. CControl Initialization
     static const size_t MEM_SIZE = 256;
@@ -32,18 +51,10 @@ int main(void)
     ControlHandle ctx;
     ControlSystem_InitHandle(&ctx, p, s);
 
-    float wn = 10.0f;
+    float wn = NATURAL_FREQUENCY;
 
-    size_t current_profile = 1;
-    size_t NUM_PROFILES = 4;
-    DampingProfile profiles[4] = {
-        {0.0f, "Undamped (Marginal Stability)"},
-        {0.5f, "Undamped (Overshoot)"},
-        {1.0f, "Critically Damped"},
-        {3.0f, "Over Damped (Slow)"},
-    };
-
-    float damping_ratio = profiles[current_profile].zeta;
+    DampingProfile profile = profiles[current_profile];
+    float damping_ratio = profile.zeta;
 
     // 3. Define Transfer Function
     // Use the Second-Order Standard Form
@@ -53,18 +64,17 @@ int main(void)
     control_vector_t num = PolyCoeffVector_Scratch(&ctx, n, 1);
     control_vector_t dem = PolyCoeffVector_Scratch(&ctx, d, 3);
 
-    // H(s) = 50 / (s^2 + 2s + 50)
     TransferFunction tf = TransferFunctionFromCoeffs(&num, &dem);
 
     // 4. State Space Representation
     StateSpace sys = TransferFunctionToStateSpace(&ctx, &tf);
 
     // StateSpace owns its data, it is safe to delete
-    // ControlArena_Clear(s);
+    ControlArena_Clear(s);
 
-    float x_data[] = {screenWidth / 2.0f, 0.0f}; // Start in middle of screen
+    float x_data[] = {100.0f / (wn * wn), 0.0f}; // Start in middle of screen
     float u_data[] = {screenWidth / 2.0f};
-    float y_data[] = {screenWidth / 2.0f};
+    float y_data[] = {100};
 
     sys.x = (vector_t){.coeffs = x_data, .size = 2};
     sys.u = (vector_t){.coeffs = u_data, .size = 1};
@@ -73,30 +83,20 @@ int main(void)
     // 5. Game Loop
     while (!WindowShouldClose())
     {
-        // --- UPDATE PHASE ---
-        if (IsKeyPressed(KEY_LEFT))
+        if (IsKeyPressed(KEY_RIGHT) || IsKeyPressed(KEY_UP))
         {
-            current_profile = (current_profile + 1) % NUM_PROFILES;
-            damping_ratio = profiles[current_profile].zeta;
-        }
-        if (IsKeyPressed(KEY_RIGHT))
-        {
-            current_profile = (current_profile - 1) % NUM_PROFILES;
-            damping_ratio = profiles[current_profile].zeta;
+            damping_ratio = NextProfile(&sys);
         }
 
-        sys.A.data[3] = -2.0f * damping_ratio * wn;
-
-        // A. Get the actual time elapsed
         float dt = GetFrameTime();
 
-        // Set input data to be the mouse position
+#ifndef CCONTROL_EXAMPLE_SHOWCASE
         sys.u.coeffs[0] = (float)GetMouseX();
+#endif
 
         // C. Iterate over the system
         StateSpace_StepContinous(&ctx, &sys, dt);
 
-        // --- DRAW PHASE ---
         BeginDrawing();
         ClearBackground(RAYWHITE);
 
@@ -110,7 +110,7 @@ int main(void)
         DrawText("System Output", actual_x - 50, screenHeight / 2 + 30, 20,
                  MAROON);
 
-        DrawText("Use Left/Right Arrows to change the physical system", 10,
+        DrawText("Use Up/Right Arrows to change the physical system", 10,
                  screenHeight - 80, 20, GRAY);
 
         DrawText(TextFormat("Mode: %s", profiles[current_profile].name), 10,
@@ -129,4 +129,24 @@ int main(void)
     free(persistent_mem);
 
     return 0;
+}
+
+float NextProfile(StateSpace *sys)
+{
+    current_profile = (current_profile + 1) % NUM_PROFILES;
+    DampingProfile p = profiles[current_profile];
+    float damping_ratio = p.zeta;
+
+    sys->x.coeffs[0] = 100.0f / (NATURAL_FREQUENCY * NATURAL_FREQUENCY);
+    sys->x.coeffs[1] = 0.0f;
+
+    sys->u.coeffs[0] = SCREEN_WIDTH / 2.0f;
+    sys->y.coeffs[0] = 100.0f;
+
+    // sys->A.data[3] = -(wn * wn);
+    sys->A.data[3] = -2.0f * damping_ratio * NATURAL_FREQUENCY;
+
+    // sys->C.data[1] = wn * wn;
+
+    return damping_ratio;
 }

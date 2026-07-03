@@ -8,7 +8,12 @@ FetchContent_Declare(
     FIND_PACKAGE_ARGS
 )
 
+
 FetchContent_MakeAvailable(raylib)
 add_executable(example_ss_second_order statespace_second_order.c)
+
+if(CCONTROL_AS_SHOWCASE)
+  target_compile_definitions(example_ss_second_order PRIVATE CCONTROL_EXAMPLE_SHOWCASE)
+endif()
 
 target_link_libraries(example_ss_second_order PRIVATE controls raylib)
