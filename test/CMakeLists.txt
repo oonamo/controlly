@@ -44,5 +44,4 @@ target_include_directories(test_runner PRIVATE
 
 target_compile_definitions(test_runner PRIVATE UNITY_FIXTURE_NO_EXTRAS)
 target_link_libraries(test_runner PRIVATE controls unity)
-enable_testing()
 add_test(NAME UnitTests COMMAND test_runner)
