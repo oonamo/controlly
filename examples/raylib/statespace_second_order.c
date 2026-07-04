@@ -6,6 +6,10 @@
 #include <stdlib.h>
 #include <string.h>
 
+#if defined(PLATFORM_WEB)
+#include <emscripten/emscripten.h>
+#endif
+
 typedef struct
 {
     float zeta;
@@ -26,7 +30,11 @@ static const DampingProfile profiles[NUM_PROFILES] = {
 };
 
 size_t current_profile = 1;
+float damping_ratio;
+StateSpace sys;
+ControlHandle ctx;
 
+void UpdateDrawFrame(void);
 float NextProfile(StateSpace *space);
 
 int main(void)
@@ -48,13 +56,12 @@ int main(void)
     ControlArena *s = ControlArena_Create(scratch_mem, MEM_SIZE);
     ControlArena *p = ControlArena_Create(persistent_mem, MEM_SIZE);
 
-    ControlHandle ctx;
     ControlSystem_InitHandle(&ctx, p, s);
 
     float wn = NATURAL_FREQUENCY;
 
     DampingProfile profile = profiles[current_profile];
-    float damping_ratio = profile.zeta;
+    damping_ratio = profile.zeta;
 
     // 3. Define Transfer Function
     // Use the Second-Order Standard Form
@@ -67,7 +74,7 @@ int main(void)
     TransferFunction tf = TransferFunctionFromCoeffs(&num, &dem);
 
     // 4. State Space Representation
-    StateSpace sys = TransferFunctionToStateSpace(&ctx, &tf);
+    sys = TransferFunctionToStateSpace(&ctx, &tf);
 
     // StateSpace owns its data, it is safe to delete
     ControlArena_Clear(s);
@@ -81,45 +88,15 @@ int main(void)
     sys.y = (vector_t){.coeffs = y_data, .size = 1};
 
     // 5. Game Loop
+#ifdef PLATFORM_WEB
+    emscripten_set_main_loop(UpdateDrawFrame, 0, 1);
+#else
+
     while (!WindowShouldClose())
     {
-        if (IsKeyPressed(KEY_RIGHT) || IsKeyPressed(KEY_UP))
-        {
-            damping_ratio = NextProfile(&sys);
-        }
-
-        float dt = GetFrameTime();
-
-#ifndef CCONTROL_EXAMPLE_SHOWCASE
-        sys.u.coeffs[0] = (float)GetMouseX();
-#endif
-
-        // C. Iterate over the system
-        StateSpace_StepContinous(&ctx, &sys, dt);
-
-        BeginDrawing();
-        ClearBackground(RAYWHITE);
-
-        int target_x = (int)sys.u.coeffs[0];
-        int actual_x = (int)sys.y.coeffs[0];
-
-        DrawLine(target_x, 0, target_x, screenHeight, LIGHTGRAY);
-        DrawText("Target (Mouse)", target_x + 5, 10, 20, GRAY);
-
-        DrawRectangle(actual_x - 20, screenHeight / 2 - 20, 40, 40, MAROON);
-        DrawText("System Output", actual_x - 50, screenHeight / 2 + 30, 20,
-                 MAROON);
-
-        DrawText("Use Up/Right Arrows to change the physical system", 10,
-                 screenHeight - 80, 20, GRAY);
-
-        DrawText(TextFormat("Mode: %s", profiles[current_profile].name), 10,
-                 screenHeight - 50, 20, DARKBLUE);
-        DrawText(TextFormat("Damping Ratio (Zeta): %.2f",
-                            profiles[current_profile].zeta),
-                 10, screenHeight - 25, 20, DARKGRAY);
-        EndDrawing();
+        UpdateDrawFrame();
     }
+#endif
 
     // 6. Cleanup
     CloseWindow();
@@ -129,6 +106,46 @@ int main(void)
     free(persistent_mem);
 
     return 0;
+}
+
+void UpdateDrawFrame()
+{
+    if (IsKeyPressed(KEY_RIGHT) || IsKeyPressed(KEY_UP))
+    {
+        damping_ratio = NextProfile(&sys);
+    }
+
+    float dt = GetFrameTime();
+
+#ifndef CCONTROL_EXAMPLE_SHOWCASE
+    sys.u.coeffs[0] = (float)GetMouseX();
+#endif
+
+    // C. Iterate over the system
+    StateSpace_StepContinous(&ctx, &sys, dt);
+
+    BeginDrawing();
+    ClearBackground(RAYWHITE);
+
+    int target_x = (int)sys.u.coeffs[0];
+    int actual_x = (int)sys.y.coeffs[0];
+
+    DrawLine(target_x, 0, target_x, SCREEN_HEIGHT, LIGHTGRAY);
+    DrawText("Target (Mouse)", target_x + 5, 10, 20, GRAY);
+
+    DrawRectangle(actual_x - 20, SCREEN_HEIGHT / 2 - 20, 40, 40, MAROON);
+    DrawText("System Output", actual_x - 50, SCREEN_HEIGHT / 2 + 30, 20,
+             MAROON);
+
+    DrawText("Use Up/Right Arrows to change the physical system", 10,
+             SCREEN_HEIGHT - 80, 20, GRAY);
+
+    DrawText(TextFormat("Mode: %s", profiles[current_profile].name), 10,
+             SCREEN_HEIGHT - 50, 20, DARKBLUE);
+    DrawText(TextFormat("Damping Ratio (Zeta): %.2f",
+                        profiles[current_profile].zeta),
+             10, SCREEN_HEIGHT - 25, 20, DARKGRAY);
+    EndDrawing();
 }
 
 float NextProfile(StateSpace *sys)
