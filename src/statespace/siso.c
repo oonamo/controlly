@@ -13,7 +13,6 @@ __generate_sys_matrix_InPersistent(ControlArena *persistent,
         A.data[i * n + (i + 1)] = 1;
     }
 
-    size_t last_row_offset = (n - 1) * n;
     for (size_t i = 0; i < n; i++)
     {
         A.data[(n - 1) * n + i] = -tf->dem.coeffs[n - i];
@@ -49,7 +48,7 @@ __gen_output_matrix_InPersistent(ControlArena *persistent,
 
     size_t offset = n - m;
 
-    for (int i = 0; i < n; i++)
+    for (size_t i = 0; i < n; i++)
     {
         size_t k = n - i; // Polynomial order
 
@@ -102,7 +101,7 @@ StateSpace TransferFunctionToStateSpace(ControlHandle *ctx,
 #define MAX_SYSTEM_ORDER 10
 #endif
 
-void __StateSpace_StepSISO(ControlHandle *ctx, StateSpace *ss, float dt)
+void __StateSpace_StepSISO( StateSpace *ss, float dt)
 {
     size_t n = ss->A.rows;
 
@@ -142,39 +141,3 @@ void __StateSpace_StepSISO(ControlHandle *ctx, StateSpace *ss, float dt)
         ss->x.coeffs[i] += x_dot[i] * dt;
     }
 }
-
-// void StateSpace_StepContinous(ControlHandle *ctx, StateSpace *ss, float dt)
-// {
-//     size_t n = ss->A.rows;
-//     size_t m = ss->B.size;
-//     size_t p = ss->C.size;
-//
-//     float x_dot[MAX_SYSTEM_ORDER] = {0.0f};
-//     ss->y.coeffs[0] = 0.0f;
-//
-//     for (size_t i = 0; i < n; i++)
-//     {
-//         ss->y.coeffs[0] += ss->C.coeffs[i] * ss->x.coeffs[i];
-//     }
-//
-//     ss->y.coeffs[0] += ss->D.coeffs[0] * ss->u.coeffs[0];
-//
-//     for (size_t i = 0; i < n; i++)
-//     {
-//         x_dot[i] = 0.0f;
-//
-//         // Matrix dot product: A row i * x vector
-//         for (size_t j = 0; j < n; j++)
-//         {
-//             x_dot[i] += ss->A.data[i * n + j] * ss->x.coeffs[j];
-//         }
-//
-//         // Vector scaling: B[i] * u[0]
-//         x_dot[i] += ss->B.coeffs[i] * ss->u.coeffs[0];
-//     }
-//
-//     for (size_t i = 0; i < n; i++)
-//     {
-//         ss->x.coeffs[i] = ss->x.coeffs[i] + (x_dot[i] * dt);
-//     }
-// }

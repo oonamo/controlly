@@ -1,3 +1,4 @@
+#include "internal_common.h"
 #include <ccontrol/arena.h>
 #include <stdint.h>
 
@@ -22,7 +23,7 @@ void ControlArena_Clear(ControlArena *arena) { arena->offset = 0; }
 
 void *ArenaAlloc(ControlArena *a, size_t size)
 {
-    size_t align_size = (size + 3) & ~3;
+    size_t align_size = ALIGN_UP(size, CCONTROL_ARENA_ALIGN_SIZE);
     if (a->offset + align_size <= a->capacity)
     {
         void *ptr = &a->buffer[a->offset];

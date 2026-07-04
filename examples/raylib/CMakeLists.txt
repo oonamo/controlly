@@ -12,6 +12,8 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(raylib)
 add_executable(example_ss_second_order statespace_second_order.c)
 
+target_compile_options(example_ss_second_order PRIVATE ${RELAXED_WARNINGS})
+
 if(CCONTROL_AS_SHOWCASE)
   target_compile_definitions(example_ss_second_order PRIVATE CCONTROL_EXAMPLE_SHOWCASE)
 endif()
@@ -23,7 +25,7 @@ if(EMSCRIPTEN)
 
     target_link_options(example_ss_second_order PRIVATE
         "-sUSE_GLFW=3"
-        #"-sASSERTIONS=1"
+        "-sASSERTIONS=1"
         "-sWASM=1"
         "-sASYNCIFY"
         "-sGL_ENABLE_GET_PROC_ADDRESS"

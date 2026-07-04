@@ -5,7 +5,7 @@
 #define MAX_SYSTEM_ORDER 10
 #endif
 
-void __StateSpace_StepMIMO(ControlHandle *ctx, StateSpace *ss, float dt)
+void __StateSpace_StepMIMO( StateSpace *ss, float dt)
 {
     size_t n = ss->A.rows; // num states  (n x n)
     size_t m = ss->B.cols; // num inputs  (n x m)

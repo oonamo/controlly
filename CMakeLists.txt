@@ -3,6 +3,25 @@ project(controlly C)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+if(MSVC)
+  set(STRICT_WARNINGS "/W4" "/WX") # Level 4, Treat as Error
+  set(RELAXED_WARNINGS "/W3")      # Level 3, ignore third-party noise
+else()
+  set(STRICT_WARNINGS
+    "-Wall"
+    "-Wextra"
+    "-Wpedantic"
+    "-Werror"
+    "-Wconversion"
+    "-Werror=implicit-function-declaration"
+    "-fno-strict-aliasing"
+  )
+  set(RELAXED_WARNINGS
+    "-Wall"
+    "-Wextra"
+  )
+endif()
+
 add_subdirectory(src)
 
 option(CCONTROL_BUILD_EXAMPLES "Build example applications" OFF)

@@ -1,5 +1,7 @@
 add_library(controls STATIC)
 
+target_compile_options(controls PRIVATE ${STRICT_WARNINGS})
+
 target_sources(controls
   PRIVATE
     tf.c
