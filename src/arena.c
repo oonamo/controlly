@@ -21,6 +21,16 @@ ControlArena *ControlArena_Create(void *backing_buffer, size_t capacity)
 
 void ControlArena_Clear(ControlArena *arena) { arena->offset = 0; }
 
+size_t ControlArena_RemainingSpace(ControlArena *arena)
+{
+    if (!arena)
+    {
+        return 0;
+    }
+
+    return arena->capacity - arena->offset;
+}
+
 void *ArenaAlloc(ControlArena *a, size_t size)
 {
     size_t align_size = ALIGN_UP(size, CCONTROL_ARENA_ALIGN_SIZE);

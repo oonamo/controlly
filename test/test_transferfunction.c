@@ -1,3 +1,5 @@
+#include "ccontrol/arena.h"
+#include <ccontrol/core.h>
 #include <ccontrol/tf.h>
 #include <stdlib.h>
 #include <unity.h>
@@ -8,6 +10,13 @@ TEST_GROUP(TransferFunction);
 static void *p_pool;
 static void *s_pool;
 static ControlHandle ctx;
+static ControlResult last_error_code = CCONTROL_OK;
+
+static void MockErrorHandler(ControlResult code, const char *msg,
+                             void *userdata)
+{
+    last_error_code = code;
+}
 
 TEST_SETUP(TransferFunction)
 {
@@ -18,6 +27,9 @@ TEST_SETUP(TransferFunction)
     ControlArena *p = ControlArena_Create(p_pool, MEMSIZE);
     ControlArena *s = ControlArena_Create(s_pool, MEMSIZE);
     ControlSystem_InitHandle(&ctx, p, s);
+
+    last_error_code = CCONTROL_OK;
+    ctx.on_error = MockErrorHandler;
 }
 
 TEST_TEAR_DOWN(TransferFunction)
@@ -91,9 +103,51 @@ TEST(TransferFunction, UnityClosedLoopReduction)
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(expected_dem, T.dem.coeffs, 2);
 }
 
+TEST(TransferFunction, IsValidDetectsEmptyTransferFunction)
+{
+    TransferFunction empty = CCONTROL_EMPTY_TF;
+    TEST_ASSERT_FALSE(TransferFunction_IsValid(&empty));
+}
+
+TEST(TransferFunction, MultiplyInvalidTransferFunctionErrorsInvalidArgument)
+{
+    float n[] = {1.0f};
+    float d[] = {1.0f};
+    control_vector_t num = PolyCoeffVector_Persistent(&ctx, n, 1);
+    control_vector_t dem = PolyCoeffVector_Persistent(&ctx, d, 1);
+
+    TransferFunction G1 = TransferFunctionFromCoeffs(&num, &dem);
+    TransferFunction G2 = CCONTROL_EMPTY_TF;
+
+    TransferFunction result = MultiplyTransferFunctions(&ctx, &G1, &G2);
+
+    TEST_ASSERT_FALSE(TransferFunction_IsValid(&result));
+    TEST_ASSERT_EQUAL_INT(last_error_code, CCONTROL_ERROR_INVALID_ARGUMENT);
+}
+
+TEST(TransferFunction, MultiplyOutOfMemorySafelyAbortsAndThrows)
+{
+    float n[] = {1.0f};
+    float d[] = {1.0f};
+    control_vector_t num = PolyCoeffVector_Persistent(&ctx, n, 1);
+    control_vector_t dem = PolyCoeffVector_Persistent(&ctx, d, 1);
+
+    TransferFunction G1 = TransferFunctionFromCoeffs(&num, &dem);
+    TransferFunction G2 = TransferFunctionFromCoeffs(&num, &dem);
+
+    size_t space_left = ControlArena_RemainingSpace(ctx.persistent);
+    ArenaAlloc(ctx.persistent, space_left);
+
+    TransferFunction result = MultiplyTransferFunctions(&ctx, &G1, &G2);
+    TEST_ASSERT_FALSE(TransferFunction_IsValid(&result));
+    TEST_ASSERT_EQUAL_INT(last_error_code, CCONTROL_ERROR_OUT_OF_MEMORY);
+}
+
 TEST_GROUP_RUNNER(TransferFunction)
 {
     RUN_TEST_CASE(TransferFunction, CanCreateTransferFunctionFromCoefficients);
     RUN_TEST_CASE(TransferFunction, MultiplyTwoTransferFunctions);
     RUN_TEST_CASE(TransferFunction, UnityClosedLoopReduction);
+    RUN_TEST_CASE(TransferFunction, IsValidDetectsEmptyTransferFunction);
+    RUN_TEST_CASE(TransferFunction, MultiplyInvalidTransferFunctionErrorsInvalidArgument);
 }

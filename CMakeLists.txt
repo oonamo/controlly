@@ -15,6 +15,7 @@ else()
     "-Wconversion"
     "-Werror=implicit-function-declaration"
     "-fno-strict-aliasing"
+    "-Wnull-dereference"
   )
   set(RELAXED_WARNINGS
     "-Wall"
