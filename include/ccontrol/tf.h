@@ -1,15 +1,10 @@
 #ifndef _TF
 #define _TF
-#include "arena.h"
+#include "core.h"
 #include "matrix.h"
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
-
-typedef struct
-{
-    ControlArena *persistent;
-    ControlArena *scratch;
-} ControlHandle;
 
 typedef enum
 {
@@ -25,17 +20,7 @@ typedef struct
     control_vector_t dem;
 } TransferFunction;
 
-typedef struct
-{
-    system_matrix_t A;
-    input_matrix_t B;
-    output_matrix_t C;
-    feedback_matrix_t D;
-
-    vector_t y;
-    vector_t u;
-    vector_t x;
-} StateSpace;
+#define CCONTROL_EMPTY_TF ((TransferFunction){0})
 
 void ControlSystem_InitHandle(ControlHandle *ctx, ControlArena *p,
                               ControlArena *s);
@@ -66,8 +51,6 @@ TransferFunction MultiplyTransferFunctions(ControlHandle *ctx,
 TransferFunction UnityClosedLoop(ControlHandle *ctx, TransferFunction *G,
                                  float gain, TransferFunctionUnity unity);
 
-StateSpace TransferFunctionToStateSpace(ControlHandle *ctx,
-                                        TransferFunction *tf);
+bool TransferFunction_IsValid(TransferFunction *tf);
 
-void StateSpace_StepContinous(ControlHandle* ctx, StateSpace* ss, float dt);
 #endif
