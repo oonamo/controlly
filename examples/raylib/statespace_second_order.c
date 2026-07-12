@@ -53,10 +53,10 @@ int main(void)
     void *scratch_mem = malloc(sizeof(uint8_t) * MEM_SIZE);
     void *persistent_mem = malloc(sizeof(uint8_t) * MEM_SIZE);
 
-    ControlArena *s = ControlArena_Create(scratch_mem, MEM_SIZE);
-    ControlArena *p = ControlArena_Create(persistent_mem, MEM_SIZE);
+    ControlArena *s = Control_Arena_Create(scratch_mem, MEM_SIZE);
+    ControlArena *p = Control_Arena_Create(persistent_mem, MEM_SIZE);
 
-    ControlSystem_InitHandle(&ctx, p, s);
+    Control_System_Init(&ctx, p, s);
 
     float wn = NATURAL_FREQUENCY;
 
@@ -68,16 +68,16 @@ int main(void)
     float n[] = {wn * wn};
     float d[] = {1.0f, 2 * damping_ratio * wn, wn * wn};
 
-    control_vector_t num = PolyCoeffVector_Scratch(&ctx, n, 1);
-    control_vector_t dem = PolyCoeffVector_Scratch(&ctx, d, 3);
+    control_vector_t num = Control_Poly_AllocScratch(&ctx, n, 1);
+    control_vector_t dem = Control_Poly_AllocScratch(&ctx, d, 3);
 
-    TransferFunction tf = TransferFunctionFromCoeffs(&num, &dem);
+    TransferFunction tf = Control_TF_FromPoly(&num, &dem);
 
     // 4. State Space Representation
-    sys = TransferFunctionToStateSpace(&ctx, &tf);
+    sys = Control_StateSpace_FromTF(&ctx, &tf);
 
     // StateSpace owns its data, it is safe to delete
-    ControlArena_Clear(s);
+    Control_Arena_Clear(s);
 
     float x_data[] = {100.0f / (wn * wn), 0.0f}; // Start in middle of screen
     float u_data[] = {screenWidth / 2.0f};
@@ -101,7 +101,7 @@ int main(void)
     // 6. Cleanup
     CloseWindow();
 
-    ControlSystem_DeInitHandle(&ctx);
+    Control_System_DeInit(&ctx);
     free(scratch_mem);
     free(persistent_mem);
 
@@ -122,7 +122,7 @@ void UpdateDrawFrame()
 #endif
 
     // C. Iterate over the system
-    StateSpace_StepContinous(&ctx, &sys, dt);
+    Control_StateSpace_StepContinous(&ctx, &sys, dt);
 
     BeginDrawing();
     ClearBackground(RAYWHITE);

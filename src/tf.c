@@ -14,24 +14,24 @@
 #endif
 
 #define REQUIRE_VALID_VEC(ctx, vec_ptr, msg)                                   \
-    CCONTROL_REQUIRE(ctx, Vector_IsValid(vec_ptr),                             \
+    CCONTROL_REQUIRE(ctx, Control_Vec_IsValid(vec_ptr),                             \
                      CCONTROL_ERROR_OUT_OF_MEMORY, msg, CCONTROL_EMPTY_VEC)
 
 #define REQUIRE_VALID_TF(ctx, tf_ptr, code, msg)                               \
-    CCONTROL_REQUIRE(ctx, TransferFunction_IsValid(tf_ptr), code, msg,         \
+    CCONTROL_REQUIRE(ctx, Control_TF_IsValid(tf_ptr), code, msg,         \
                      CCONTROL_EMPTY_TF)
 
-void ControlSystem_InitHandle(ControlHandle *ctx, ControlArena *p,
+void Control_System_Init(ControlHandle *ctx, ControlArena *p,
                               ControlArena *s)
 {
     ctx->persistent = p;
     ctx->scratch = s;
 }
 
-void ControlSystem_DeInitHandle(ControlHandle *ctx)
+void Control_System_DeInit(ControlHandle *ctx)
 {
-    ControlArena_Clear(ctx->scratch);
-    ControlArena_Clear(ctx->persistent);
+    Control_Arena_Clear(ctx->scratch);
+    Control_Arena_Clear(ctx->persistent);
 }
 
 CONTROL_PRIVATE_API control_vector_t __CreateVectorInArena(ControlArena *a,
@@ -42,8 +42,8 @@ CONTROL_PRIVATE_API control_vector_t __CreateVectorInArena(ControlArena *a,
     v.size = 0;
     v.coeffs = NULL;
 
-    v.coeffs = (float *)ArenaAlloc(a, capacity * sizeof(float));
-    if (!Vector_IsValid(&v))
+    v.coeffs = (float *)Control_Arena_Alloc(a, capacity * sizeof(float));
+    if (!Control_Vec_IsValid(&v))
     {
         return CCONTROL_EMPTY_VEC;
     }
@@ -61,7 +61,7 @@ __PolyCoeffVector_InArena(ControlArena *a, const float *coeffs, size_t size)
     }
 
     control_vector_t v = __CreateVectorInArena(a, size);
-    if (!Vector_IsValid(&v))
+    if (!Control_Vec_IsValid(&v))
     {
         return CCONTROL_EMPTY_VEC;
     }
@@ -76,7 +76,7 @@ __PolyCoeffVector_InArena(ControlArena *a, const float *coeffs, size_t size)
     return v;
 }
 
-control_vector_t PolyCoeffVector_Cannonicalize(const control_vector_t *v)
+control_vector_t Control_Poly_Canonicalize(const control_vector_t *v)
 {
     control_vector_t canon = *v;
 
@@ -99,7 +99,7 @@ control_vector_t PolyCoeffVector_Cannonicalize(const control_vector_t *v)
  * @param size size of coefficients
  * @return Vector representation
  */
-control_vector_t PolyCoeffVector_Scratch(ControlHandle *ctx,
+control_vector_t Control_Poly_AllocScratch(ControlHandle *ctx,
                                          const float *coeffs, size_t size)
 {
     control_vector_t v = __PolyCoeffVector_InArena(ctx->scratch, coeffs, size);
@@ -108,7 +108,7 @@ control_vector_t PolyCoeffVector_Scratch(ControlHandle *ctx,
     return v;
 }
 
-control_vector_t PolyCoeffVector_Persistent(ControlHandle *ctx,
+control_vector_t Control_Poly_AllocPersistent(ControlHandle *ctx,
                                             const float *coeffs, size_t size)
 {
     control_vector_t v =
@@ -124,7 +124,7 @@ static control_vector_t __PolyCoeffAdd_InArena(ControlArena *arena,
 {
     size_t max_size = a->size > b->size ? a->size : b->size;
     control_vector_t vec = __CreateVectorInArena(arena, max_size);
-    if (!Vector_IsValid(&vec))
+    if (!Control_Vec_IsValid(&vec))
     {
         return vec;
     }
@@ -151,7 +151,7 @@ static control_vector_t __PolyCoeffAdd_InArena(ControlArena *arena,
     return vec;
 }
 
-control_vector_t AddCoeffVector(ControlHandle *ctx, const control_vector_t *a,
+control_vector_t Control_Poly_Add(ControlHandle *ctx, const control_vector_t *a,
                                 const control_vector_t *b)
 {
     control_vector_t v = __PolyCoeffAdd_InArena(ctx->scratch, a, b);
@@ -166,14 +166,14 @@ static control_vector_t __MultiplyPoly_InArena(ControlArena *arena,
                                                control_vector_t *a,
                                                control_vector_t *b)
 {
-    if (!Vector_IsValid(a) || !Vector_IsValid(b))
+    if (!Control_Vec_IsValid(a) || !Control_Vec_IsValid(b))
     {
         return CCONTROL_EMPTY_VEC;
     }
     size_t new_size = a->size + b->size - 1;
 
     control_vector_t result = __CreateVectorInArena(arena, new_size);
-    if (!Vector_IsValid(&result))
+    if (!Control_Vec_IsValid(&result))
     {
         return CCONTROL_EMPTY_VEC;
     }
@@ -196,7 +196,7 @@ static control_vector_t __MultiplyPoly_InArena(ControlArena *arena,
     return result;
 }
 
-control_vector_t MultiplyPoly(ControlHandle *ctx, control_vector_t *a,
+control_vector_t Control_Poly_Multiply(ControlHandle *ctx, control_vector_t *a,
                               control_vector_t *b)
 {
     control_vector_t v = __MultiplyPoly_InArena(ctx->scratch, a, b);
@@ -205,7 +205,7 @@ control_vector_t MultiplyPoly(ControlHandle *ctx, control_vector_t *a,
     return v;
 }
 
-TransferFunction TransferFunctionFromCoeffs(const control_vector_t *num,
+TransferFunction Control_TF_FromPoly(const control_vector_t *num,
                                             const control_vector_t *dem)
 {
     TransferFunction G = {
@@ -220,24 +220,24 @@ __MultiplyTransferFunctions_InArena(ControlArena *a, TransferFunction *G1,
                                     TransferFunction *G2)
 {
     control_vector_t conv_num = __MultiplyPoly_InArena(a, &G1->num, &G2->num);
-    if (!Vector_IsValid(&conv_num))
+    if (!Control_Vec_IsValid(&conv_num))
     {
         return CCONTROL_EMPTY_TF;
     }
 
     control_vector_t conv_dem = __MultiplyPoly_InArena(a, &G1->dem, &G2->dem);
-    if (!Vector_IsValid(&conv_dem))
+    if (!Control_Vec_IsValid(&conv_dem))
     {
         return CCONTROL_EMPTY_TF;
     }
 
-    control_vector_t clean_num = PolyCoeffVector_Cannonicalize(&conv_num);
-    control_vector_t clean_dem = PolyCoeffVector_Cannonicalize(&conv_dem);
+    control_vector_t clean_num = Control_Poly_Canonicalize(&conv_num);
+    control_vector_t clean_dem = Control_Poly_Canonicalize(&conv_dem);
 
-    return TransferFunctionFromCoeffs(&clean_num, &clean_dem);
+    return Control_TF_FromPoly(&clean_num, &clean_dem);
 }
 
-TransferFunction MultiplyTransferFunctions(ControlHandle *ctx,
+TransferFunction Control_TF_Multiply(ControlHandle *ctx,
                                            TransferFunction *G1,
                                            TransferFunction *G2)
 {
@@ -253,12 +253,12 @@ TransferFunction MultiplyTransferFunctions(ControlHandle *ctx,
     return tf;
 }
 
-inline bool TransferFunction_IsValid(TransferFunction *tf)
+inline bool Control_TF_IsValid(TransferFunction *tf)
 {
     return tf != NULL && tf->num.coeffs != NULL && tf->dem.coeffs != NULL;
 }
 
-TransferFunction UnityClosedLoop(ControlHandle *ctx, TransferFunction *G,
+TransferFunction Control_TF_ClosedLoop(ControlHandle *ctx, TransferFunction *G,
                                  float gain, TransferFunctionUnity unity)
 {
     REQUIRE_VALID_TF(ctx, G, CCONTROL_ERROR_DIVIDE_BY_ZERO,
@@ -280,7 +280,7 @@ TransferFunction UnityClosedLoop(ControlHandle *ctx, TransferFunction *G,
     {
         scaled_num = __CreateVectorInArena(ctx->scratch, G->num.size);
         CCONTROL_REQUIRE(
-            ctx, Vector_IsValid(&scaled_num), CCONTROL_ERROR_OUT_OF_MEMORY,
+            ctx, Control_Vec_IsValid(&scaled_num), CCONTROL_ERROR_OUT_OF_MEMORY,
             "Failed to allocate vector in scratch arena", CCONTROL_EMPTY_TF);
 
         for (size_t i = 0; i < G->num.size; i++)
@@ -295,7 +295,7 @@ TransferFunction UnityClosedLoop(ControlHandle *ctx, TransferFunction *G,
 
     control_vector_t denom =
         __PolyCoeffAdd_InArena(ctx->scratch, &G->dem, &scaled_num);
-    if (!Vector_IsValid(&denom))
+    if (!Control_Vec_IsValid(&denom))
     {
         CCONTROL_THROW(ctx, CCONTROL_ERROR_OUT_OF_MEMORY,
                        "Could not allocate vector for polynomial addition for "
@@ -303,5 +303,5 @@ TransferFunction UnityClosedLoop(ControlHandle *ctx, TransferFunction *G,
         return CCONTROL_EMPTY_TF;
     }
 
-    return TransferFunctionFromCoeffs(&G->num, &denom);
+    return Control_TF_FromPoly(&G->num, &denom);
 }

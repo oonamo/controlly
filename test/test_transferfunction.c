@@ -24,9 +24,9 @@ TEST_SETUP(TransferFunction)
     p_pool = malloc(sizeof(uint8_t) * MEMSIZE);
     s_pool = malloc(sizeof(uint8_t) * MEMSIZE);
 
-    ControlArena *p = ControlArena_Create(p_pool, MEMSIZE);
-    ControlArena *s = ControlArena_Create(s_pool, MEMSIZE);
-    ControlSystem_InitHandle(&ctx, p, s);
+    ControlArena *p = Control_Arena_Create(p_pool, MEMSIZE);
+    ControlArena *s = Control_Arena_Create(s_pool, MEMSIZE);
+    Control_System_Init(&ctx, p, s);
 
     last_error_code = CCONTROL_OK;
     ctx.on_error = MockErrorHandler;
@@ -34,7 +34,7 @@ TEST_SETUP(TransferFunction)
 
 TEST_TEAR_DOWN(TransferFunction)
 {
-    ControlSystem_DeInitHandle(&ctx);
+    Control_System_DeInit(&ctx);
     free(p_pool);
     free(s_pool);
 }
@@ -45,9 +45,9 @@ TEST(TransferFunction, CanCreateTransferFunctionFromCoefficients)
     float n_val[] = {2.0f, 3.0f};
     float d_val[] = {1.0f, 4.0f, 5.0f};
 
-    control_vector_t num = PolyCoeffVector_Persistent(&ctx, n_val, 2);
-    control_vector_t dem = PolyCoeffVector_Persistent(&ctx, d_val, 3);
-    TransferFunction tf = TransferFunctionFromCoeffs(&num, &dem);
+    control_vector_t num = Control_Poly_AllocPersistent(&ctx, n_val, 2);
+    control_vector_t dem = Control_Poly_AllocPersistent(&ctx, d_val, 3);
+    TransferFunction tf = Control_TF_FromPoly(&num, &dem);
 
     TEST_ASSERT_EQUAL_size_t(2, tf.num.size);
     TEST_ASSERT_EQUAL_size_t(3, tf.dem.size);
@@ -61,19 +61,19 @@ TEST(TransferFunction, MultiplyTwoTransferFunctions)
     // G1(s) = 1 / (s + 2)
     float n1[] = {1.0f};
     float d1[] = {1.0f, 2.0f};
-    control_vector_t num1 = PolyCoeffVector_Persistent(&ctx, n1, 1);
-    control_vector_t dem1 = PolyCoeffVector_Persistent(&ctx, d1, 2);
-    TransferFunction G1 = TransferFunctionFromCoeffs(&num1, &dem1);
+    control_vector_t num1 = Control_Poly_AllocPersistent(&ctx, n1, 1);
+    control_vector_t dem1 = Control_Poly_AllocPersistent(&ctx, d1, 2);
+    TransferFunction G1 = Control_TF_FromPoly(&num1, &dem1);
 
     // G2(s) = 2 / (s + 3)
     float n2[] = {2.0f};
     float d2[] = {1.0f, 3.0f};
-    control_vector_t num2 = PolyCoeffVector_Persistent(&ctx, n2, 1);
-    control_vector_t dem2 = PolyCoeffVector_Persistent(&ctx, d2, 2);
-    TransferFunction G2 = TransferFunctionFromCoeffs(&num2, &dem2);
+    control_vector_t num2 = Control_Poly_AllocPersistent(&ctx, n2, 1);
+    control_vector_t dem2 = Control_Poly_AllocPersistent(&ctx, d2, 2);
+    TransferFunction G2 = Control_TF_FromPoly(&num2, &dem2);
 
     // Act: G_sys = G1 * G2
-    TransferFunction G_sys = MultiplyTransferFunctions(&ctx, &G1, &G2);
+    TransferFunction G_sys = Control_TF_Multiply(&ctx, &G1, &G2);
 
     // Expected: 2 / (s^2 + 5s + 6)
     float expected_num[] = {2.0f};
@@ -88,13 +88,13 @@ TEST(TransferFunction, UnityClosedLoopReduction)
     // Forward path G(s) = 10 / (s + 2)
     float n[] = {10.0f};
     float d[] = {1.0f, 2.0f};
-    control_vector_t num = PolyCoeffVector_Persistent(&ctx, n, 1);
-    control_vector_t dem = PolyCoeffVector_Persistent(&ctx, d, 2);
-    TransferFunction G = TransferFunctionFromCoeffs(&num, &dem);
+    control_vector_t num = Control_Poly_AllocPersistent(&ctx, n, 1);
+    control_vector_t dem = Control_Poly_AllocPersistent(&ctx, d, 2);
+    TransferFunction G = Control_TF_FromPoly(&num, &dem);
 
     // Act: Closed loop T(s) = G(s) / (1 + G(s))
     TransferFunction T =
-        UnityClosedLoop(&ctx, &G, 1.0f, 0); // Gain/Unity enum mocked as 1.0f, 0
+        Control_TF_ClosedLoop(&ctx, &G, 1.0f, 0); // Gain/Unity enum mocked as 1.0f, 0
 
     // Expected: 10 / (s + 12)
     float expected_dem[] = {1.0f, 12.0f};
@@ -106,22 +106,22 @@ TEST(TransferFunction, UnityClosedLoopReduction)
 TEST(TransferFunction, IsValidDetectsEmptyTransferFunction)
 {
     TransferFunction empty = CCONTROL_EMPTY_TF;
-    TEST_ASSERT_FALSE(TransferFunction_IsValid(&empty));
+    TEST_ASSERT_FALSE(Control_TF_IsValid(&empty));
 }
 
 TEST(TransferFunction, MultiplyInvalidTransferFunctionErrorsInvalidArgument)
 {
     float n[] = {1.0f};
     float d[] = {1.0f};
-    control_vector_t num = PolyCoeffVector_Persistent(&ctx, n, 1);
-    control_vector_t dem = PolyCoeffVector_Persistent(&ctx, d, 1);
+    control_vector_t num = Control_Poly_AllocPersistent(&ctx, n, 1);
+    control_vector_t dem = Control_Poly_AllocPersistent(&ctx, d, 1);
 
-    TransferFunction G1 = TransferFunctionFromCoeffs(&num, &dem);
+    TransferFunction G1 = Control_TF_FromPoly(&num, &dem);
     TransferFunction G2 = CCONTROL_EMPTY_TF;
 
-    TransferFunction result = MultiplyTransferFunctions(&ctx, &G1, &G2);
+    TransferFunction result = Control_TF_Multiply(&ctx, &G1, &G2);
 
-    TEST_ASSERT_FALSE(TransferFunction_IsValid(&result));
+    TEST_ASSERT_FALSE(Control_TF_IsValid(&result));
     TEST_ASSERT_EQUAL_INT(last_error_code, CCONTROL_ERROR_INVALID_ARGUMENT);
 }
 
@@ -129,17 +129,17 @@ TEST(TransferFunction, MultiplyOutOfMemorySafelyAbortsAndThrows)
 {
     float n[] = {1.0f};
     float d[] = {1.0f};
-    control_vector_t num = PolyCoeffVector_Persistent(&ctx, n, 1);
-    control_vector_t dem = PolyCoeffVector_Persistent(&ctx, d, 1);
+    control_vector_t num = Control_Poly_AllocPersistent(&ctx, n, 1);
+    control_vector_t dem = Control_Poly_AllocPersistent(&ctx, d, 1);
 
-    TransferFunction G1 = TransferFunctionFromCoeffs(&num, &dem);
-    TransferFunction G2 = TransferFunctionFromCoeffs(&num, &dem);
+    TransferFunction G1 = Control_TF_FromPoly(&num, &dem);
+    TransferFunction G2 = Control_TF_FromPoly(&num, &dem);
 
-    size_t space_left = ControlArena_RemainingSpace(ctx.persistent);
-    ArenaAlloc(ctx.persistent, space_left);
+    size_t space_left = Control_Arena_RemainingSpace(ctx.persistent);
+    Control_Arena_Alloc(ctx.persistent, space_left);
 
-    TransferFunction result = MultiplyTransferFunctions(&ctx, &G1, &G2);
-    TEST_ASSERT_FALSE(TransferFunction_IsValid(&result));
+    TransferFunction result = Control_TF_Multiply(&ctx, &G1, &G2);
+    TEST_ASSERT_FALSE(Control_TF_IsValid(&result));
     TEST_ASSERT_EQUAL_INT(last_error_code, CCONTROL_ERROR_OUT_OF_MEMORY);
 }
 

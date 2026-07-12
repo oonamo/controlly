@@ -2,7 +2,7 @@
 #include "ss_internal.h"
 #include <ccontrol/statespace.h>
 
-void StateSpace_StepContinous(ControlHandle *ctx, StateSpace *ss, float dt)
+void Control_StateSpace_StepContinous(ControlHandle *ctx, StateSpace *ss, float dt)
 {
     CCONTROL_UNUSED(ctx);
 

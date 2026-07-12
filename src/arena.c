@@ -9,7 +9,7 @@ struct ControlArena
     size_t offset;
 };
 
-ControlArena *ControlArena_Create(void *backing_buffer, size_t capacity)
+ControlArena *Control_Arena_Create(void *backing_buffer, size_t capacity)
 {
     ControlArena *arena = (ControlArena *)backing_buffer;
     arena->buffer = (uint8_t *)backing_buffer + sizeof(ControlArena);
@@ -19,9 +19,9 @@ ControlArena *ControlArena_Create(void *backing_buffer, size_t capacity)
     return arena;
 }
 
-void ControlArena_Clear(ControlArena *arena) { arena->offset = 0; }
+void Control_Arena_Clear(ControlArena *arena) { arena->offset = 0; }
 
-size_t ControlArena_RemainingSpace(ControlArena *arena)
+size_t Control_Arena_RemainingSpace(ControlArena *arena)
 {
     if (!arena)
     {
@@ -31,7 +31,7 @@ size_t ControlArena_RemainingSpace(ControlArena *arena)
     return arena->capacity - arena->offset;
 }
 
-void *ArenaAlloc(ControlArena *a, size_t size)
+void *Control_Arena_Alloc(ControlArena *a, size_t size)
 {
     size_t align_size = ALIGN_UP(size, CCONTROL_ARENA_ALIGN_SIZE);
     if (a->offset + align_size <= a->capacity)
@@ -44,4 +44,4 @@ void *ArenaAlloc(ControlArena *a, size_t size)
     return NULL;
 }
 
-void ArenaReset(ControlArena *a) { a->offset = 0; }
+void Control_Arena_Reset(ControlArena *a) { a->offset = 0; }

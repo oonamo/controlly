@@ -4,10 +4,10 @@
 
 typedef struct ControlArena ControlArena;
 
-ControlArena *ControlArena_Create(void *backing_buffer, size_t capacity);
-void ControlArena_Clear(ControlArena *arena);
-size_t ControlArena_RemainingSpace(ControlArena *arena);
+ControlArena *Control_Arena_Create(void *backing_buffer, size_t capacity);
+void Control_Arena_Clear(ControlArena *arena);
+size_t Control_Arena_RemainingSpace(ControlArena *arena);
 
-void *ArenaAlloc(ControlArena *a, size_t size);
-void ArenaReset(ControlArena *a);
+void *Control_Arena_Alloc(ControlArena *a, size_t size);
+void Control_Arena_Reset(ControlArena *a);
 #endif

@@ -23,12 +23,12 @@ typedef struct
 #define CCONTROL_EMPTY_MATRIX ((matrix_t){0})
 
 
-vector_t ArenaAllocVec(ControlArena *a, size_t size);
-matrix_t ArenaAllocMatrix(ControlArena *a, size_t rows, size_t cols);
-vector_t VectorMulMatrix(ControlArena *a, const matrix_t *m, const vector_t *v);
-vector_t VectorAdd(ControlArena *a, vector_t *lhs, vector_t *rhs);
-vector_t VectorScalar(ControlArena *a, vector_t *v, float scalar);
+vector_t Control_Vec_Alloc(ControlArena *a, size_t size);
+matrix_t Control_Matrix_Alloc(ControlArena *a, size_t rows, size_t cols);
+vector_t Control_Matrix_MultiplyVec(ControlArena *a, const matrix_t *m, const vector_t *v);
+vector_t Control_Vec_Add(ControlArena *a, vector_t *lhs, vector_t *rhs);
+vector_t Control_Vec_Scale(ControlArena *a, vector_t *v, float scalar);
 
-bool Matrix_IsValid(matrix_t *m);
-bool Vector_IsValid(vector_t *v);
+bool Control_Matrix_IsValid(matrix_t *m);
+bool Control_Vec_IsValid(vector_t *v);
 #endif

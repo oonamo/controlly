@@ -18,14 +18,14 @@ TEST_SETUP(StateSpace)
     p_pool = malloc(sizeof(uint8_t) * MEMSIZE);
     s_pool = malloc(sizeof(uint8_t) * MEMSIZE);
 
-    ControlArena *p = ControlArena_Create(p_pool, MEMSIZE);
-    ControlArena *s = ControlArena_Create(s_pool, MEMSIZE);
-    ControlSystem_InitHandle(&ctx, p, s);
+    ControlArena *p = Control_Arena_Create(p_pool, MEMSIZE);
+    ControlArena *s = Control_Arena_Create(s_pool, MEMSIZE);
+    Control_System_Init(&ctx, p, s);
 }
 
 TEST_TEAR_DOWN(StateSpace)
 {
-    ControlSystem_DeInitHandle(&ctx);
+    Control_System_DeInit(&ctx);
     free(p_pool);
     free(s_pool);
 }
@@ -35,11 +35,11 @@ TEST(StateSpace, CanConvertTransferFunction)
     float n[] = {10.0f};
     float d[] = {1.0f, 2.0f, 5.0f};
 
-    control_vector_t num = PolyCoeffVector_Persistent(&ctx, n, 1);
-    control_vector_t dem = PolyCoeffVector_Persistent(&ctx, d, 3);
-    TransferFunction tf = TransferFunctionFromCoeffs(&num, &dem);
+    control_vector_t num = Control_Poly_AllocPersistent(&ctx, n, 1);
+    control_vector_t dem = Control_Poly_AllocPersistent(&ctx, d, 3);
+    TransferFunction tf = Control_TF_FromPoly(&num, &dem);
 
-    StateSpace sys = TransferFunctionToStateSpace(&ctx, &tf);
+    StateSpace sys = Control_StateSpace_FromTF(&ctx, &tf);
 
     // 2x2 matrix
     float expected_A[] = {0.0f, 1.0f, -5.0f, -2.0f};
@@ -61,11 +61,11 @@ TEST(StateSpace, ContinousSISORealizationWithStepResponse)
     float n[] = {10.0f};
     float d[] = {1.0f, 2.0f, 5.0f};
 
-    control_vector_t num = PolyCoeffVector_Persistent(&ctx, n, 1);
-    control_vector_t dem = PolyCoeffVector_Persistent(&ctx, d, 3);
-    TransferFunction tf = TransferFunctionFromCoeffs(&num, &dem);
+    control_vector_t num = Control_Poly_AllocPersistent(&ctx, n, 1);
+    control_vector_t dem = Control_Poly_AllocPersistent(&ctx, d, 3);
+    TransferFunction tf = Control_TF_FromPoly(&num, &dem);
 
-    StateSpace sys = TransferFunctionToStateSpace(&ctx, &tf);
+    StateSpace sys = Control_StateSpace_FromTF(&ctx, &tf);
 
     float x_data[] = {0.0f, 0.0f}; // Initial states at 0
     float u_data[] = {1.0f};       // Constant step input of 1.0
@@ -78,7 +78,7 @@ TEST(StateSpace, ContinousSISORealizationWithStepResponse)
     float Ts = 0.1f;
     for (int k = 0; k < 3; k++)
     {
-        StateSpace_StepContinous(&ctx, &sys, Ts);
+        Control_StateSpace_StepContinous(&ctx, &sys, Ts);
     }
 
     // NOTE: The y output is calculated at the BEGINNING of the 3rd tick (k=2).
@@ -116,7 +116,7 @@ TEST(StateSpace, ContinousMIMORealizationWithStepResponse)
     float dt = 0.1f;
     for (int k = 0; k < 3; k++)
     {
-        StateSpace_StepContinous(&ctx, &sys, dt);
+        Control_StateSpace_StepContinous(&ctx, &sys, dt);
     }
 
     // NOTE: The y output is calculated at the BEGINNING of the 3rd tick (k=2).

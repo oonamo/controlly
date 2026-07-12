@@ -24,8 +24,8 @@ typedef struct
 
 #define CCONTROL_EMPTY_STATESPACE (StateSpace){0}
 
-void StateSpace_StepContinous(ControlHandle *ctx, StateSpace *ss, float dt);
-StateSpace TransferFunctionToStateSpace(ControlHandle *ctx,
+void Control_StateSpace_StepContinous(ControlHandle *ctx, StateSpace *ss, float dt);
+StateSpace Control_StateSpace_FromTF(ControlHandle *ctx,
                                         TransferFunction *tf);
 
 #endif

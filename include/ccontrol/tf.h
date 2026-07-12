@@ -22,31 +22,32 @@ typedef struct
 
 #define CCONTROL_EMPTY_TF ((TransferFunction){0})
 
-void ControlSystem_InitHandle(ControlHandle *ctx, ControlArena *p,
+void Control_System_Init(ControlHandle *ctx, ControlArena *p,
                               ControlArena *s);
-void ControlSystem_DeInitHandle(ControlHandle *ctx);
+void Control_System_DeInit(ControlHandle *ctx);
 
-control_vector_t PolyCoeffVector_Scratch(ControlHandle *ctx,
+control_vector_t Control_Poly_AllocScratch(ControlHandle *ctx,
                                          const float *coeffs, size_t size);
-control_vector_t PolyCoeffVector_Persistent(ControlHandle *ctx,
+control_vector_t Control_Poly_AllocPersistent(ControlHandle *ctx,
                                             const float *coeffs, size_t size);
-control_vector_t PolyCoeffVector_Cannonicalize(const control_vector_t *v);
+control_vector_t Control_Poly_Canonicalize(const control_vector_t *v);
 
-control_vector_t AddCoeffVector(ControlHandle *ctx, const control_vector_t *a,
+control_vector_t Control_Poly_Add(ControlHandle *ctx, const control_vector_t *a,
                                 const control_vector_t *b);
 
-TransferFunction TransferFunctionFromCoeffs(const control_vector_t *num,
-                                            const control_vector_t *dem);
-
-control_vector_t MultiplyPoly(ControlHandle *ctx, control_vector_t *a,
+control_vector_t Control_Poly_Multiply(ControlHandle *ctx, control_vector_t *a,
                               control_vector_t *b);
 
-TransferFunction MultiplyTransferFunctions(ControlHandle *ctx,
+TransferFunction Control_TF_FromPoly(const control_vector_t *num,
+                                            const control_vector_t *dem);
+
+
+TransferFunction Control_TF_Multiply(ControlHandle *ctx,
                                            TransferFunction *G1,
                                            TransferFunction *G2);
-TransferFunction UnityClosedLoop(ControlHandle *ctx, TransferFunction *G,
+TransferFunction Control_TF_ClosedLoop(ControlHandle *ctx, TransferFunction *G,
                                  float gain, TransferFunctionUnity unity);
 
-bool TransferFunction_IsValid(TransferFunction *tf);
+bool Control_TF_IsValid(TransferFunction *tf);
 
 #endif
