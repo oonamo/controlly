@@ -9,26 +9,26 @@ typedef struct
     size_t size;
     size_t capacity;
     float *coeffs;
-} vector_t;
+} ControlVec;
 
-#define CCONTROL_EMPTY_VEC ((vector_t){0})
+#define CCONTROL_EMPTY_VEC ((ControlVec){0})
 
 typedef struct
 {
     size_t rows;
     size_t cols;
     float *data;
-} matrix_t;
+} ControlMatrix;
 
-#define CCONTROL_EMPTY_MATRIX ((matrix_t){0})
+#define CCONTROL_EMPTY_MATRIX ((ControlMatrix){0})
 
 
-vector_t Control_Vec_Alloc(ControlArena *a, size_t size);
-matrix_t Control_Matrix_Alloc(ControlArena *a, size_t rows, size_t cols);
-vector_t Control_Matrix_MultiplyVec(ControlArena *a, const matrix_t *m, const vector_t *v);
-vector_t Control_Vec_Add(ControlArena *a, vector_t *lhs, vector_t *rhs);
-vector_t Control_Vec_Scale(ControlArena *a, vector_t *v, float scalar);
+ControlVec Control_Vec_Alloc(ControlArena *a, size_t size);
+ControlMatrix Control_Matrix_Alloc(ControlArena *a, size_t rows, size_t cols);
+ControlVec Control_Matrix_MultiplyVec(ControlArena *a, const ControlMatrix *m, const ControlVec *v);
+ControlVec Control_Vec_Add(ControlArena *a, ControlVec *lhs, ControlVec *rhs);
+ControlVec Control_Vec_Scale(ControlArena *a, ControlVec *v, float scalar);
 
-bool Control_Matrix_IsValid(matrix_t *m);
-bool Control_Vec_IsValid(vector_t *v);
+bool Control_Matrix_IsValid(ControlMatrix *m);
+bool Control_Vec_IsValid(ControlVec *v);
 #endif

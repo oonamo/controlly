@@ -3,7 +3,7 @@
 
 #include <ccontrol/statespace.h>
 
-void __StateSpace_StepSISO( StateSpace* ss, float dt);
-void __StateSpace_StepMIMO( StateSpace* ss, float dt);
+void __Control_StateSpace_StepSISO(ControlStateSpace *ss, float dt);
+void __Control_StateSpace_StepMIMO(ControlStateSpace *ss, float dt);
 
 #endif

@@ -10,44 +10,39 @@ typedef enum
 {
     TF_UNITY_POSITIVE = 1,
     TF_UNITY_NEGATIVE = 1,
-} TransferFunctionUnity;
-
-typedef vector_t control_vector_t;
+} ControlFeedbackUnity;
 
 typedef struct
 {
-    control_vector_t num;
-    control_vector_t dem;
-} TransferFunction;
+    ControlVec num;
+    ControlVec dem;
+} ControlTransferFunction;
 
-#define CCONTROL_EMPTY_TF ((TransferFunction){0})
+#define CCONTROL_EMPTY_TF ((ControlTransferFunction){0})
 
-void Control_System_Init(ControlHandle *ctx, ControlArena *p,
-                              ControlArena *s);
-void Control_System_DeInit(ControlHandle *ctx);
 
-control_vector_t Control_Poly_AllocScratch(ControlHandle *ctx,
+ControlVec Control_Poly_AllocScratch(ControlHandle *ctx,
                                          const float *coeffs, size_t size);
-control_vector_t Control_Poly_AllocPersistent(ControlHandle *ctx,
+ControlVec Control_Poly_AllocPersistent(ControlHandle *ctx,
                                             const float *coeffs, size_t size);
-control_vector_t Control_Poly_Canonicalize(const control_vector_t *v);
+ControlVec Control_Poly_Canonicalize(const ControlVec *v);
 
-control_vector_t Control_Poly_Add(ControlHandle *ctx, const control_vector_t *a,
-                                const control_vector_t *b);
+ControlVec Control_Poly_Add(ControlHandle *ctx, const ControlVec *a,
+                                const ControlVec *b);
 
-control_vector_t Control_Poly_Multiply(ControlHandle *ctx, control_vector_t *a,
-                              control_vector_t *b);
+ControlVec Control_Poly_Multiply(ControlHandle *ctx, ControlVec *a,
+                              ControlVec *b);
 
-TransferFunction Control_TF_FromPoly(const control_vector_t *num,
-                                            const control_vector_t *dem);
+ControlTransferFunction Control_TF_FromPoly(const ControlVec *num,
+                                            const ControlVec *dem);
 
 
-TransferFunction Control_TF_Multiply(ControlHandle *ctx,
-                                           TransferFunction *G1,
-                                           TransferFunction *G2);
-TransferFunction Control_TF_ClosedLoop(ControlHandle *ctx, TransferFunction *G,
-                                 float gain, TransferFunctionUnity unity);
+ControlTransferFunction Control_TF_Multiply(ControlHandle *ctx,
+                                           ControlTransferFunction *G1,
+                                           ControlTransferFunction *G2);
+ControlTransferFunction Control_TF_ClosedLoop(ControlHandle *ctx, ControlTransferFunction *G,
+                                 float gain, ControlFeedbackUnity unity);
 
-bool Control_TF_IsValid(TransferFunction *tf);
+bool Control_TF_IsValid(ControlTransferFunction *tf);
 
 #endif

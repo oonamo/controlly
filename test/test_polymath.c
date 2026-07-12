@@ -39,8 +39,8 @@ TEST(PolyMath, PolynomialMultiplication)
     // s + 2
     float b[2] = {1, 2};
 
-    control_vector_t a_coeffs = Control_Poly_AllocScratch(&ctx, a, 3);
-    control_vector_t b_coeffs = Control_Poly_AllocScratch(&ctx, b, 2);
+    ControlVec a_coeffs = Control_Poly_AllocScratch(&ctx, a, 3);
+    ControlVec b_coeffs = Control_Poly_AllocScratch(&ctx, b, 2);
 
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(a, a_coeffs.coeffs, 3);
     TEST_ASSERT_EQUAL_size_t(3, a_coeffs.size);
@@ -49,7 +49,7 @@ TEST(PolyMath, PolynomialMultiplication)
     TEST_ASSERT_EQUAL_size_t(2, b_coeffs.size);
 
     // s^3 + 4s^2 + 7s + 6
-    control_vector_t result = Control_Poly_Multiply(&ctx, &a_coeffs, &b_coeffs);
+    ControlVec result = Control_Poly_Multiply(&ctx, &a_coeffs, &b_coeffs);
     float expected_result[] = {1, 4, 7, 6};
 
     TEST_ASSERT_EQUAL_size_t(4, result.size);
@@ -61,10 +61,10 @@ TEST(PolyMath, PolynomialAdditionSameSize)
     float a[3] = {1.0f, 2.0f, 3.0f};
     float b[3] = {4.0f, 5.0f, 6.0f};
 
-    control_vector_t a_coeffs = Control_Poly_AllocScratch(&ctx, a, 3);
-    control_vector_t b_coeffs = Control_Poly_AllocScratch(&ctx, b, 3);
+    ControlVec a_coeffs = Control_Poly_AllocScratch(&ctx, a, 3);
+    ControlVec b_coeffs = Control_Poly_AllocScratch(&ctx, b, 3);
 
-    control_vector_t result = Control_Poly_Add(&ctx, &a_coeffs, &b_coeffs);
+    ControlVec result = Control_Poly_Add(&ctx, &a_coeffs, &b_coeffs);
     float expected[] = {5.0f, 7.0f, 9.0f};
     TEST_ASSERT_EQUAL_size_t(3, result.size);
     TEST_ASSERT_FLOAT_ARRAY_WITHIN(0.001, expected, result.coeffs, result.size);
@@ -76,10 +76,10 @@ TEST(PolyMath, PolynomialAdditionDifferentSize)
     float a[3] = {1.0f, 2.0f, 3.0f};
     float b[2] = {4.0f, 5.0f};
 
-    control_vector_t a_coeffs = Control_Poly_AllocScratch(&ctx, a, 3);
-    control_vector_t b_coeffs = Control_Poly_AllocScratch(&ctx, b, 2);
+    ControlVec a_coeffs = Control_Poly_AllocScratch(&ctx, a, 3);
+    ControlVec b_coeffs = Control_Poly_AllocScratch(&ctx, b, 2);
 
-    control_vector_t result = Control_Poly_Add(&ctx, &a_coeffs, &b_coeffs);
+    ControlVec result = Control_Poly_Add(&ctx, &a_coeffs, &b_coeffs);
 
     float expected[] = {1.0f, 6.0f, 8.0f};
 
@@ -92,13 +92,13 @@ TEST(PolyMath, RepeatedMathDoesNotOOM)
     float a[3] = {1.0f, 2.0f, 3.0f};
     float b[2] = {4.0f, 5.0f};
 
-    control_vector_t a_coeffs = Control_Poly_AllocScratch(&ctx, a, 3);
-    control_vector_t b_coeffs = Control_Poly_AllocScratch(&ctx, b, 2);
+    ControlVec a_coeffs = Control_Poly_AllocScratch(&ctx, a, 3);
+    ControlVec b_coeffs = Control_Poly_AllocScratch(&ctx, b, 2);
 
     // Loop 1000 times to ensure scratch wiping works
     for (int i = 0; i < 1000; i++)
     {
-        control_vector_t temp = Control_Poly_Multiply(&ctx, &a_coeffs, &b_coeffs);
+        ControlVec temp = Control_Poly_Multiply(&ctx, &a_coeffs, &b_coeffs);
         Control_Arena_Clear(ctx.scratch);
     }
 
@@ -110,9 +110,9 @@ TEST(PolyMath, CanonicalizeRemovesLeadingZeroes)
     float c[] = {0.0f, 0.0f, 1, 0.0f, 2};
     float expected[] = {1, 0.0f, 2};
 
-    control_vector_t uncanon_vec = Control_Poly_AllocScratch(&ctx, c, 5);
+    ControlVec uncanon_vec = Control_Poly_AllocScratch(&ctx, c, 5);
 
-    control_vector_t canon_vec = Control_Poly_Canonicalize(&uncanon_vec);
+    ControlVec canon_vec = Control_Poly_Canonicalize(&uncanon_vec);
     TEST_ASSERT_EQUAL_size_t(3, canon_vec.size);
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(expected, canon_vec.coeffs, 3);
 }

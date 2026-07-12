@@ -31,11 +31,11 @@ static const DampingProfile profiles[NUM_PROFILES] = {
 
 size_t current_profile = 1;
 float damping_ratio;
-StateSpace sys;
+ControlStateSpace sys;
 ControlHandle ctx;
 
 void UpdateDrawFrame(void);
-float NextProfile(StateSpace *space);
+float NextProfile(ControlStateSpace *space);
 
 int main(void)
 {
@@ -68,10 +68,10 @@ int main(void)
     float n[] = {wn * wn};
     float d[] = {1.0f, 2 * damping_ratio * wn, wn * wn};
 
-    control_vector_t num = Control_Poly_AllocScratch(&ctx, n, 1);
-    control_vector_t dem = Control_Poly_AllocScratch(&ctx, d, 3);
+    ControlVec num = Control_Poly_AllocScratch(&ctx, n, 1);
+    ControlVec dem = Control_Poly_AllocScratch(&ctx, d, 3);
 
-    TransferFunction tf = Control_TF_FromPoly(&num, &dem);
+    ControlTransferFunction tf = Control_TF_FromPoly(&num, &dem);
 
     // 4. State Space Representation
     sys = Control_StateSpace_FromTF(&ctx, &tf);
@@ -83,9 +83,9 @@ int main(void)
     float u_data[] = {screenWidth / 2.0f};
     float y_data[] = {100};
 
-    sys.x = (vector_t){.coeffs = x_data, .size = 2};
-    sys.u = (vector_t){.coeffs = u_data, .size = 1};
-    sys.y = (vector_t){.coeffs = y_data, .size = 1};
+    sys.x = (ControlVec){.coeffs = x_data, .size = 2};
+    sys.u = (ControlVec){.coeffs = u_data, .size = 1};
+    sys.y = (ControlVec){.coeffs = y_data, .size = 1};
 
     // 5. Game Loop
 #ifdef PLATFORM_WEB
@@ -122,7 +122,7 @@ void UpdateDrawFrame()
 #endif
 
     // C. Iterate over the system
-    Control_StateSpace_StepContinous(&ctx, &sys, dt);
+    Control_StateSpace_StepContinuous(&ctx, &sys, dt);
 
     BeginDrawing();
     ClearBackground(RAYWHITE);
@@ -148,7 +148,7 @@ void UpdateDrawFrame()
     EndDrawing();
 }
 
-float NextProfile(StateSpace *sys)
+float NextProfile(ControlStateSpace *sys)
 {
     current_profile = (current_profile + 1) % NUM_PROFILES;
     DampingProfile p = profiles[current_profile];

@@ -20,10 +20,10 @@ fprintf(fileID, 'static ControlHandle ctx;\n');
 fprintf(fileID, 'static void *p_pool, *s_pool;\n');
 fprintf(fileID, 'TEST_SETUP(GeneratedFuzz) {\n');
 fprintf(fileID, '    p_pool = malloc(1024); s_pool = malloc(1024);\n');
-fprintf(fileID, '    ControlSystem_InitHandle(&ctx, ControlArena_Create(p_pool, 1024), ControlArena_Create(s_pool, 1024));\n');
+fprintf(fileID, '    Control_System_Init(&ctx, Control_Arena_Create(p_pool, 1024), Control_Arena_Create(s_pool, 1024));\n');
 fprintf(fileID, '}\n');
 fprintf(fileID, 'TEST_TEAR_DOWN(GeneratedFuzz) {\n');
-fprintf(fileID, '    ControlSystem_DeInitHandle(&ctx);\n');
+fprintf(fileID, '    Control_System_DeInit(&ctx);\n');
 fprintf(fileID, '    free(p_pool); free(s_pool);\n');
 fprintf(fileID, '}\n\n');
 
@@ -91,15 +91,15 @@ function write_unity_test(fileID, test_name, G1, G2)
     fprintf(fileID, '    float d_exp[] = {'); fprintf(fileID, '%.6ff, ', den_exp); fprintf(fileID, '};\n');
 
     % Write the C logic to test these arrays
-    fprintf(fileID, '    control_vector_t num1_v = PolyCoeffVector_Persistent(&ctx, n1, %d);\n', length(num1));
-    fprintf(fileID, '    control_vector_t dem1_v = PolyCoeffVector_Persistent(&ctx, d1, %d);\n', length(den1));
-    fprintf(fileID, '    TransferFunction tf1 = TransferFunctionFromCoeffs(&num1_v, &dem1_v);\n');
+    fprintf(fileID, '    ControlVec num1_v = Control_Poly_AllocPersistent(&ctx, n1, %d);\n', length(num1));
+    fprintf(fileID, '    ControlVec dem1_v = Control_Poly_AllocPersistent(&ctx, d1, %d);\n', length(den1));
+    fprintf(fileID, '    ControlTransferFunction tf1 = Control_TF_FromPoly(&num1_v, &dem1_v);\n');
 
-    fprintf(fileID, '    control_vector_t num2_v = PolyCoeffVector_Persistent(&ctx, n2, %d);\n', length(num2));
-    fprintf(fileID, '    control_vector_t dem2_v = PolyCoeffVector_Persistent(&ctx, d2, %d);\n', length(den2));
-    fprintf(fileID, '    TransferFunction tf2 = TransferFunctionFromCoeffs(&num2_v, &dem2_v);\n');
+    fprintf(fileID, '    ControlVec num2_v = Control_Poly_AllocPersistent(&ctx, n2, %d);\n', length(num2));
+    fprintf(fileID, '    ControlVec dem2_v = Control_Poly_AllocPersistent(&ctx, d2, %d);\n', length(den2));
+    fprintf(fileID, '    ControlTransferFunction tf2 = Control_TF_FromPoly(&num2_v, &dem2_v);\n');
 
-    fprintf(fileID, '    TransferFunction result = MultiplyTransferFunctions(&ctx, &tf1, &tf2);\n');
+    fprintf(fileID, '    ControlTransferFunction result = Control_TF_Multiply(&ctx, &tf1, &tf2);\n');
 
     % Write the Assertions using the EXACT true lengths
     fprintf(fileID, '    TEST_ASSERT_EQUAL_FLOAT_ARRAY(n_exp, result.num.coeffs, %d);\n', length(num_exp));

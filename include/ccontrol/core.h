@@ -14,7 +14,8 @@ typedef enum
 } ControlResult;
 
 typedef void (*ControlErrorCallback)(ControlResult code, const char *message,
-                                     void *userdata);
+                                     void *user_data);
+
 
 typedef struct
 {
@@ -22,7 +23,11 @@ typedef struct
     ControlArena *scratch;
 
     ControlErrorCallback on_error;
-    void *userdata;
+    void *user_data;
 } ControlHandle;
+
+void Control_System_Init(ControlHandle *ctx, ControlArena *p,
+                              ControlArena *s);
+void Control_System_DeInit(ControlHandle *ctx);
 
 #endif

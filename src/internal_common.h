@@ -15,7 +15,7 @@
     {                                                                          \
         if ((ctx) && (ctx)->on_error)                                          \
         {                                                                      \
-            (ctx)->on_error((code), (msg), (ctx)->userdata);                   \
+            (ctx)->on_error((code), (msg), (ctx)->user_data);                   \
         }                                                                      \
     } while (0)
 

@@ -1,8 +1,8 @@
 #include <ccontrol/matrix.h>
 
-vector_t Control_Vec_Alloc(ControlArena *a, size_t size)
+ControlVec Control_Vec_Alloc(ControlArena *a, size_t size)
 {
-    vector_t v;
+    ControlVec v;
     v.capacity = size;
     v.size = 0;
 
@@ -17,9 +17,9 @@ vector_t Control_Vec_Alloc(ControlArena *a, size_t size)
     return v;
 }
 
-matrix_t Control_Matrix_Alloc(ControlArena *a, size_t rows, size_t cols)
+ControlMatrix Control_Matrix_Alloc(ControlArena *a, size_t rows, size_t cols)
 {
-    matrix_t m;
+    ControlMatrix m;
 
     m.data = (float *)Control_Arena_Alloc(a, rows * cols * sizeof(float));
     if (!m.data)
@@ -38,9 +38,9 @@ matrix_t Control_Matrix_Alloc(ControlArena *a, size_t rows, size_t cols)
     return m;
 }
 
-vector_t _CreateVectorInArena(ControlArena *a, size_t capacity)
+ControlVec _CreateVectorInArena(ControlArena *a, size_t capacity)
 {
-    vector_t v;
+    ControlVec v;
     v.capacity = capacity;
     v.size = 0;
 
@@ -48,7 +48,8 @@ vector_t _CreateVectorInArena(ControlArena *a, size_t capacity)
     return v;
 }
 
-vector_t Control_Matrix_MultiplyVec(ControlArena *a, const matrix_t *m, const vector_t *v)
+ControlVec Control_Matrix_MultiplyVec(ControlArena *a, const ControlMatrix *m,
+                                      const ControlVec *v)
 {
     if (!m || !v || m->cols != v->size)
     {
@@ -56,7 +57,7 @@ vector_t Control_Matrix_MultiplyVec(ControlArena *a, const matrix_t *m, const ve
     }
     size_t new_size = m->rows;
 
-    vector_t res = _CreateVectorInArena(a, new_size);
+    ControlVec res = _CreateVectorInArena(a, new_size);
     if (Control_Vec_IsValid(&res))
         return res;
 
@@ -76,11 +77,11 @@ vector_t Control_Matrix_MultiplyVec(ControlArena *a, const matrix_t *m, const ve
     return res;
 }
 
-vector_t Control_Vec_Add(ControlArena *a, vector_t *lhs, vector_t *rhs)
+ControlVec Control_Vec_Add(ControlArena *a, ControlVec *lhs, ControlVec *rhs)
 {
     size_t max_size = lhs->size > rhs->size ? lhs->size : rhs->size;
 
-    vector_t res = _CreateVectorInArena(a, max_size);
+    ControlVec res = _CreateVectorInArena(a, max_size);
     if (!Control_Vec_IsValid(&res))
         return res;
 
@@ -104,9 +105,9 @@ vector_t Control_Vec_Add(ControlArena *a, vector_t *lhs, vector_t *rhs)
     return res;
 }
 
-vector_t Control_Vec_Scale(ControlArena *a, vector_t *v, float scalar)
+ControlVec Control_Vec_Scale(ControlArena *a, ControlVec *v, float scalar)
 {
-    vector_t res = _CreateVectorInArena(a, v->size);
+    ControlVec res = _CreateVectorInArena(a, v->size);
     if (!Control_Vec_IsValid(&res))
         return CCONTROL_EMPTY_VEC;
 
@@ -120,8 +121,11 @@ vector_t Control_Vec_Scale(ControlArena *a, vector_t *v, float scalar)
     return res;
 }
 
-inline bool Control_Matrix_IsValid(matrix_t *m) { return m != NULL && m->data != NULL; }
-inline bool Control_Vec_IsValid(vector_t *v)
+inline bool Control_Matrix_IsValid(ControlMatrix *m)
+{
+    return m != NULL && m->data != NULL;
+}
+inline bool Control_Vec_IsValid(ControlVec *v)
 {
     return v != NULL && v->coeffs != NULL;
 }
