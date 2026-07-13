@@ -22,7 +22,6 @@ typedef struct
 
 #define CCONTROL_EMPTY_MATRIX ((ControlMatrix){0})
 
-
 ControlVec Control_Vec_Alloc(ControlArena *a, size_t size);
 ControlMatrix Control_Matrix_Alloc(ControlArena *a, size_t rows, size_t cols);
 ControlVec Control_Matrix_MultiplyVec(ControlArena *a, const ControlMatrix *m, const ControlVec *v);

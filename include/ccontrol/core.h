@@ -13,9 +13,7 @@ typedef enum
     CCONTROL_ERROR_USE_DISABLE_FEATURE,
 } ControlResult;
 
-typedef void (*ControlErrorCallback)(ControlResult code, const char *message,
-                                     void *user_data);
-
+typedef void (*ControlErrorCallback)(ControlResult code, const char *message, void *user_data);
 
 typedef struct
 {
@@ -26,8 +24,7 @@ typedef struct
     void *user_data;
 } ControlHandle;
 
-void Control_System_Init(ControlHandle *ctx, ControlArena *p,
-                              ControlArena *s);
+void Control_System_Init(ControlHandle *ctx, ControlArena *p, ControlArena *s);
 void Control_System_DeInit(ControlHandle *ctx);
 
 #endif

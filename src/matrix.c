@@ -8,7 +8,9 @@ ControlVec Control_Vec_Alloc(ControlArena *a, size_t size)
 
     v.coeffs = (float *)Control_Arena_Alloc(a, size * sizeof(float));
     if (!v.coeffs)
+    {
         return CCONTROL_EMPTY_VEC;
+    }
 
     for (size_t i = 0; i < size; i++)
     {
@@ -19,11 +21,13 @@ ControlVec Control_Vec_Alloc(ControlArena *a, size_t size)
 
 ControlMatrix Control_Matrix_Alloc(ControlArena *a, size_t rows, size_t cols)
 {
-    ControlMatrix m;
+    ControlMatrix m = {0};
 
     m.data = (float *)Control_Arena_Alloc(a, rows * cols * sizeof(float));
     if (!m.data)
+    {
         return CCONTROL_EMPTY_MATRIX;
+    }
 
     for (size_t i = 0; i < rows; i++)
     {
@@ -48,8 +52,7 @@ ControlVec _CreateVectorInArena(ControlArena *a, size_t capacity)
     return v;
 }
 
-ControlVec Control_Matrix_MultiplyVec(ControlArena *a, const ControlMatrix *m,
-                                      const ControlVec *v)
+ControlVec Control_Matrix_MultiplyVec(ControlArena *a, const ControlMatrix *m, const ControlVec *v)
 {
     if (!m || !v || m->cols != v->size)
     {
@@ -59,7 +62,9 @@ ControlVec Control_Matrix_MultiplyVec(ControlArena *a, const ControlMatrix *m,
 
     ControlVec res = _CreateVectorInArena(a, new_size);
     if (Control_Vec_IsValid(&res))
+    {
         return res;
+    }
 
     res.size = new_size;
 
@@ -83,7 +88,9 @@ ControlVec Control_Vec_Add(ControlArena *a, ControlVec *lhs, ControlVec *rhs)
 
     ControlVec res = _CreateVectorInArena(a, max_size);
     if (!Control_Vec_IsValid(&res))
+    {
         return res;
+    }
 
     res.size = max_size;
 
@@ -108,8 +115,11 @@ ControlVec Control_Vec_Add(ControlArena *a, ControlVec *lhs, ControlVec *rhs)
 ControlVec Control_Vec_Scale(ControlArena *a, ControlVec *v, float scalar)
 {
     ControlVec res = _CreateVectorInArena(a, v->size);
+
     if (!Control_Vec_IsValid(&res))
+    {
         return CCONTROL_EMPTY_VEC;
+    }
 
     res.size = v->size;
 

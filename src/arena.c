@@ -19,7 +19,10 @@ ControlArena *Control_Arena_Create(void *backing_buffer, size_t capacity)
     return arena;
 }
 
-void Control_Arena_Clear(ControlArena *arena) { arena->offset = 0; }
+void Control_Arena_Clear(ControlArena *arena)
+{
+    arena->offset = 0;
+}
 
 size_t Control_Arena_RemainingSpace(ControlArena *arena)
 {
@@ -44,4 +47,7 @@ void *Control_Arena_Alloc(ControlArena *a, size_t size)
     return NULL;
 }
 
-void Control_Arena_Reset(ControlArena *a) { a->offset = 0; }
+void Control_Arena_Reset(ControlArena *a)
+{
+    a->offset = 0;
+}

@@ -13,6 +13,8 @@ else()
     "-Wpedantic"
     "-Werror"
     "-Wconversion"
+    "-Wshadow"
+    "-Wdouble-promotion"
     "-Werror=implicit-function-declaration"
     "-fno-strict-aliasing"
     "-Wnull-dereference"

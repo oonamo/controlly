@@ -6,6 +6,8 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(unity)
 
+target_compile_definitions(unity PRIVATE UNITY_OUTPUT_COLOR)
+
 find_program(MATLAB_EXE matlab)
 
 if(MATLAB_EXE)

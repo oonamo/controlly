@@ -13,16 +13,14 @@
 #define CONTROL_INLINE_API inline
 #endif
 
-#define REQUIRE_VALID_VEC(ctx, vec_ptr, msg)                                   \
-    CCONTROL_REQUIRE(ctx, Control_Vec_IsValid(vec_ptr),                             \
-                     CCONTROL_ERROR_OUT_OF_MEMORY, msg, CCONTROL_EMPTY_VEC)
+#define REQUIRE_VALID_VEC(ctx, vec_ptr, msg)                                                       \
+    CCONTROL_REQUIRE(                                                                              \
+        ctx, Control_Vec_IsValid(vec_ptr), CCONTROL_ERROR_OUT_OF_MEMORY, msg, CCONTROL_EMPTY_VEC)
 
-#define REQUIRE_VALID_TF(ctx, tf_ptr, code, msg)                               \
-    CCONTROL_REQUIRE(ctx, Control_TF_IsValid(tf_ptr), code, msg,         \
-                     CCONTROL_EMPTY_TF)
+#define REQUIRE_VALID_TF(ctx, tf_ptr, code, msg)                                                   \
+    CCONTROL_REQUIRE(ctx, Control_TF_IsValid(tf_ptr), code, msg, CCONTROL_EMPTY_TF)
 
-void Control_System_Init(ControlHandle *ctx, ControlArena *p,
-                              ControlArena *s)
+void Control_System_Init(ControlHandle *ctx, ControlArena *p, ControlArena *s)
 {
     ctx->persistent = p;
     ctx->scratch = s;
@@ -34,8 +32,7 @@ void Control_System_DeInit(ControlHandle *ctx)
     Control_Arena_Clear(ctx->persistent);
 }
 
-CONTROL_PRIVATE_API ControlVec __Control_Vec_CreateInArena(ControlArena *a,
-                                                           size_t capacity)
+CONTROL_PRIVATE_API ControlVec __Control_Vec_CreateInArena(ControlArena *a, size_t capacity)
 {
     ControlVec v;
     v.capacity = 0;
@@ -52,8 +49,7 @@ CONTROL_PRIVATE_API ControlVec __Control_Vec_CreateInArena(ControlArena *a,
     return v;
 }
 
-static ControlVec
-__Control_Poly_CreateInArena(ControlArena *a, const float *coeffs, size_t size)
+static ControlVec __Control_Poly_CreateInArena(ControlArena *a, const float *coeffs, size_t size)
 {
     if (coeffs == NULL || size <= 0)
     {
@@ -99,8 +95,7 @@ ControlVec Control_Poly_Canonicalize(const ControlVec *v)
  * @param size size of coefficients
  * @return Vector representation
  */
-ControlVec Control_Poly_AllocScratch(ControlHandle *ctx,
-                                         const float *coeffs, size_t size)
+ControlVec Control_Poly_AllocScratch(ControlHandle *ctx, const float *coeffs, size_t size)
 {
     ControlVec v = __Control_Poly_CreateInArena(ctx->scratch, coeffs, size);
     REQUIRE_VALID_VEC(ctx, &v, "Could not allocate in scratch arena");
@@ -108,19 +103,16 @@ ControlVec Control_Poly_AllocScratch(ControlHandle *ctx,
     return v;
 }
 
-ControlVec Control_Poly_AllocPersistent(ControlHandle *ctx,
-                                            const float *coeffs, size_t size)
+ControlVec Control_Poly_AllocPersistent(ControlHandle *ctx, const float *coeffs, size_t size)
 {
-    ControlVec v =
-        __Control_Poly_CreateInArena(ctx->persistent, coeffs, size);
+    ControlVec v = __Control_Poly_CreateInArena(ctx->persistent, coeffs, size);
     REQUIRE_VALID_VEC(ctx, &v, "Could not allocate in persistent arena");
 
     return v;
 }
 
-static ControlVec __Control_Poly_AddInArena(ControlArena *arena,
-                                               const ControlVec *a,
-                                               const ControlVec *b)
+static ControlVec
+__Control_Poly_AddInArena(ControlArena *arena, const ControlVec *a, const ControlVec *b)
 {
     size_t max_size = a->size > b->size ? a->size : b->size;
     ControlVec vec = __Control_Vec_CreateInArena(arena, max_size);
@@ -151,20 +143,15 @@ static ControlVec __Control_Poly_AddInArena(ControlArena *arena,
     return vec;
 }
 
-ControlVec Control_Poly_Add(ControlHandle *ctx, const ControlVec *a,
-                                const ControlVec *b)
+ControlVec Control_Poly_Add(ControlHandle *ctx, const ControlVec *a, const ControlVec *b)
 {
     ControlVec v = __Control_Poly_AddInArena(ctx->scratch, a, b);
-    REQUIRE_VALID_VEC(
-        ctx, &v,
-        "Could not create vector for polynomial addition in scratch arena");
+    REQUIRE_VALID_VEC(ctx, &v, "Could not create vector for polynomial addition in scratch arena");
 
     return v;
 }
 
-static ControlVec __Control_Poly_MultiplyInArena(ControlArena *arena,
-                                               ControlVec *a,
-                                               ControlVec *b)
+static ControlVec __Control_Poly_MultiplyInArena(ControlArena *arena, ControlVec *a, ControlVec *b)
 {
     if (!Control_Vec_IsValid(a) || !Control_Vec_IsValid(b))
     {
@@ -196,8 +183,7 @@ static ControlVec __Control_Poly_MultiplyInArena(ControlArena *arena,
     return result;
 }
 
-ControlVec Control_Poly_Multiply(ControlHandle *ctx, ControlVec *a,
-                              ControlVec *b)
+ControlVec Control_Poly_Multiply(ControlHandle *ctx, ControlVec *a, ControlVec *b)
 {
     ControlVec v = __Control_Poly_MultiplyInArena(ctx->scratch, a, b);
     REQUIRE_VALID_VEC(ctx, &v, "Could not multiply polynomials");
@@ -205,8 +191,7 @@ ControlVec Control_Poly_Multiply(ControlHandle *ctx, ControlVec *a,
     return v;
 }
 
-ControlTransferFunction Control_TF_FromPoly(const ControlVec *num,
-                                            const ControlVec *dem)
+ControlTransferFunction Control_TF_FromPoly(const ControlVec *num, const ControlVec *dem)
 {
     ControlTransferFunction G = {
         .num = *num,
@@ -215,9 +200,9 @@ ControlTransferFunction Control_TF_FromPoly(const ControlVec *num,
     return G;
 }
 
-static ControlTransferFunction
-__Control_TF_MultiplyInArena(ControlArena *a, ControlTransferFunction *G1,
-                                    ControlTransferFunction *G2)
+static ControlTransferFunction __Control_TF_MultiplyInArena(ControlArena *a,
+                                                            ControlTransferFunction *G1,
+                                                            ControlTransferFunction *G2)
 {
     ControlVec conv_num = __Control_Poly_MultiplyInArena(a, &G1->num, &G2->num);
     if (!Control_Vec_IsValid(&conv_num))
@@ -237,19 +222,17 @@ __Control_TF_MultiplyInArena(ControlArena *a, ControlTransferFunction *G1,
     return Control_TF_FromPoly(&clean_num, &clean_dem);
 }
 
-ControlTransferFunction Control_TF_Multiply(ControlHandle *ctx,
-                                           ControlTransferFunction *G1,
-                                           ControlTransferFunction *G2)
+ControlTransferFunction
+Control_TF_Multiply(ControlHandle *ctx, ControlTransferFunction *G1, ControlTransferFunction *G2)
 {
-    REQUIRE_VALID_TF(ctx, G1, CCONTROL_ERROR_INVALID_ARGUMENT,
-                     "TransferFunction G1 is NULL or invalid");
-    REQUIRE_VALID_TF(ctx, G2, CCONTROL_ERROR_INVALID_ARGUMENT,
-                     "TransferFunction G2 is NULL or invalid");
+    REQUIRE_VALID_TF(
+        ctx, G1, CCONTROL_ERROR_INVALID_ARGUMENT, "TransferFunction G1 is NULL or invalid");
+    REQUIRE_VALID_TF(
+        ctx, G2, CCONTROL_ERROR_INVALID_ARGUMENT, "TransferFunction G2 is NULL or invalid");
 
-    ControlTransferFunction tf =
-        __Control_TF_MultiplyInArena(ctx->scratch, G1, G2);
-    REQUIRE_VALID_TF(ctx, &tf, CCONTROL_ERROR_OUT_OF_MEMORY,
-                     "Could not multiply transfer function");
+    ControlTransferFunction tf = __Control_TF_MultiplyInArena(ctx->scratch, G1, G2);
+    REQUIRE_VALID_TF(
+        ctx, &tf, CCONTROL_ERROR_OUT_OF_MEMORY, "Could not multiply transfer function");
     return tf;
 }
 
@@ -258,11 +241,13 @@ inline bool Control_TF_IsValid(ControlTransferFunction *tf)
     return tf != NULL && tf->num.coeffs != NULL && tf->dem.coeffs != NULL;
 }
 
-ControlTransferFunction Control_TF_ClosedLoop(ControlHandle *ctx, ControlTransferFunction *G,
-                                 float gain, ControlFeedbackUnity unity)
+ControlTransferFunction Control_TF_ClosedLoop(ControlHandle *ctx,
+                                              ControlTransferFunction *G,
+                                              float gain,
+                                              ControlFeedbackUnity unity)
 {
-    REQUIRE_VALID_TF(ctx, G, CCONTROL_ERROR_DIVIDE_BY_ZERO,
-                     "TransferFunction G is NULL or invalid");
+    REQUIRE_VALID_TF(
+        ctx, G, CCONTROL_ERROR_DIVIDE_BY_ZERO, "TransferFunction G is NULL or invalid");
     /*
      * G(s) = N(s)/D(s)
      *
@@ -279,9 +264,11 @@ ControlTransferFunction Control_TF_ClosedLoop(ControlHandle *ctx, ControlTransfe
     if (gain != 1.0f)
     {
         scaled_num = __Control_Vec_CreateInArena(ctx->scratch, G->num.size);
-        CCONTROL_REQUIRE(
-            ctx, Control_Vec_IsValid(&scaled_num), CCONTROL_ERROR_OUT_OF_MEMORY,
-            "Failed to allocate vector in scratch arena", CCONTROL_EMPTY_TF);
+        CCONTROL_REQUIRE(ctx,
+                         Control_Vec_IsValid(&scaled_num),
+                         CCONTROL_ERROR_OUT_OF_MEMORY,
+                         "Failed to allocate vector in scratch arena",
+                         CCONTROL_EMPTY_TF);
 
         for (size_t i = 0; i < G->num.size; i++)
         {
@@ -293,11 +280,11 @@ ControlTransferFunction Control_TF_ClosedLoop(ControlHandle *ctx, ControlTransfe
         scaled_num = G->num;
     }
 
-    ControlVec denom =
-        __Control_Poly_AddInArena(ctx->scratch, &G->dem, &scaled_num);
+    ControlVec denom = __Control_Poly_AddInArena(ctx->scratch, &G->dem, &scaled_num);
     if (!Control_Vec_IsValid(&denom))
     {
-        CCONTROL_THROW(ctx, CCONTROL_ERROR_OUT_OF_MEMORY,
+        CCONTROL_THROW(ctx,
+                       CCONTROL_ERROR_OUT_OF_MEMORY,
                        "Could not allocate vector for polynomial addition for "
                        "closed loop");
         return CCONTROL_EMPTY_TF;

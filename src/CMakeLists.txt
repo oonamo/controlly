@@ -7,6 +7,7 @@ target_sources(controls
     tf.c
     arena.c
     matrix.c
+    core.c
     statespace/mimo.c
     statespace/siso.c
     statespace/router.c
