@@ -24,7 +24,7 @@ typedef struct
 } ControlPIDController;
 
 void Control_PID_Init(
-    ControlPIDController *pid, float kp, float kd, float ki, ControlPIDConfig *config);
+    ControlPIDController *pid, float kp, float ki, float kd, ControlPIDConfig *config);
 
 void Control_PID_Reset(ControlPIDController *pid);
 
