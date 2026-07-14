@@ -11,6 +11,7 @@ target_sources(controls
     statespace/mimo.c
     statespace/siso.c
     statespace/router.c
+    controllers/pid.c
   PUBLIC
     FILE_SET HEADERS
     BASE_DIRS
@@ -20,4 +21,5 @@ target_sources(controls
       ${PROJECT_SOURCE_DIR}/include/ccontrol/arena.h
       ${PROJECT_SOURCE_DIR}/include/ccontrol/matrix.h
       ${PROJECT_SOURCE_DIR}/include/ccontrol/statespace.h
+      ${PROJECT_SOURCE_DIR}/include/ccontrol/controllers/pid.h
 )
