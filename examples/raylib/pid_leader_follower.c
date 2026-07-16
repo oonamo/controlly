@@ -55,7 +55,7 @@ static const char *braking_msg = "BRAKING!";
 float collision_msg_len = 0.0f;
 float braking_msg_len = 0.0f;
 
-void RaylibSetup();
+void RaylibSetup(void);
 void UpdateLeaderPosition(float dt);
 void DrawVisuals(float cur_dist, float target, ControlPIDController *pid);
 void CalculateZoom(void);
