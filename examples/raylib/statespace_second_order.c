@@ -42,8 +42,7 @@ int main(void)
     // 1. Raylib Initialization
     const int screenWidth = SCREEN_WIDTH;
     const int screenHeight = SCREEN_HEIGHT;
-    InitWindow(screenWidth, screenHeight,
-               "ccontrol + raylib : Mass-Spring-Damper");
+    InitWindow(screenWidth, screenHeight, "ccontrol + raylib : Mass-Spring-Damper");
     SetTargetFPS(60);
     HideCursor();
 
@@ -134,17 +133,20 @@ void UpdateDrawFrame()
     DrawText("Target (Mouse)", target_x + 5, 10, 20, GRAY);
 
     DrawRectangle(actual_x - 20, SCREEN_HEIGHT / 2 - 20, 40, 40, MAROON);
-    DrawText("System Output", actual_x - 50, SCREEN_HEIGHT / 2 + 30, 20,
-             MAROON);
+    DrawText("System Output", actual_x - 50, SCREEN_HEIGHT / 2 + 30, 20, MAROON);
 
-    DrawText("Use Up/Right Arrows to change the physical system", 10,
-             SCREEN_HEIGHT - 80, 20, GRAY);
+    DrawText("Use Up/Right Arrows to change the physical system", 10, SCREEN_HEIGHT - 80, 20, GRAY);
 
-    DrawText(TextFormat("Mode: %s", profiles[current_profile].name), 10,
-             SCREEN_HEIGHT - 50, 20, DARKBLUE);
-    DrawText(TextFormat("Damping Ratio (Zeta): %.2f",
-                        profiles[current_profile].zeta),
-             10, SCREEN_HEIGHT - 25, 20, DARKGRAY);
+    DrawText(TextFormat("Mode: %s", profiles[current_profile].name),
+             10,
+             SCREEN_HEIGHT - 50,
+             20,
+             DARKBLUE);
+    DrawText(TextFormat("Damping Ratio (Zeta): %.2f", profiles[current_profile].zeta),
+             10,
+             SCREEN_HEIGHT - 25,
+             20,
+             DARKGRAY);
     EndDrawing();
 }
 
