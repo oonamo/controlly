@@ -64,7 +64,7 @@ void DrawSkyline(void);
 bool VehiclesAreColliding(void);
 
 // ========================================
-// 3. GLOBAL STATE AND TARGET
+// 3. GLOBAL STATE & TARGET
 // ========================================
 static const float TARGET_DISTANCE = 250.0f;
 static ControlPIDController pid = {0};

@@ -11,7 +11,7 @@
 #endif
 
 // ========================================
-// 1. CONFIGURATION AND MODEL
+// 1. CONFIGURATION & MODEL
 // ========================================
 #define SCREEN_WIDTH 850
 #define SCREEN_HEIGHT 450
@@ -101,6 +101,9 @@ void ControlSetup()
 
 void ControlLoop()
 {
+    // ----------------------------------------
+    // [TIME] Get time between last iteration
+    // ----------------------------------------
     float dt = GetFrameTime();
     if (dt > 0.1)
     {
@@ -108,21 +111,31 @@ void ControlLoop()
     }
 
 #ifndef CCONTROL_EXAMPLE_SHOWCASE
-    // Mouse acts as the reference target (Step Input)
+    // ----------------------------------------
+    // [INPUT] Mouse acts as the reference target (Step Input)
+    // ----------------------------------------
     sys.u.coeffs[0] = (float)GetMouseX();
 #endif
 
+    // ----------------------------------------
+    // [SYSTEM CONFIG] Update Damping profile
+    // ----------------------------------------
     if (IsKeyPressed(KEY_RIGHT) || IsKeyPressed(KEY_UP) || IsKeyPressed(KEY_SPACE))
     {
         damping_ratio = NextProfile(&sys);
     }
 
-    // Step the next step to the mathematical system
+    // ----------------------------------------
+    // [STEP] Calculate the next step to the mathematical system
+    // ----------------------------------------
     Control_StateSpace_StepContinuous(&ctx, &sys, dt);
 
     int target_x = sys.u.coeffs[0];
     int actual_x = sys.y.coeffs[0];
 
+    // ----------------------------------------
+    // [VISUALIZATION] Draw the simulated frame
+    // ----------------------------------------
     DrawVisuals(target_x, actual_x);
 }
 
