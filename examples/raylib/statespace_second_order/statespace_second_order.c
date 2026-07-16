@@ -173,7 +173,7 @@ void DrawVisuals(int target_x, int actual_x)
         DrawLine(target_x, 0, target_x, SCREEN_HEIGHT, LIGHTGRAY);
         DrawText("Target (Mouse)", target_x + 5, 10, 20, GRAY);
 
-        DrawRectangle(actual_x - 20, SCREEN_HEIGHT / 2 - 20, 40, 40, MAROON);
+        DrawRectangle(actual_x - 20, SCREEN_HEIGHT / 2 - 20, 40, 40, BLUE);
         DrawText("System Output", actual_x - 50, SCREEN_HEIGHT / 2 + 30, 20, MAROON);
 
         DrawText(

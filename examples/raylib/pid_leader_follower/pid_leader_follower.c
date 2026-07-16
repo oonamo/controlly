@@ -276,7 +276,7 @@ void DrawVisuals(float cur_dist, float target, ControlPIDController *pid)
 
         float avg_error = (total_time > 0.0f) ? (accumulated_error / total_time) : 0.0f;
         DrawText(
-            TextFormat("Avg Error (MAE): %1.f px", avg_error), outer_rect.x + 5, 65, 20, MAROON);
+            TextFormat("Avg Error (MAE): %1.f px", avg_error), outer_rect.x + 5, 65, 20, RED);
 
         static const float padding = 10;
         static const float width = 350;
