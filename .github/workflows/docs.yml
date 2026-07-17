@@ -20,7 +20,6 @@ jobs:
     permissions:
       pages: write      # to deploy to Pages
       id-token: write   # to verify the deployment originates from an appropriate source
-    needs: build-raylib-webassembly
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -73,7 +72,7 @@ jobs:
       - name: Extract to Sphinx static folder
         run: |
           mkdir -p ../docs/source/_static/wasm
-          
+
           cp ./examples/raylib/state_space_second_order.js ../docs/source/_static/wasm/
           cp ./examples/raylib/state_space_second_order.wasm ../docs/source/_static/wasm/
           cp ./examples/raylib/state_space_second_order.html ../docs/source/_static/wasm/
