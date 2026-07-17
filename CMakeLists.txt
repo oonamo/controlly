@@ -34,5 +34,6 @@ if (CCONTROL_BUILD_EXAMPLES)
   add_subdirectory(examples)
 endif()
 
+list(APPEND CMAKE_CTEST_ARGUMENTS "--output-on-failure")
 enable_testing()
 add_subdirectory(test)
