@@ -40,7 +40,7 @@ jobs:
         run: doxygen ./Doxyfile
 
       - name: Build Docs
-        working-directory: /docs
+        working-directory: ./docs
         run: make html
 
       - name: Upload Artifact for GitHub Pages
