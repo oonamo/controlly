@@ -90,6 +90,7 @@ jobs:
           path: 'docs/build/html'
 
   deploy:
+    runs-on: ubuntu-latest
     needs: build
 
     # Grant GITHUB_TOKEN the permissions required to make a Pages deployment
