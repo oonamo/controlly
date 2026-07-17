@@ -43,12 +43,13 @@ foreach(SRC_FILE IN LISTS EXAMPLE_SOURCES)
   if(EMSCRIPTEN)
     set_target_properties(${TARGET_NAME} PROPERTIES SUFFIX ".html")
 
-      target_link_options(${TARGET_NAME} PRIVATE
+    target_link_options(${TARGET_NAME} PRIVATE
           "-sUSE_GLFW=3"
           "-sASSERTIONS=1"
           "-sWASM=1"
           "-sASYNCIFY"
           "-sGL_ENABLE_GET_PROC_ADDRESS"
+          "--shell-file" "${CMAKE_CURRENT_SOURCE_DIR}/shell.html"
           # "-sINITIAL_MEMORY=67108864" # 64 MB
       )
       # set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -s USE_GLFW=3 -s ASSERTIONS=1 -s WASM=1 -s ASYNCIFY -s GL_ENABLE_GET_PROC_ADDRESS=1")

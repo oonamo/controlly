@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en-us">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no" />
+  <title>CControl Simulation</title>
+  <style>
+    /* Reset body to remove default web margins */
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #1e1e1e;
+      /* Dark background to match Raylib/Sphinx */
+      overflow: hidden;
+      /* Prevent scrolling inside the iframe */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      width: 100vw;
+    }
+
+    /* Style the canvas to have no borders and ignore default outlines */
+    canvas.emscripten {
+      border: 0px none;
+      background-color: black;
+      outline: none;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- The HTML5 Canvas that Raylib will bind to -->
+  <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()" tabindex="-1"></canvas>
+
+  <script type='text/javascript'>
+    // Define the Module object that Emscripten expects
+    var Module = {
+      canvas: (function () {
+        var canvas = document.getElementById('canvas');
+
+        // Handle WebGL context loss gracefully
+        canvas.addEventListener("webglcontextlost", function (e) {
+          alert('WebGL context lost. You will need to reload the page.');
+          e.preventDefault();
+        }, false);
+
+        return canvas;
+      })()
+    };
+  </script>
+
+  <!-- Emscripten will automatically replace this tag with the compiled JavaScript -->
+  {{{ SCRIPT }}}
+</body>
+
+</html>

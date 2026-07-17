@@ -1,5 +1,6 @@
-**/build/*
+build/
 /docs/xml
 /latex/
-build_web/*
+build_web/
 .cache
+wasm
