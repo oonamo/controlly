@@ -39,6 +39,7 @@ target_compile_definitions(unity
   PUBLIC
   UNITY_OUTPUT_COLOR # Show colored output
   UNITY_INCLUDE_COMMAND_LINE_ARGS # Allows for parsing command line arguments
+  UNITY_FIXTURE_NO_EXTRAS
 )
 
 target_sources(test_runner PRIVATE
