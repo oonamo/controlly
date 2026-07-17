@@ -145,7 +145,7 @@ int main(void)
 
     // 5. Game Loop
 #ifdef PLATFORM_WEB
-    emscripten_set_main_loop(UpdateDrawFrame, 0, 1);
+    emscripten_set_main_loop(ControlLoop, 0, 1);
 #else
 
     while (!WindowShouldClose())
