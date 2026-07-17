@@ -38,15 +38,6 @@ jobs:
       - name: Install Python Dependencieds
         run: pip install sphinx breathe sphinx-rtd-theme
 
-      - name: Run Doxygen
-        run: doxygen ./Doxyfile
-
-      - name: Build Docs
-        working-directory: ./docs
-        run: |
-          make html
-          touch build/html/.nojekyll
-
       - name: Setup emsdk
         uses: emscripten-core/setup-emsdk@v15
         with:
@@ -80,6 +71,14 @@ jobs:
           cp ./examples/raylib/pid_leader_follower.wasm ../docs/source/_static/wasm/
           cp ./examples/raylib/pid_leader_follower.html ../docs/source/_static/wasm/
 
+      - name: Run Doxygen
+        run: doxygen ./Doxyfile
+
+      - name: Build Docs
+        working-directory: ./docs
+        run: |
+          make html
+          touch build/html/.nojekyll
 
       - name: Upload Artifact for GitHub Pages
         uses: actions/upload-pages-artifact@v3
