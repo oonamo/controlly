@@ -63,14 +63,11 @@ jobs:
       - name: Create Build Directory
         run: mkdir build_web
 
-      - name: Build cmake file
+      - name: Build and move files
         run: |
           cd build_web
           emcmake cmake .. -DCCONTROL_BUILD_EXAMPLES=ON
           cmake --build .
-
-      - name: Extract to Sphinx static folder
-        run: |
           mkdir -p ../docs/source/_static/wasm
 
           cp ./examples/raylib/statespace_second_order.js ../docs/source/_static/wasm/
