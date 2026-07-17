@@ -9,5 +9,4 @@ void Control_Arena_Clear(ControlArena *arena);
 size_t Control_Arena_RemainingSpace(ControlArena *arena);
 
 void *Control_Arena_Alloc(ControlArena *a, size_t size);
-void Control_Arena_Reset(ControlArena *a);
 #endif

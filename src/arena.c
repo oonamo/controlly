@@ -46,8 +46,3 @@ void *Control_Arena_Alloc(ControlArena *a, size_t size)
 
     return NULL;
 }
-
-void Control_Arena_Reset(ControlArena *a)
-{
-    a->offset = 0;
-}
