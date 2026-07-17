@@ -14,8 +14,14 @@
 #include <emscripten/emscripten.h>
 #endif
 
+#if defined(PLATFORM_WEB)
+#define SCREEN_WIDTH 800
+#define SCREEN_HEIGHT 600
+#else
 #define SCREEN_WIDTH 1250
 #define SCREEN_HEIGHT 750
+#endif
+
 #define FLOOR_HEIGHT SCREEN_HEIGHT * 0.6
 #define VEHICLE_HEIGHT 50
 #define VEHICLE_WIDTH 100
@@ -218,7 +224,8 @@ void DrawVisuals(float cur_dist, float target, ControlPIDController *pid)
 
             DrawLineEx(target_line_start, target_line_end, 3.0f, Fade(DARKGREEN, 0.6f));
 
-            DrawRectangle(target_pos - 35, target_line_end.y - 13.0f, 70, 20, Fade(DARKGREEN, 0.8f));
+            DrawRectangle(
+                target_pos - 35, target_line_end.y - 13.0f, 70, 20, Fade(DARKGREEN, 0.8f));
             DrawText("TARGET", target_pos - 22, target_line_end.y - 11.0f, 10, WHITE);
 
             // ERROR LINE
@@ -275,8 +282,7 @@ void DrawVisuals(float cur_dist, float target, ControlPIDController *pid)
         DrawText(TextFormat("Target: %.1f px", target), outer_rect.x + 5, 35, 20, DARKGREEN);
 
         float avg_error = (total_time > 0.0f) ? (accumulated_error / total_time) : 0.0f;
-        DrawText(
-            TextFormat("Avg Error (MAE): %1.f px", avg_error), outer_rect.x + 5, 65, 20, RED);
+        DrawText(TextFormat("Avg Error (MAE): %1.f px", avg_error), outer_rect.x + 5, 65, 20, RED);
 
         static const float padding = 10;
         static const float width = 350;
