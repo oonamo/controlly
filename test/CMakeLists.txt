@@ -48,6 +48,7 @@ target_sources(test_runner PRIVATE
   test_transferfunction.c
   test_statespace.c
   test_generated.c
+  test_matrix.c
   test_pid.c
   matlab_test_data.h
 )

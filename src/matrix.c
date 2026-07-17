@@ -1,3 +1,4 @@
+#include "ccontrol/arena.h"
 #include <ccontrol/matrix.h>
 
 ControlVec Control_Vec_Alloc(ControlArena *a, size_t size)
@@ -12,11 +13,31 @@ ControlVec Control_Vec_Alloc(ControlArena *a, size_t size)
         return CCONTROL_EMPTY_VEC;
     }
 
+    // TODO: Does this need to be reset?
     for (size_t i = 0; i < size; i++)
     {
         v.coeffs[i] = 0.0f;
     }
     return v;
+}
+
+ControlVec Control_Vec_Clone(ControlArena *a, const ControlVec *v)
+{
+    ControlVec cloned = Control_Vec_Alloc(a, v->size);
+    if (!Control_Vec_IsValid(&cloned))
+    {
+        return CCONTROL_EMPTY_VEC;
+    }
+
+    cloned.size = v->size;
+
+    // TODO: Abstract into CCONTROL_MEMCPY
+    for (size_t i = 0; i < v->size; i++)
+    {
+        cloned.coeffs[i] = v->coeffs[i];
+    }
+
+    return cloned;
 }
 
 ControlMatrix Control_Matrix_Alloc(ControlArena *a, size_t rows, size_t cols)
@@ -29,6 +50,7 @@ ControlMatrix Control_Matrix_Alloc(ControlArena *a, size_t rows, size_t cols)
         return CCONTROL_EMPTY_MATRIX;
     }
 
+    // TODO: Does this need to be set to 0.0f?
     for (size_t i = 0; i < rows; i++)
     {
         for (size_t j = 0; j < cols; j++)
@@ -40,6 +62,26 @@ ControlMatrix Control_Matrix_Alloc(ControlArena *a, size_t rows, size_t cols)
     m.rows = rows;
     m.cols = cols;
     return m;
+}
+
+ControlMatrix Control_Matrix_Clone(ControlArena *a, const ControlMatrix *m)
+{
+    ControlMatrix cloned = Control_Matrix_Alloc(a, m->rows, m->cols);
+    if (!Control_Matrix_IsValid(&cloned))
+    {
+        return CCONTROL_EMPTY_MATRIX;
+    }
+
+    // TODO: Abstract into CCONTROL_MEMCPY
+    for (size_t i = 0; i < m->rows; i++)
+    {
+        for (size_t j = 0; j < m->cols; j++)
+        {
+            cloned.data[i * m->cols + j] = m->data[i * m->cols + j];
+        }
+    }
+
+    return cloned;
 }
 
 ControlVec _CreateVectorInArena(ControlArena *a, size_t capacity)

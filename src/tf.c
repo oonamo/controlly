@@ -292,3 +292,15 @@ ControlTransferFunction Control_TF_ClosedLoop(ControlHandle *ctx,
 
     return Control_TF_FromPoly(&G->num, &denom);
 }
+
+ControlTransferFunction Control_TF_Persist(ControlHandle *ctx, const ControlTransferFunction *tf)
+{
+    ControlTransferFunction p_tf = {0};
+    CCONTROL_REQUIRE(
+        ctx, tf != NULL, CCONTROL_ERROR_INVALID_ARGUMENT, "Invalid TF", CCONTROL_EMPTY_TF);
+
+    p_tf.num = __Control_Poly_CreateInArena(ctx->persistent, tf->num.coeffs, tf->num.size);
+    p_tf.dem = __Control_Poly_CreateInArena(ctx->persistent, tf->dem.coeffs, tf->dem.size);
+
+    return p_tf;
+}

@@ -2,6 +2,7 @@
 #include <ccontrol/core.h>
 #include <ccontrol/tf.h>
 #include <stdlib.h>
+#include <string.h>
 #include <unity.h>
 #include <unity_fixture.h>
 
@@ -12,8 +13,7 @@ static void *s_pool;
 static ControlHandle ctx;
 static ControlResult last_error_code = CCONTROL_OK;
 
-static void MockErrorHandler(ControlResult code, const char *msg,
-                             void *user_data)
+static void MockErrorHandler(ControlResult code, const char *msg, void *user_data)
 {
     last_error_code = code;
 }
@@ -143,6 +143,41 @@ TEST(TransferFunction, MultiplyOutOfMemorySafelyAbortsAndThrows)
     TEST_ASSERT_EQUAL_INT(last_error_code, CCONTROL_ERROR_OUT_OF_MEMORY);
 }
 
+TEST(TransferFunction, CanDeepCloneTransferFunction)
+{
+    float tf_n[] = {1.0f, 2.0f, 3.0f};
+    float tf_d[] = {1.0f, 2.0f, 3.0f, 8.0f};
+
+    ControlVec num = Control_Poly_AllocScratch(&ctx, tf_n, 3);
+    ControlVec dem = Control_Poly_AllocScratch(&ctx, tf_d, 4);
+
+    ControlTransferFunction G1 = Control_TF_FromPoly(&num, &dem);
+    ControlTransferFunction cloned_tf = Control_TF_Persist(&ctx, &G1);
+
+    TEST_ASSERT_TRUE(Control_TF_IsValid(&cloned_tf));
+    TEST_ASSERT_TRUE(G1.num.coeffs != cloned_tf.num.coeffs &&
+                     G1.dem.coeffs != cloned_tf.dem.coeffs);
+
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(tf_n, cloned_tf.num.coeffs, 3);
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(tf_d, cloned_tf.dem.coeffs, 4);
+
+    // Clear scratch arena
+    Control_Arena_Clear(ctx.scratch);
+
+    // Fill scratch arena to check that TF was cloned to persistent arena
+    size_t remaining_space = Control_Arena_RemainingSpace(ctx.scratch);
+    void *mem = Control_Arena_Alloc(ctx.scratch, remaining_space);
+    TEST_ASSERT_NOT_NULL(mem);
+
+    // TODO: Abstract memcpy to CCONTROL_MEMCPY or ctx->memcpy() (if needed?)
+    // Also, is this safe for all testing environments
+    memset(mem, 0, remaining_space);
+
+    TEST_ASSERT_TRUE(Control_TF_IsValid(&cloned_tf));
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(tf_n, cloned_tf.num.coeffs, 3);
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(tf_d, cloned_tf.dem.coeffs, 4);
+}
+
 TEST_GROUP_RUNNER(TransferFunction)
 {
     RUN_TEST_CASE(TransferFunction, CanCreateTransferFunctionFromCoefficients);
@@ -150,4 +185,5 @@ TEST_GROUP_RUNNER(TransferFunction)
     RUN_TEST_CASE(TransferFunction, UnityClosedLoopReduction);
     RUN_TEST_CASE(TransferFunction, IsValidDetectsEmptyTransferFunction);
     RUN_TEST_CASE(TransferFunction, MultiplyInvalidTransferFunctionErrorsInvalidArgument);
+    RUN_TEST_CASE(TransferFunction, CanDeepCloneTransferFunction);
 }

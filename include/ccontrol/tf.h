@@ -40,4 +40,6 @@ ControlTransferFunction Control_TF_ClosedLoop(ControlHandle *ctx,
 
 bool Control_TF_IsValid(ControlTransferFunction *tf);
 
+ControlTransferFunction Control_TF_Persist(ControlHandle* ctx, const ControlTransferFunction* tf);
+
 #endif

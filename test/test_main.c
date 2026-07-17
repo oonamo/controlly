@@ -10,6 +10,7 @@ static void runAllTests(void)
     RUN_TEST_GROUP(GeneratedFuzz);
     RUN_TEST_GROUP(StateSpace);
     RUN_TEST_GROUP(PID);
+    RUN_TEST_GROUP(Matrix);
 }
 
 int main(int argc, const char *argv[])
