@@ -34,6 +34,7 @@ TEST_SETUP(Arena)
 
 TEST_TEAR_DOWN(Arena)
 {
+    arena = NULL;
 }
 
 TEST(Arena, InitialCreationTracksCapacityCorrectly)
