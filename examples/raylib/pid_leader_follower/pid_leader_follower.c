@@ -72,6 +72,7 @@ bool VehiclesAreColliding(void);
 // ========================================
 // 3. GLOBAL STATE & TARGET
 // ========================================
+// [DOC_START: pid_example]
 static const float TARGET_DISTANCE = 250.0f;
 static ControlPIDController pid = {0};
 
@@ -140,6 +141,7 @@ void ControlLoop()
     // ----------------------------------------
     DrawVisuals(current_distance, TARGET_DISTANCE, &pid);
 }
+// [DOC_END: pid_example]
 
 int main()
 {
