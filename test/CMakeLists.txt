@@ -38,7 +38,6 @@ add_executable(test_runner)
 target_compile_definitions(unity
   PUBLIC
   UNITY_OUTPUT_COLOR # Show colored output
-  UNITY_INCLUDE_EXEC_TIME # See Unity #838
   UNITY_INCLUDE_COMMAND_LINE_ARGS # Allows for parsing command line arguments
 )
 
