@@ -102,6 +102,12 @@ TEST(Arena, HandlesAllocOfZero)
     TEST_ASSERT_EQUAL_size_t(initial_space, Control_Arena_RemainingSpace(arena));
 }
 
+TEST(Arena, CreationFailsIfCapacityIsTooSmall)
+{
+    ControlArena *new_arena = Control_Arena_Create(static_mempool, sizeof(ControlArena) - 1);
+    TEST_ASSERT_NULL(new_arena);
+}
+
 TEST_GROUP_RUNNER(Arena)
 {
     RUN_TEST_CASE(Arena, InitialCreationTracksCapacityCorrectly);
@@ -111,4 +117,6 @@ TEST_GROUP_RUNNER(Arena)
     RUN_TEST_CASE(Arena, AllocReturnsNullWhenExhausted);
     RUN_TEST_CASE(Arena, ClearResetsCapacityAndReusesMemory);
     RUN_TEST_CASE(Arena, HandlesAllocOfZero);
+    RUN_TEST_CASE(Arena, HandlesAllocOfZero);
+    RUN_TEST_CASE(Arena, CreationFailsIfCapacityIsTooSmall);
 }

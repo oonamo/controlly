@@ -3,6 +3,10 @@
 
 ControlArena *Control_Arena_Create(void *backing_buffer, size_t capacity)
 {
+    if (capacity <= sizeof(ControlArena))
+    {
+        return NULL;
+    }
     ControlArena *arena = (ControlArena *)backing_buffer;
     arena->_buffer = (uint8_t *)backing_buffer + sizeof(ControlArena);
     arena->_capacity = capacity - sizeof(ControlArena);
@@ -30,7 +34,7 @@ void *Control_Arena_Alloc(ControlArena *a, size_t size)
 {
     if (size == 0)
     {
-      return NULL;
+        return NULL;
     }
 
     size_t align_size = ALIGN_UP(size, CCONTROL_ARENA_ALIGN_SIZE);
