@@ -1,3 +1,5 @@
-build/*
+**/build/*
+/docs/xml
+/latex/
 build_web/*
 .cache
