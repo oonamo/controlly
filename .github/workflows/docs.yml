@@ -73,9 +73,9 @@ jobs:
         run: |
           mkdir -p ../docs/source/_static/wasm
 
-          cp ./examples/raylib/state_space_second_order.js ../docs/source/_static/wasm/
-          cp ./examples/raylib/state_space_second_order.wasm ../docs/source/_static/wasm/
-          cp ./examples/raylib/state_space_second_order.html ../docs/source/_static/wasm/
+          cp ./examples/raylib/statespace_second_order.js ../docs/source/_static/wasm/
+          cp ./examples/raylib/statespace_second_order.wasm ../docs/source/_static/wasm/
+          cp ./examples/raylib/statespace_second_order.html ../docs/source/_static/wasm/
 
           cp ./examples/raylib/pid_leader_follower.js ../docs/source/_static/wasm/
           cp ./examples/raylib/pid_leader_follower.wasm ../docs/source/_static/wasm/
