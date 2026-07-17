@@ -66,8 +66,8 @@ jobs:
       - name: Build cmake file
         run: |
           cd build_web
-          emcmake cmake ..
-          cmake --build . -DCCONTROL_BUILD_EXAMPLES
+          emcmake cmake .. -DCCONTROL_BUILD_EXAMPLES=ON
+          cmake --build .
 
       - name: Extract to Sphinx static folder
         run: |
