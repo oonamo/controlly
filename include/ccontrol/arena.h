@@ -12,14 +12,14 @@
 #include <stdint.h>
 
 #ifndef CCONTROL_ARENA_ALIGN_SIZE
-#define CCONTROL_ARENA_ALIGN_SIZE 8
+/*
+ * Size of arena alignment
+ */
+#    define CCONTROL_ARENA_ALIGN_SIZE 8
 #endif
 
 /**
  * @brief In-place structure for the memory arena
- *
- * @warning This struct allocates itself into the backing buffer.
- * It is possibile that `sizeof(ControlArena) != Control_Arena_RemainingSpace(arena)`
  *
  * @warning Fields prefixed with an underscore (_) are considered private
  * and should not be modified by the user
@@ -59,6 +59,9 @@ void Control_Arena_Clear(ControlArena *arena);
 
 /**
  * @brief Calculates the remaining bytes in the arena.
+ *
+ * @warning On initialization, the result of `Control_Arena_RemainingSpace(arena)` may not equal
+ * arena->capacity
  *
  * @param Pointer to the arena.
  * @return Number of possible bytes available for allocation
