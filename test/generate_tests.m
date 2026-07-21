@@ -92,22 +92,22 @@ function write_unity_test(fileID, test_name, G1, G2)
 
     % Write the C logic to test these arrays
     fprintf(fileID, '    ControlVec num1_v = Control_Poly_AllocPersistent(&ctx, n1, %d);\n', length(num1));
-    fprintf(fileID, '    ControlVec dem1_v = Control_Poly_AllocPersistent(&ctx, d1, %d);\n', length(den1));
-    fprintf(fileID, '    ControlTransferFunction tf1 = Control_TF_FromPoly(&num1_v, &dem1_v);\n');
+    fprintf(fileID, '    ControlVec den1_v = Control_Poly_AllocPersistent(&ctx, d1, %d);\n', length(den1));
+    fprintf(fileID, '    ControlTransferFunction tf1 = Control_TF_FromPoly(&num1_v, &den1_v);\n');
 
     fprintf(fileID, '    ControlVec num2_v = Control_Poly_AllocPersistent(&ctx, n2, %d);\n', length(num2));
-    fprintf(fileID, '    ControlVec dem2_v = Control_Poly_AllocPersistent(&ctx, d2, %d);\n', length(den2));
-    fprintf(fileID, '    ControlTransferFunction tf2 = Control_TF_FromPoly(&num2_v, &dem2_v);\n');
+    fprintf(fileID, '    ControlVec den2_v = Control_Poly_AllocPersistent(&ctx, d2, %d);\n', length(den2));
+    fprintf(fileID, '    ControlTransferFunction tf2 = Control_TF_FromPoly(&num2_v, &den2_v);\n');
 
     fprintf(fileID, '    ControlTransferFunction result = Control_TF_Multiply(&ctx, &tf1, &tf2);\n');
 
     % Write the Assertions using the EXACT true lengths
     fprintf(fileID, '    TEST_ASSERT_EQUAL_FLOAT_ARRAY(n_exp, result.num.coeffs, %d);\n', length(num_exp));
-    fprintf(fileID, '    TEST_ASSERT_EQUAL_FLOAT_ARRAY(d_exp, result.dem.coeffs, %d);\n', length(den_exp));
+    fprintf(fileID, '    TEST_ASSERT_EQUAL_FLOAT_ARRAY(d_exp, result.den.coeffs, %d);\n', length(den_exp));
 
     % Assert that ccontrol calculated the size correctly
     fprintf(fileID, '    TEST_ASSERT_EQUAL_size_t(%d, result.num.size);\n', length(num_exp));
-    fprintf(fileID, '    TEST_ASSERT_EQUAL_size_t(%d, result.dem.size);\n', length(den_exp));
+    fprintf(fileID, '    TEST_ASSERT_EQUAL_size_t(%d, result.den.size);\n', length(den_exp));
 
     fprintf(fileID, '}\n\n');
 end

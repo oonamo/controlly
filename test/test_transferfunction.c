@@ -50,10 +50,10 @@ TEST(TransferFunction, CanCreateTransferFunctionFromCoefficients)
     ControlTransferFunction tf = Control_TF_FromPoly(&num, &dem);
 
     TEST_ASSERT_EQUAL_size_t(2, tf.num.size);
-    TEST_ASSERT_EQUAL_size_t(3, tf.dem.size);
+    TEST_ASSERT_EQUAL_size_t(3, tf.den.size);
 
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(n_val, tf.num.coeffs, 2);
-    TEST_ASSERT_EQUAL_FLOAT_ARRAY(d_val, tf.dem.coeffs, 3);
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(d_val, tf.den.coeffs, 3);
 }
 
 TEST(TransferFunction, MultiplyTwoTransferFunctions)
@@ -80,7 +80,7 @@ TEST(TransferFunction, MultiplyTwoTransferFunctions)
     float expected_dem[] = {1.0f, 5.0f, 6.0f};
 
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(expected_num, G_sys.num.coeffs, 1);
-    TEST_ASSERT_EQUAL_FLOAT_ARRAY(expected_dem, G_sys.dem.coeffs, 3);
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(expected_dem, G_sys.den.coeffs, 3);
 }
 
 TEST(TransferFunction, UnityClosedLoopReduction)
@@ -100,7 +100,7 @@ TEST(TransferFunction, UnityClosedLoopReduction)
     float expected_dem[] = {1.0f, 12.0f};
 
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(n, T.num.coeffs, 1);
-    TEST_ASSERT_EQUAL_FLOAT_ARRAY(expected_dem, T.dem.coeffs, 2);
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(expected_dem, T.den.coeffs, 2);
 }
 
 TEST(TransferFunction, IsValidDetectsEmptyTransferFunction)
@@ -156,10 +156,10 @@ TEST(TransferFunction, CanDeepCloneTransferFunction)
 
     TEST_ASSERT_TRUE(Control_TF_IsValid(&cloned_tf));
     TEST_ASSERT_TRUE(G1.num.coeffs != cloned_tf.num.coeffs &&
-                     G1.dem.coeffs != cloned_tf.dem.coeffs);
+                     G1.den.coeffs != cloned_tf.den.coeffs);
 
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(tf_n, cloned_tf.num.coeffs, 3);
-    TEST_ASSERT_EQUAL_FLOAT_ARRAY(tf_d, cloned_tf.dem.coeffs, 4);
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(tf_d, cloned_tf.den.coeffs, 4);
 
     // Clear scratch arena
     Control_Arena_Clear(ctx.scratch);
@@ -175,7 +175,7 @@ TEST(TransferFunction, CanDeepCloneTransferFunction)
 
     TEST_ASSERT_TRUE(Control_TF_IsValid(&cloned_tf));
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(tf_n, cloned_tf.num.coeffs, 3);
-    TEST_ASSERT_EQUAL_FLOAT_ARRAY(tf_d, cloned_tf.dem.coeffs, 4);
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(tf_d, cloned_tf.den.coeffs, 4);
 }
 
 TEST_GROUP_RUNNER(TransferFunction)

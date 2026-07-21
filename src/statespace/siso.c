@@ -7,7 +7,7 @@
 static ControlSystemMatrixj __generate_sys_matrix_InPersistent(ControlArena *persistent,
                                                                const ControlTransferFunction *tf)
 {
-    size_t n = tf->dem.size - 1;
+    size_t n = tf->den.size - 1;
     ControlMatrix A = Control_Matrix_Alloc(persistent, n, n);
     if (!Control_Matrix_IsValid(&A))
     {
@@ -21,7 +21,7 @@ static ControlSystemMatrixj __generate_sys_matrix_InPersistent(ControlArena *per
 
     for (size_t i = 0; i < n; i++)
     {
-        A.data[(n - 1) * n + i] = -tf->dem.coeffs[n - i];
+        A.data[(n - 1) * n + i] = -tf->den.coeffs[n - i];
     }
 
     return A;
@@ -30,7 +30,7 @@ static ControlSystemMatrixj __generate_sys_matrix_InPersistent(ControlArena *per
 static ControlInputMatrix __gen_input_matrix_InPersistent(ControlArena *persistent,
                                                           const ControlTransferFunction *tf)
 {
-    size_t n = tf->dem.size - 1;
+    size_t n = tf->den.size - 1;
     ControlMatrix B = Control_Matrix_Alloc(persistent, n, 1);
     if (!Control_Matrix_IsValid(&B))
     {
@@ -43,7 +43,7 @@ static ControlInputMatrix __gen_input_matrix_InPersistent(ControlArena *persiste
 static ControlOutputMatrix __gen_output_matrix_InPersistent(ControlArena *persistent,
                                                             const ControlTransferFunction *tf)
 {
-    size_t n = tf->dem.size - 1;
+    size_t n = tf->den.size - 1;
     ControlMatrix C = Control_Matrix_Alloc(persistent, 1, n);
     if (!Control_Matrix_IsValid(&C))
     {
@@ -53,7 +53,7 @@ static ControlOutputMatrix __gen_output_matrix_InPersistent(ControlArena *persis
     size_t m = tf->num.size - 1;
 
     float b0 = 0.0f;
-    if (tf->num.size == tf->dem.size)
+    if (tf->num.size == tf->den.size)
     {
         b0 = tf->num.coeffs[0];
     }
@@ -64,7 +64,7 @@ static ControlOutputMatrix __gen_output_matrix_InPersistent(ControlArena *persis
     {
         size_t k = n - i; // Polynomial order
 
-        float ak = tf->dem.coeffs[k];
+        float ak = tf->den.coeffs[k];
         float bk = 0.0f;
 
         if (k >= offset)
@@ -85,7 +85,7 @@ __gen_feedthrough_matrix_InPersistent(ControlArena *persistent, const ControlTra
         return CCONTROL_EMPTY_MATRIX;
     }
     float b0 = 0.0f;
-    if (tf->num.size == tf->dem.size)
+    if (tf->num.size == tf->den.size)
     {
         b0 = tf->num.coeffs[0];
     }

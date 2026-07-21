@@ -6,16 +6,23 @@
 #include <stddef.h>
 #include <stdint.h>
 
+// TODO: Rename to ControlFeedbackType
+/**
+ * Feedback loop type
+ */
 typedef enum
 {
-    TF_UNITY_POSITIVE = 1,
-    TF_UNITY_NEGATIVE = 1,
+    TF_FEEDBACK_POSITIVE = 1, /*!< Describes a system with a positive feedback loop */
+    TF_FEEDBACK_NEGATIVE = 1, /*!< Describes a system with a negative feedback loop */
 } ControlFeedbackUnity;
 
+/**
+ * Transfer function structure
+ */
 typedef struct
 {
-    ControlVec num;
-    ControlVec dem;
+    ControlVec num; /*!< Numerator of the transfer function */
+    ControlVec den; /*!< Denominator of the transfer function */
 } ControlTransferFunction;
 
 #define CCONTROL_EMPTY_TF ((ControlTransferFunction){0})
@@ -40,6 +47,6 @@ ControlTransferFunction Control_TF_ClosedLoop(ControlHandle *ctx,
 
 bool Control_TF_IsValid(ControlTransferFunction *tf);
 
-ControlTransferFunction Control_TF_Persist(ControlHandle* ctx, const ControlTransferFunction* tf);
+ControlTransferFunction Control_TF_Persist(ControlHandle *ctx, const ControlTransferFunction *tf);
 
 #endif

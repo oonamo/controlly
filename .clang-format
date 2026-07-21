@@ -20,4 +20,6 @@ PointerAlignment: Right
 SpaceBeforeParens: ControlStatements
 
 InsertBraces: true
+AlignConsecutiveMacros: AcrossEmptyLinesAndComments
+IndentPPDirectives: AfterHash
 ...

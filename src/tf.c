@@ -195,7 +195,7 @@ ControlTransferFunction Control_TF_FromPoly(const ControlVec *num, const Control
 {
     ControlTransferFunction G = {
         .num = *num,
-        .dem = *dem,
+        .den = *dem,
     };
     return G;
 }
@@ -210,7 +210,7 @@ static ControlTransferFunction __Control_TF_MultiplyInArena(ControlArena *a,
         return CCONTROL_EMPTY_TF;
     }
 
-    ControlVec conv_dem = __Control_Poly_MultiplyInArena(a, &G1->dem, &G2->dem);
+    ControlVec conv_dem = __Control_Poly_MultiplyInArena(a, &G1->den, &G2->den);
     if (!Control_Vec_IsValid(&conv_dem))
     {
         return CCONTROL_EMPTY_TF;
@@ -238,7 +238,7 @@ Control_TF_Multiply(ControlHandle *ctx, ControlTransferFunction *G1, ControlTran
 
 inline bool Control_TF_IsValid(ControlTransferFunction *tf)
 {
-    return tf != NULL && tf->num.coeffs != NULL && tf->dem.coeffs != NULL;
+    return tf != NULL && tf->num.coeffs != NULL && tf->den.coeffs != NULL;
 }
 
 ControlTransferFunction Control_TF_ClosedLoop(ControlHandle *ctx,
@@ -255,7 +255,7 @@ ControlTransferFunction Control_TF_ClosedLoop(ControlHandle *ctx,
      * H(s) = N(s)/(D(s) + k*N(s))
      */
 
-    if (unity == TF_UNITY_NEGATIVE)
+    if (unity == TF_FEEDBACK_NEGATIVE)
     {
         gain = -gain;
     }
@@ -280,7 +280,7 @@ ControlTransferFunction Control_TF_ClosedLoop(ControlHandle *ctx,
         scaled_num = G->num;
     }
 
-    ControlVec denom = __Control_Poly_AddInArena(ctx->scratch, &G->dem, &scaled_num);
+    ControlVec denom = __Control_Poly_AddInArena(ctx->scratch, &G->den, &scaled_num);
     if (!Control_Vec_IsValid(&denom))
     {
         CCONTROL_THROW(ctx,
@@ -300,7 +300,7 @@ ControlTransferFunction Control_TF_Persist(ControlHandle *ctx, const ControlTran
         ctx, tf != NULL, CCONTROL_ERROR_INVALID_ARGUMENT, "Invalid TF", CCONTROL_EMPTY_TF);
 
     p_tf.num = __Control_Poly_CreateInArena(ctx->persistent, tf->num.coeffs, tf->num.size);
-    p_tf.dem = __Control_Poly_CreateInArena(ctx->persistent, tf->dem.coeffs, tf->dem.size);
+    p_tf.den = __Control_Poly_CreateInArena(ctx->persistent, tf->den.coeffs, tf->den.size);
 
     return p_tf;
 }

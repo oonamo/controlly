@@ -24,16 +24,16 @@ TEST(GeneratedFuzz, SimpleSeries) {
     float n_exp[] = {2.000000f, };
     float d_exp[] = {1.000000f, 5.000000f, 6.000000f, };
     ControlVec num1_v = Control_Poly_AllocPersistent(&ctx, n1, 1);
-    ControlVec dem1_v = Control_Poly_AllocPersistent(&ctx, d1, 2);
-    ControlTransferFunction tf1 = Control_TF_FromPoly(&num1_v, &dem1_v);
+    ControlVec den1_v = Control_Poly_AllocPersistent(&ctx, d1, 2);
+    ControlTransferFunction tf1 = Control_TF_FromPoly(&num1_v, &den1_v);
     ControlVec num2_v = Control_Poly_AllocPersistent(&ctx, n2, 1);
-    ControlVec dem2_v = Control_Poly_AllocPersistent(&ctx, d2, 2);
-    ControlTransferFunction tf2 = Control_TF_FromPoly(&num2_v, &dem2_v);
+    ControlVec den2_v = Control_Poly_AllocPersistent(&ctx, d2, 2);
+    ControlTransferFunction tf2 = Control_TF_FromPoly(&num2_v, &den2_v);
     ControlTransferFunction result = Control_TF_Multiply(&ctx, &tf1, &tf2);
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(n_exp, result.num.coeffs, 1);
-    TEST_ASSERT_EQUAL_FLOAT_ARRAY(d_exp, result.dem.coeffs, 3);
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(d_exp, result.den.coeffs, 3);
     TEST_ASSERT_EQUAL_size_t(1, result.num.size);
-    TEST_ASSERT_EQUAL_size_t(3, result.dem.size);
+    TEST_ASSERT_EQUAL_size_t(3, result.den.size);
 }
 
 TEST(GeneratedFuzz, MismatchedOrder) {
@@ -44,16 +44,16 @@ TEST(GeneratedFuzz, MismatchedOrder) {
     float n_exp[] = {1.000000f, 2.000000f, };
     float d_exp[] = {1.000000f, 5.000000f, 10.000000f, 13.000000f, 10.000000f, };
     ControlVec num1_v = Control_Poly_AllocPersistent(&ctx, n1, 1);
-    ControlVec dem1_v = Control_Poly_AllocPersistent(&ctx, d1, 2);
-    ControlTransferFunction tf1 = Control_TF_FromPoly(&num1_v, &dem1_v);
+    ControlVec den1_v = Control_Poly_AllocPersistent(&ctx, d1, 2);
+    ControlTransferFunction tf1 = Control_TF_FromPoly(&num1_v, &den1_v);
     ControlVec num2_v = Control_Poly_AllocPersistent(&ctx, n2, 2);
-    ControlVec dem2_v = Control_Poly_AllocPersistent(&ctx, d2, 4);
-    ControlTransferFunction tf2 = Control_TF_FromPoly(&num2_v, &dem2_v);
+    ControlVec den2_v = Control_Poly_AllocPersistent(&ctx, d2, 4);
+    ControlTransferFunction tf2 = Control_TF_FromPoly(&num2_v, &den2_v);
     ControlTransferFunction result = Control_TF_Multiply(&ctx, &tf1, &tf2);
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(n_exp, result.num.coeffs, 2);
-    TEST_ASSERT_EQUAL_FLOAT_ARRAY(d_exp, result.dem.coeffs, 5);
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(d_exp, result.den.coeffs, 5);
     TEST_ASSERT_EQUAL_size_t(2, result.num.size);
-    TEST_ASSERT_EQUAL_size_t(5, result.dem.size);
+    TEST_ASSERT_EQUAL_size_t(5, result.den.size);
 }
 
 TEST(GeneratedFuzz, FuzzMultiply_1) {
@@ -64,16 +64,16 @@ TEST(GeneratedFuzz, FuzzMultiply_1) {
     float n_exp[] = {-12.000000f, -22.000000f, -8.000000f, };
     float d_exp[] = {-4.000000f, -15.000000f, 6.000000f, 30.000000f, 5.000000f, };
     ControlVec num1_v = Control_Poly_AllocPersistent(&ctx, n1, 2);
-    ControlVec dem1_v = Control_Poly_AllocPersistent(&ctx, d1, 3);
-    ControlTransferFunction tf1 = Control_TF_FromPoly(&num1_v, &dem1_v);
+    ControlVec den1_v = Control_Poly_AllocPersistent(&ctx, d1, 3);
+    ControlTransferFunction tf1 = Control_TF_FromPoly(&num1_v, &den1_v);
     ControlVec num2_v = Control_Poly_AllocPersistent(&ctx, n2, 2);
-    ControlVec dem2_v = Control_Poly_AllocPersistent(&ctx, d2, 3);
-    ControlTransferFunction tf2 = Control_TF_FromPoly(&num2_v, &dem2_v);
+    ControlVec den2_v = Control_Poly_AllocPersistent(&ctx, d2, 3);
+    ControlTransferFunction tf2 = Control_TF_FromPoly(&num2_v, &den2_v);
     ControlTransferFunction result = Control_TF_Multiply(&ctx, &tf1, &tf2);
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(n_exp, result.num.coeffs, 3);
-    TEST_ASSERT_EQUAL_FLOAT_ARRAY(d_exp, result.dem.coeffs, 5);
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(d_exp, result.den.coeffs, 5);
     TEST_ASSERT_EQUAL_size_t(3, result.num.size);
-    TEST_ASSERT_EQUAL_size_t(5, result.dem.size);
+    TEST_ASSERT_EQUAL_size_t(5, result.den.size);
 }
 
 TEST(GeneratedFuzz, FuzzMultiply_2) {
@@ -84,16 +84,16 @@ TEST(GeneratedFuzz, FuzzMultiply_2) {
     float n_exp[] = {16.000000f, -16.000000f, -5.000000f, };
     float d_exp[] = {25.000000f, 15.000000f, 40.000000f, 9.000000f, 15.000000f, };
     ControlVec num1_v = Control_Poly_AllocPersistent(&ctx, n1, 2);
-    ControlVec dem1_v = Control_Poly_AllocPersistent(&ctx, d1, 3);
-    ControlTransferFunction tf1 = Control_TF_FromPoly(&num1_v, &dem1_v);
+    ControlVec den1_v = Control_Poly_AllocPersistent(&ctx, d1, 3);
+    ControlTransferFunction tf1 = Control_TF_FromPoly(&num1_v, &den1_v);
     ControlVec num2_v = Control_Poly_AllocPersistent(&ctx, n2, 2);
-    ControlVec dem2_v = Control_Poly_AllocPersistent(&ctx, d2, 3);
-    ControlTransferFunction tf2 = Control_TF_FromPoly(&num2_v, &dem2_v);
+    ControlVec den2_v = Control_Poly_AllocPersistent(&ctx, d2, 3);
+    ControlTransferFunction tf2 = Control_TF_FromPoly(&num2_v, &den2_v);
     ControlTransferFunction result = Control_TF_Multiply(&ctx, &tf1, &tf2);
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(n_exp, result.num.coeffs, 3);
-    TEST_ASSERT_EQUAL_FLOAT_ARRAY(d_exp, result.dem.coeffs, 5);
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(d_exp, result.den.coeffs, 5);
     TEST_ASSERT_EQUAL_size_t(3, result.num.size);
-    TEST_ASSERT_EQUAL_size_t(5, result.dem.size);
+    TEST_ASSERT_EQUAL_size_t(5, result.den.size);
 }
 
 TEST(GeneratedFuzz, FuzzMultiply_3) {
@@ -104,16 +104,16 @@ TEST(GeneratedFuzz, FuzzMultiply_3) {
     float n_exp[] = {6.000000f, -9.000000f, -15.000000f, };
     float d_exp[] = {-4.000000f, 3.000000f, -8.000000f, -16.000000f, -8.000000f, };
     ControlVec num1_v = Control_Poly_AllocPersistent(&ctx, n1, 2);
-    ControlVec dem1_v = Control_Poly_AllocPersistent(&ctx, d1, 3);
-    ControlTransferFunction tf1 = Control_TF_FromPoly(&num1_v, &dem1_v);
+    ControlVec den1_v = Control_Poly_AllocPersistent(&ctx, d1, 3);
+    ControlTransferFunction tf1 = Control_TF_FromPoly(&num1_v, &den1_v);
     ControlVec num2_v = Control_Poly_AllocPersistent(&ctx, n2, 2);
-    ControlVec dem2_v = Control_Poly_AllocPersistent(&ctx, d2, 3);
-    ControlTransferFunction tf2 = Control_TF_FromPoly(&num2_v, &dem2_v);
+    ControlVec den2_v = Control_Poly_AllocPersistent(&ctx, d2, 3);
+    ControlTransferFunction tf2 = Control_TF_FromPoly(&num2_v, &den2_v);
     ControlTransferFunction result = Control_TF_Multiply(&ctx, &tf1, &tf2);
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(n_exp, result.num.coeffs, 3);
-    TEST_ASSERT_EQUAL_FLOAT_ARRAY(d_exp, result.dem.coeffs, 5);
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(d_exp, result.den.coeffs, 5);
     TEST_ASSERT_EQUAL_size_t(3, result.num.size);
-    TEST_ASSERT_EQUAL_size_t(5, result.dem.size);
+    TEST_ASSERT_EQUAL_size_t(5, result.den.size);
 }
 
 TEST(GeneratedFuzz, FuzzMultiply_4) {
@@ -124,16 +124,16 @@ TEST(GeneratedFuzz, FuzzMultiply_4) {
     float n_exp[] = {8.000000f, -16.000000f, -10.000000f, };
     float d_exp[] = {4.000000f, 0.000000f, -7.000000f, 5.000000f, 20.000000f, };
     ControlVec num1_v = Control_Poly_AllocPersistent(&ctx, n1, 2);
-    ControlVec dem1_v = Control_Poly_AllocPersistent(&ctx, d1, 3);
-    ControlTransferFunction tf1 = Control_TF_FromPoly(&num1_v, &dem1_v);
+    ControlVec den1_v = Control_Poly_AllocPersistent(&ctx, d1, 3);
+    ControlTransferFunction tf1 = Control_TF_FromPoly(&num1_v, &den1_v);
     ControlVec num2_v = Control_Poly_AllocPersistent(&ctx, n2, 2);
-    ControlVec dem2_v = Control_Poly_AllocPersistent(&ctx, d2, 3);
-    ControlTransferFunction tf2 = Control_TF_FromPoly(&num2_v, &dem2_v);
+    ControlVec den2_v = Control_Poly_AllocPersistent(&ctx, d2, 3);
+    ControlTransferFunction tf2 = Control_TF_FromPoly(&num2_v, &den2_v);
     ControlTransferFunction result = Control_TF_Multiply(&ctx, &tf1, &tf2);
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(n_exp, result.num.coeffs, 3);
-    TEST_ASSERT_EQUAL_FLOAT_ARRAY(d_exp, result.dem.coeffs, 5);
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(d_exp, result.den.coeffs, 5);
     TEST_ASSERT_EQUAL_size_t(3, result.num.size);
-    TEST_ASSERT_EQUAL_size_t(5, result.dem.size);
+    TEST_ASSERT_EQUAL_size_t(5, result.den.size);
 }
 
 TEST(GeneratedFuzz, FuzzMultiply_5) {
@@ -144,16 +144,16 @@ TEST(GeneratedFuzz, FuzzMultiply_5) {
     float n_exp[] = {1.000000f, 1.000000f, };
     float d_exp[] = {6.000000f, 12.000000f, 9.000000f, 3.000000f, -9.000000f, };
     ControlVec num1_v = Control_Poly_AllocPersistent(&ctx, n1, 2);
-    ControlVec dem1_v = Control_Poly_AllocPersistent(&ctx, d1, 3);
-    ControlTransferFunction tf1 = Control_TF_FromPoly(&num1_v, &dem1_v);
+    ControlVec den1_v = Control_Poly_AllocPersistent(&ctx, d1, 3);
+    ControlTransferFunction tf1 = Control_TF_FromPoly(&num1_v, &den1_v);
     ControlVec num2_v = Control_Poly_AllocPersistent(&ctx, n2, 1);
-    ControlVec dem2_v = Control_Poly_AllocPersistent(&ctx, d2, 3);
-    ControlTransferFunction tf2 = Control_TF_FromPoly(&num2_v, &dem2_v);
+    ControlVec den2_v = Control_Poly_AllocPersistent(&ctx, d2, 3);
+    ControlTransferFunction tf2 = Control_TF_FromPoly(&num2_v, &den2_v);
     ControlTransferFunction result = Control_TF_Multiply(&ctx, &tf1, &tf2);
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(n_exp, result.num.coeffs, 2);
-    TEST_ASSERT_EQUAL_FLOAT_ARRAY(d_exp, result.dem.coeffs, 5);
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(d_exp, result.den.coeffs, 5);
     TEST_ASSERT_EQUAL_size_t(2, result.num.size);
-    TEST_ASSERT_EQUAL_size_t(5, result.dem.size);
+    TEST_ASSERT_EQUAL_size_t(5, result.den.size);
 }
 
 TEST(GeneratedFuzz, FuzzMultiply_6) {
@@ -164,16 +164,16 @@ TEST(GeneratedFuzz, FuzzMultiply_6) {
     float n_exp[] = {-10.000000f, 10.000000f, };
     float d_exp[] = {-4.000000f, 10.000000f, -2.000000f, 8.000000f, 12.000000f, };
     ControlVec num1_v = Control_Poly_AllocPersistent(&ctx, n1, 2);
-    ControlVec dem1_v = Control_Poly_AllocPersistent(&ctx, d1, 3);
-    ControlTransferFunction tf1 = Control_TF_FromPoly(&num1_v, &dem1_v);
+    ControlVec den1_v = Control_Poly_AllocPersistent(&ctx, d1, 3);
+    ControlTransferFunction tf1 = Control_TF_FromPoly(&num1_v, &den1_v);
     ControlVec num2_v = Control_Poly_AllocPersistent(&ctx, n2, 1);
-    ControlVec dem2_v = Control_Poly_AllocPersistent(&ctx, d2, 3);
-    ControlTransferFunction tf2 = Control_TF_FromPoly(&num2_v, &dem2_v);
+    ControlVec den2_v = Control_Poly_AllocPersistent(&ctx, d2, 3);
+    ControlTransferFunction tf2 = Control_TF_FromPoly(&num2_v, &den2_v);
     ControlTransferFunction result = Control_TF_Multiply(&ctx, &tf1, &tf2);
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(n_exp, result.num.coeffs, 2);
-    TEST_ASSERT_EQUAL_FLOAT_ARRAY(d_exp, result.dem.coeffs, 5);
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(d_exp, result.den.coeffs, 5);
     TEST_ASSERT_EQUAL_size_t(2, result.num.size);
-    TEST_ASSERT_EQUAL_size_t(5, result.dem.size);
+    TEST_ASSERT_EQUAL_size_t(5, result.den.size);
 }
 
 TEST(GeneratedFuzz, FuzzMultiply_7) {
@@ -184,16 +184,16 @@ TEST(GeneratedFuzz, FuzzMultiply_7) {
     float n_exp[] = {15.000000f, -12.000000f, -3.000000f, };
     float d_exp[] = {-8.000000f, -24.000000f, -22.000000f, -12.000000f, };
     ControlVec num1_v = Control_Poly_AllocPersistent(&ctx, n1, 2);
-    ControlVec dem1_v = Control_Poly_AllocPersistent(&ctx, d1, 2);
-    ControlTransferFunction tf1 = Control_TF_FromPoly(&num1_v, &dem1_v);
+    ControlVec den1_v = Control_Poly_AllocPersistent(&ctx, d1, 2);
+    ControlTransferFunction tf1 = Control_TF_FromPoly(&num1_v, &den1_v);
     ControlVec num2_v = Control_Poly_AllocPersistent(&ctx, n2, 2);
-    ControlVec dem2_v = Control_Poly_AllocPersistent(&ctx, d2, 3);
-    ControlTransferFunction tf2 = Control_TF_FromPoly(&num2_v, &dem2_v);
+    ControlVec den2_v = Control_Poly_AllocPersistent(&ctx, d2, 3);
+    ControlTransferFunction tf2 = Control_TF_FromPoly(&num2_v, &den2_v);
     ControlTransferFunction result = Control_TF_Multiply(&ctx, &tf1, &tf2);
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(n_exp, result.num.coeffs, 3);
-    TEST_ASSERT_EQUAL_FLOAT_ARRAY(d_exp, result.dem.coeffs, 4);
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(d_exp, result.den.coeffs, 4);
     TEST_ASSERT_EQUAL_size_t(3, result.num.size);
-    TEST_ASSERT_EQUAL_size_t(4, result.dem.size);
+    TEST_ASSERT_EQUAL_size_t(4, result.den.size);
 }
 
 TEST(GeneratedFuzz, FuzzMultiply_8) {
@@ -204,16 +204,16 @@ TEST(GeneratedFuzz, FuzzMultiply_8) {
     float n_exp[] = {-8.000000f, -6.000000f, 9.000000f, };
     float d_exp[] = {-9.000000f, 12.000000f, -18.000000f, 5.000000f, 0.000000f, };
     ControlVec num1_v = Control_Poly_AllocPersistent(&ctx, n1, 2);
-    ControlVec dem1_v = Control_Poly_AllocPersistent(&ctx, d1, 3);
-    ControlTransferFunction tf1 = Control_TF_FromPoly(&num1_v, &dem1_v);
+    ControlVec den1_v = Control_Poly_AllocPersistent(&ctx, d1, 3);
+    ControlTransferFunction tf1 = Control_TF_FromPoly(&num1_v, &den1_v);
     ControlVec num2_v = Control_Poly_AllocPersistent(&ctx, n2, 2);
-    ControlVec dem2_v = Control_Poly_AllocPersistent(&ctx, d2, 3);
-    ControlTransferFunction tf2 = Control_TF_FromPoly(&num2_v, &dem2_v);
+    ControlVec den2_v = Control_Poly_AllocPersistent(&ctx, d2, 3);
+    ControlTransferFunction tf2 = Control_TF_FromPoly(&num2_v, &den2_v);
     ControlTransferFunction result = Control_TF_Multiply(&ctx, &tf1, &tf2);
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(n_exp, result.num.coeffs, 3);
-    TEST_ASSERT_EQUAL_FLOAT_ARRAY(d_exp, result.dem.coeffs, 5);
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(d_exp, result.den.coeffs, 5);
     TEST_ASSERT_EQUAL_size_t(3, result.num.size);
-    TEST_ASSERT_EQUAL_size_t(5, result.dem.size);
+    TEST_ASSERT_EQUAL_size_t(5, result.den.size);
 }
 
 TEST(GeneratedFuzz, FuzzMultiply_9) {
@@ -224,16 +224,16 @@ TEST(GeneratedFuzz, FuzzMultiply_9) {
     float n_exp[] = {4.000000f, -14.000000f, 12.000000f, };
     float d_exp[] = {3.000000f, 2.000000f, 15.000000f, -4.000000f, 5.000000f, };
     ControlVec num1_v = Control_Poly_AllocPersistent(&ctx, n1, 2);
-    ControlVec dem1_v = Control_Poly_AllocPersistent(&ctx, d1, 3);
-    ControlTransferFunction tf1 = Control_TF_FromPoly(&num1_v, &dem1_v);
+    ControlVec den1_v = Control_Poly_AllocPersistent(&ctx, d1, 3);
+    ControlTransferFunction tf1 = Control_TF_FromPoly(&num1_v, &den1_v);
     ControlVec num2_v = Control_Poly_AllocPersistent(&ctx, n2, 2);
-    ControlVec dem2_v = Control_Poly_AllocPersistent(&ctx, d2, 3);
-    ControlTransferFunction tf2 = Control_TF_FromPoly(&num2_v, &dem2_v);
+    ControlVec den2_v = Control_Poly_AllocPersistent(&ctx, d2, 3);
+    ControlTransferFunction tf2 = Control_TF_FromPoly(&num2_v, &den2_v);
     ControlTransferFunction result = Control_TF_Multiply(&ctx, &tf1, &tf2);
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(n_exp, result.num.coeffs, 3);
-    TEST_ASSERT_EQUAL_FLOAT_ARRAY(d_exp, result.dem.coeffs, 5);
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(d_exp, result.den.coeffs, 5);
     TEST_ASSERT_EQUAL_size_t(3, result.num.size);
-    TEST_ASSERT_EQUAL_size_t(5, result.dem.size);
+    TEST_ASSERT_EQUAL_size_t(5, result.den.size);
 }
 
 TEST(GeneratedFuzz, FuzzMultiply_10) {
@@ -244,16 +244,16 @@ TEST(GeneratedFuzz, FuzzMultiply_10) {
     float n_exp[] = {20.000000f, 15.000000f, -5.000000f, };
     float d_exp[] = {-15.000000f, -31.000000f, -10.000000f, };
     ControlVec num1_v = Control_Poly_AllocPersistent(&ctx, n1, 2);
-    ControlVec dem1_v = Control_Poly_AllocPersistent(&ctx, d1, 2);
-    ControlTransferFunction tf1 = Control_TF_FromPoly(&num1_v, &dem1_v);
+    ControlVec den1_v = Control_Poly_AllocPersistent(&ctx, d1, 2);
+    ControlTransferFunction tf1 = Control_TF_FromPoly(&num1_v, &den1_v);
     ControlVec num2_v = Control_Poly_AllocPersistent(&ctx, n2, 2);
-    ControlVec dem2_v = Control_Poly_AllocPersistent(&ctx, d2, 2);
-    ControlTransferFunction tf2 = Control_TF_FromPoly(&num2_v, &dem2_v);
+    ControlVec den2_v = Control_Poly_AllocPersistent(&ctx, d2, 2);
+    ControlTransferFunction tf2 = Control_TF_FromPoly(&num2_v, &den2_v);
     ControlTransferFunction result = Control_TF_Multiply(&ctx, &tf1, &tf2);
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(n_exp, result.num.coeffs, 3);
-    TEST_ASSERT_EQUAL_FLOAT_ARRAY(d_exp, result.dem.coeffs, 3);
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(d_exp, result.den.coeffs, 3);
     TEST_ASSERT_EQUAL_size_t(3, result.num.size);
-    TEST_ASSERT_EQUAL_size_t(3, result.dem.size);
+    TEST_ASSERT_EQUAL_size_t(3, result.den.size);
 }
 
 TEST(GeneratedFuzz, FuzzMultiply_11) {
@@ -264,16 +264,16 @@ TEST(GeneratedFuzz, FuzzMultiply_11) {
     float n_exp[] = {-4.000000f, 15.000000f, -9.000000f, };
     float d_exp[] = {-4.000000f, -4.000000f, -14.000000f, -8.000000f, -12.000000f, };
     ControlVec num1_v = Control_Poly_AllocPersistent(&ctx, n1, 2);
-    ControlVec dem1_v = Control_Poly_AllocPersistent(&ctx, d1, 3);
-    ControlTransferFunction tf1 = Control_TF_FromPoly(&num1_v, &dem1_v);
+    ControlVec den1_v = Control_Poly_AllocPersistent(&ctx, d1, 3);
+    ControlTransferFunction tf1 = Control_TF_FromPoly(&num1_v, &den1_v);
     ControlVec num2_v = Control_Poly_AllocPersistent(&ctx, n2, 2);
-    ControlVec dem2_v = Control_Poly_AllocPersistent(&ctx, d2, 3);
-    ControlTransferFunction tf2 = Control_TF_FromPoly(&num2_v, &dem2_v);
+    ControlVec den2_v = Control_Poly_AllocPersistent(&ctx, d2, 3);
+    ControlTransferFunction tf2 = Control_TF_FromPoly(&num2_v, &den2_v);
     ControlTransferFunction result = Control_TF_Multiply(&ctx, &tf1, &tf2);
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(n_exp, result.num.coeffs, 3);
-    TEST_ASSERT_EQUAL_FLOAT_ARRAY(d_exp, result.dem.coeffs, 5);
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(d_exp, result.den.coeffs, 5);
     TEST_ASSERT_EQUAL_size_t(3, result.num.size);
-    TEST_ASSERT_EQUAL_size_t(5, result.dem.size);
+    TEST_ASSERT_EQUAL_size_t(5, result.den.size);
 }
 
 TEST(GeneratedFuzz, FuzzMultiply_12) {
@@ -284,16 +284,16 @@ TEST(GeneratedFuzz, FuzzMultiply_12) {
     float n_exp[] = {-4.000000f, -20.000000f, 0.000000f, };
     float d_exp[] = {-15.000000f, 40.000000f, -42.000000f, 15.000000f, 4.000000f, };
     ControlVec num1_v = Control_Poly_AllocPersistent(&ctx, n1, 2);
-    ControlVec dem1_v = Control_Poly_AllocPersistent(&ctx, d1, 3);
-    ControlTransferFunction tf1 = Control_TF_FromPoly(&num1_v, &dem1_v);
+    ControlVec den1_v = Control_Poly_AllocPersistent(&ctx, d1, 3);
+    ControlTransferFunction tf1 = Control_TF_FromPoly(&num1_v, &den1_v);
     ControlVec num2_v = Control_Poly_AllocPersistent(&ctx, n2, 2);
-    ControlVec dem2_v = Control_Poly_AllocPersistent(&ctx, d2, 3);
-    ControlTransferFunction tf2 = Control_TF_FromPoly(&num2_v, &dem2_v);
+    ControlVec den2_v = Control_Poly_AllocPersistent(&ctx, d2, 3);
+    ControlTransferFunction tf2 = Control_TF_FromPoly(&num2_v, &den2_v);
     ControlTransferFunction result = Control_TF_Multiply(&ctx, &tf1, &tf2);
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(n_exp, result.num.coeffs, 3);
-    TEST_ASSERT_EQUAL_FLOAT_ARRAY(d_exp, result.dem.coeffs, 5);
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(d_exp, result.den.coeffs, 5);
     TEST_ASSERT_EQUAL_size_t(3, result.num.size);
-    TEST_ASSERT_EQUAL_size_t(5, result.dem.size);
+    TEST_ASSERT_EQUAL_size_t(5, result.den.size);
 }
 
 TEST(GeneratedFuzz, FuzzMultiply_13) {
@@ -304,16 +304,16 @@ TEST(GeneratedFuzz, FuzzMultiply_13) {
     float n_exp[] = {-16.000000f, 40.000000f, -25.000000f, };
     float d_exp[] = {5.000000f, 12.000000f, -27.000000f, 0.000000f, 9.000000f, };
     ControlVec num1_v = Control_Poly_AllocPersistent(&ctx, n1, 2);
-    ControlVec dem1_v = Control_Poly_AllocPersistent(&ctx, d1, 3);
-    ControlTransferFunction tf1 = Control_TF_FromPoly(&num1_v, &dem1_v);
+    ControlVec den1_v = Control_Poly_AllocPersistent(&ctx, d1, 3);
+    ControlTransferFunction tf1 = Control_TF_FromPoly(&num1_v, &den1_v);
     ControlVec num2_v = Control_Poly_AllocPersistent(&ctx, n2, 2);
-    ControlVec dem2_v = Control_Poly_AllocPersistent(&ctx, d2, 3);
-    ControlTransferFunction tf2 = Control_TF_FromPoly(&num2_v, &dem2_v);
+    ControlVec den2_v = Control_Poly_AllocPersistent(&ctx, d2, 3);
+    ControlTransferFunction tf2 = Control_TF_FromPoly(&num2_v, &den2_v);
     ControlTransferFunction result = Control_TF_Multiply(&ctx, &tf1, &tf2);
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(n_exp, result.num.coeffs, 3);
-    TEST_ASSERT_EQUAL_FLOAT_ARRAY(d_exp, result.dem.coeffs, 5);
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(d_exp, result.den.coeffs, 5);
     TEST_ASSERT_EQUAL_size_t(3, result.num.size);
-    TEST_ASSERT_EQUAL_size_t(5, result.dem.size);
+    TEST_ASSERT_EQUAL_size_t(5, result.den.size);
 }
 
 TEST(GeneratedFuzz, FuzzMultiply_14) {
@@ -324,16 +324,16 @@ TEST(GeneratedFuzz, FuzzMultiply_14) {
     float n_exp[] = {4.000000f, -24.000000f, 20.000000f, };
     float d_exp[] = {-3.000000f, -6.000000f, 5.000000f, 8.000000f, 16.000000f, };
     ControlVec num1_v = Control_Poly_AllocPersistent(&ctx, n1, 2);
-    ControlVec dem1_v = Control_Poly_AllocPersistent(&ctx, d1, 3);
-    ControlTransferFunction tf1 = Control_TF_FromPoly(&num1_v, &dem1_v);
+    ControlVec den1_v = Control_Poly_AllocPersistent(&ctx, d1, 3);
+    ControlTransferFunction tf1 = Control_TF_FromPoly(&num1_v, &den1_v);
     ControlVec num2_v = Control_Poly_AllocPersistent(&ctx, n2, 2);
-    ControlVec dem2_v = Control_Poly_AllocPersistent(&ctx, d2, 3);
-    ControlTransferFunction tf2 = Control_TF_FromPoly(&num2_v, &dem2_v);
+    ControlVec den2_v = Control_Poly_AllocPersistent(&ctx, d2, 3);
+    ControlTransferFunction tf2 = Control_TF_FromPoly(&num2_v, &den2_v);
     ControlTransferFunction result = Control_TF_Multiply(&ctx, &tf1, &tf2);
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(n_exp, result.num.coeffs, 3);
-    TEST_ASSERT_EQUAL_FLOAT_ARRAY(d_exp, result.dem.coeffs, 5);
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(d_exp, result.den.coeffs, 5);
     TEST_ASSERT_EQUAL_size_t(3, result.num.size);
-    TEST_ASSERT_EQUAL_size_t(5, result.dem.size);
+    TEST_ASSERT_EQUAL_size_t(5, result.den.size);
 }
 
 TEST(GeneratedFuzz, FuzzMultiply_15) {
@@ -344,16 +344,16 @@ TEST(GeneratedFuzz, FuzzMultiply_15) {
     float n_exp[] = {-20.000000f, -17.000000f, -3.000000f, };
     float d_exp[] = {8.000000f, 6.000000f, 10.000000f, 3.000000f, 3.000000f, };
     ControlVec num1_v = Control_Poly_AllocPersistent(&ctx, n1, 2);
-    ControlVec dem1_v = Control_Poly_AllocPersistent(&ctx, d1, 3);
-    ControlTransferFunction tf1 = Control_TF_FromPoly(&num1_v, &dem1_v);
+    ControlVec den1_v = Control_Poly_AllocPersistent(&ctx, d1, 3);
+    ControlTransferFunction tf1 = Control_TF_FromPoly(&num1_v, &den1_v);
     ControlVec num2_v = Control_Poly_AllocPersistent(&ctx, n2, 2);
-    ControlVec dem2_v = Control_Poly_AllocPersistent(&ctx, d2, 3);
-    ControlTransferFunction tf2 = Control_TF_FromPoly(&num2_v, &dem2_v);
+    ControlVec den2_v = Control_Poly_AllocPersistent(&ctx, d2, 3);
+    ControlTransferFunction tf2 = Control_TF_FromPoly(&num2_v, &den2_v);
     ControlTransferFunction result = Control_TF_Multiply(&ctx, &tf1, &tf2);
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(n_exp, result.num.coeffs, 3);
-    TEST_ASSERT_EQUAL_FLOAT_ARRAY(d_exp, result.dem.coeffs, 5);
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(d_exp, result.den.coeffs, 5);
     TEST_ASSERT_EQUAL_size_t(3, result.num.size);
-    TEST_ASSERT_EQUAL_size_t(5, result.dem.size);
+    TEST_ASSERT_EQUAL_size_t(5, result.den.size);
 }
 
 TEST(GeneratedFuzz, FuzzMultiply_16) {
@@ -364,16 +364,16 @@ TEST(GeneratedFuzz, FuzzMultiply_16) {
     float n_exp[] = {2.000000f, 10.000000f, };
     float d_exp[] = {16.000000f, 16.000000f, -21.000000f, -20.000000f, 0.000000f, };
     ControlVec num1_v = Control_Poly_AllocPersistent(&ctx, n1, 2);
-    ControlVec dem1_v = Control_Poly_AllocPersistent(&ctx, d1, 3);
-    ControlTransferFunction tf1 = Control_TF_FromPoly(&num1_v, &dem1_v);
+    ControlVec den1_v = Control_Poly_AllocPersistent(&ctx, d1, 3);
+    ControlTransferFunction tf1 = Control_TF_FromPoly(&num1_v, &den1_v);
     ControlVec num2_v = Control_Poly_AllocPersistent(&ctx, n2, 1);
-    ControlVec dem2_v = Control_Poly_AllocPersistent(&ctx, d2, 3);
-    ControlTransferFunction tf2 = Control_TF_FromPoly(&num2_v, &dem2_v);
+    ControlVec den2_v = Control_Poly_AllocPersistent(&ctx, d2, 3);
+    ControlTransferFunction tf2 = Control_TF_FromPoly(&num2_v, &den2_v);
     ControlTransferFunction result = Control_TF_Multiply(&ctx, &tf1, &tf2);
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(n_exp, result.num.coeffs, 2);
-    TEST_ASSERT_EQUAL_FLOAT_ARRAY(d_exp, result.dem.coeffs, 5);
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(d_exp, result.den.coeffs, 5);
     TEST_ASSERT_EQUAL_size_t(2, result.num.size);
-    TEST_ASSERT_EQUAL_size_t(5, result.dem.size);
+    TEST_ASSERT_EQUAL_size_t(5, result.den.size);
 }
 
 TEST(GeneratedFuzz, FuzzMultiply_17) {
@@ -384,16 +384,16 @@ TEST(GeneratedFuzz, FuzzMultiply_17) {
     float n_exp[] = {-12.000000f, 19.000000f, -5.000000f, };
     float d_exp[] = {-15.000000f, -8.000000f, -6.000000f, 1.000000f, 20.000000f, };
     ControlVec num1_v = Control_Poly_AllocPersistent(&ctx, n1, 2);
-    ControlVec dem1_v = Control_Poly_AllocPersistent(&ctx, d1, 3);
-    ControlTransferFunction tf1 = Control_TF_FromPoly(&num1_v, &dem1_v);
+    ControlVec den1_v = Control_Poly_AllocPersistent(&ctx, d1, 3);
+    ControlTransferFunction tf1 = Control_TF_FromPoly(&num1_v, &den1_v);
     ControlVec num2_v = Control_Poly_AllocPersistent(&ctx, n2, 2);
-    ControlVec dem2_v = Control_Poly_AllocPersistent(&ctx, d2, 3);
-    ControlTransferFunction tf2 = Control_TF_FromPoly(&num2_v, &dem2_v);
+    ControlVec den2_v = Control_Poly_AllocPersistent(&ctx, d2, 3);
+    ControlTransferFunction tf2 = Control_TF_FromPoly(&num2_v, &den2_v);
     ControlTransferFunction result = Control_TF_Multiply(&ctx, &tf1, &tf2);
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(n_exp, result.num.coeffs, 3);
-    TEST_ASSERT_EQUAL_FLOAT_ARRAY(d_exp, result.dem.coeffs, 5);
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(d_exp, result.den.coeffs, 5);
     TEST_ASSERT_EQUAL_size_t(3, result.num.size);
-    TEST_ASSERT_EQUAL_size_t(5, result.dem.size);
+    TEST_ASSERT_EQUAL_size_t(5, result.den.size);
 }
 
 TEST(GeneratedFuzz, FuzzMultiply_18) {
@@ -404,16 +404,16 @@ TEST(GeneratedFuzz, FuzzMultiply_18) {
     float n_exp[] = {12.000000f, 2.000000f, -4.000000f, };
     float d_exp[] = {12.000000f, -7.000000f, -29.000000f, -5.000000f, 5.000000f, };
     ControlVec num1_v = Control_Poly_AllocPersistent(&ctx, n1, 2);
-    ControlVec dem1_v = Control_Poly_AllocPersistent(&ctx, d1, 3);
-    ControlTransferFunction tf1 = Control_TF_FromPoly(&num1_v, &dem1_v);
+    ControlVec den1_v = Control_Poly_AllocPersistent(&ctx, d1, 3);
+    ControlTransferFunction tf1 = Control_TF_FromPoly(&num1_v, &den1_v);
     ControlVec num2_v = Control_Poly_AllocPersistent(&ctx, n2, 2);
-    ControlVec dem2_v = Control_Poly_AllocPersistent(&ctx, d2, 3);
-    ControlTransferFunction tf2 = Control_TF_FromPoly(&num2_v, &dem2_v);
+    ControlVec den2_v = Control_Poly_AllocPersistent(&ctx, d2, 3);
+    ControlTransferFunction tf2 = Control_TF_FromPoly(&num2_v, &den2_v);
     ControlTransferFunction result = Control_TF_Multiply(&ctx, &tf1, &tf2);
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(n_exp, result.num.coeffs, 3);
-    TEST_ASSERT_EQUAL_FLOAT_ARRAY(d_exp, result.dem.coeffs, 5);
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(d_exp, result.den.coeffs, 5);
     TEST_ASSERT_EQUAL_size_t(3, result.num.size);
-    TEST_ASSERT_EQUAL_size_t(5, result.dem.size);
+    TEST_ASSERT_EQUAL_size_t(5, result.den.size);
 }
 
 TEST(GeneratedFuzz, FuzzMultiply_19) {
@@ -424,16 +424,16 @@ TEST(GeneratedFuzz, FuzzMultiply_19) {
     float n_exp[] = {-3.000000f, 5.000000f, 2.000000f, };
     float d_exp[] = {3.000000f, 6.000000f, -22.000000f, 21.000000f, -10.000000f, };
     ControlVec num1_v = Control_Poly_AllocPersistent(&ctx, n1, 2);
-    ControlVec dem1_v = Control_Poly_AllocPersistent(&ctx, d1, 3);
-    ControlTransferFunction tf1 = Control_TF_FromPoly(&num1_v, &dem1_v);
+    ControlVec den1_v = Control_Poly_AllocPersistent(&ctx, d1, 3);
+    ControlTransferFunction tf1 = Control_TF_FromPoly(&num1_v, &den1_v);
     ControlVec num2_v = Control_Poly_AllocPersistent(&ctx, n2, 2);
-    ControlVec dem2_v = Control_Poly_AllocPersistent(&ctx, d2, 3);
-    ControlTransferFunction tf2 = Control_TF_FromPoly(&num2_v, &dem2_v);
+    ControlVec den2_v = Control_Poly_AllocPersistent(&ctx, d2, 3);
+    ControlTransferFunction tf2 = Control_TF_FromPoly(&num2_v, &den2_v);
     ControlTransferFunction result = Control_TF_Multiply(&ctx, &tf1, &tf2);
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(n_exp, result.num.coeffs, 3);
-    TEST_ASSERT_EQUAL_FLOAT_ARRAY(d_exp, result.dem.coeffs, 5);
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(d_exp, result.den.coeffs, 5);
     TEST_ASSERT_EQUAL_size_t(3, result.num.size);
-    TEST_ASSERT_EQUAL_size_t(5, result.dem.size);
+    TEST_ASSERT_EQUAL_size_t(5, result.den.size);
 }
 
 TEST(GeneratedFuzz, FuzzMultiply_20) {
@@ -444,16 +444,16 @@ TEST(GeneratedFuzz, FuzzMultiply_20) {
     float n_exp[] = {-10.000000f, -6.000000f, 0.000000f, };
     float d_exp[] = {-3.000000f, -6.000000f, -3.000000f, };
     ControlVec num1_v = Control_Poly_AllocPersistent(&ctx, n1, 2);
-    ControlVec dem1_v = Control_Poly_AllocPersistent(&ctx, d1, 2);
-    ControlTransferFunction tf1 = Control_TF_FromPoly(&num1_v, &dem1_v);
+    ControlVec den1_v = Control_Poly_AllocPersistent(&ctx, d1, 2);
+    ControlTransferFunction tf1 = Control_TF_FromPoly(&num1_v, &den1_v);
     ControlVec num2_v = Control_Poly_AllocPersistent(&ctx, n2, 2);
-    ControlVec dem2_v = Control_Poly_AllocPersistent(&ctx, d2, 2);
-    ControlTransferFunction tf2 = Control_TF_FromPoly(&num2_v, &dem2_v);
+    ControlVec den2_v = Control_Poly_AllocPersistent(&ctx, d2, 2);
+    ControlTransferFunction tf2 = Control_TF_FromPoly(&num2_v, &den2_v);
     ControlTransferFunction result = Control_TF_Multiply(&ctx, &tf1, &tf2);
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(n_exp, result.num.coeffs, 3);
-    TEST_ASSERT_EQUAL_FLOAT_ARRAY(d_exp, result.dem.coeffs, 3);
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(d_exp, result.den.coeffs, 3);
     TEST_ASSERT_EQUAL_size_t(3, result.num.size);
-    TEST_ASSERT_EQUAL_size_t(3, result.dem.size);
+    TEST_ASSERT_EQUAL_size_t(3, result.den.size);
 }
 
 TEST(GeneratedFuzz, FuzzMultiply_21) {
@@ -464,16 +464,16 @@ TEST(GeneratedFuzz, FuzzMultiply_21) {
     float n_exp[] = {10.000000f, 3.000000f, -4.000000f, };
     float d_exp[] = {3.000000f, 3.000000f, 1.000000f, -2.000000f, -2.000000f, };
     ControlVec num1_v = Control_Poly_AllocPersistent(&ctx, n1, 2);
-    ControlVec dem1_v = Control_Poly_AllocPersistent(&ctx, d1, 3);
-    ControlTransferFunction tf1 = Control_TF_FromPoly(&num1_v, &dem1_v);
+    ControlVec den1_v = Control_Poly_AllocPersistent(&ctx, d1, 3);
+    ControlTransferFunction tf1 = Control_TF_FromPoly(&num1_v, &den1_v);
     ControlVec num2_v = Control_Poly_AllocPersistent(&ctx, n2, 2);
-    ControlVec dem2_v = Control_Poly_AllocPersistent(&ctx, d2, 3);
-    ControlTransferFunction tf2 = Control_TF_FromPoly(&num2_v, &dem2_v);
+    ControlVec den2_v = Control_Poly_AllocPersistent(&ctx, d2, 3);
+    ControlTransferFunction tf2 = Control_TF_FromPoly(&num2_v, &den2_v);
     ControlTransferFunction result = Control_TF_Multiply(&ctx, &tf1, &tf2);
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(n_exp, result.num.coeffs, 3);
-    TEST_ASSERT_EQUAL_FLOAT_ARRAY(d_exp, result.dem.coeffs, 5);
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(d_exp, result.den.coeffs, 5);
     TEST_ASSERT_EQUAL_size_t(3, result.num.size);
-    TEST_ASSERT_EQUAL_size_t(5, result.dem.size);
+    TEST_ASSERT_EQUAL_size_t(5, result.den.size);
 }
 
 TEST(GeneratedFuzz, FuzzMultiply_22) {
@@ -484,16 +484,16 @@ TEST(GeneratedFuzz, FuzzMultiply_22) {
     float n_exp[] = {9.000000f, 15.000000f, 6.000000f, };
     float d_exp[] = {12.000000f, -7.000000f, -9.000000f, -4.000000f, };
     ControlVec num1_v = Control_Poly_AllocPersistent(&ctx, n1, 2);
-    ControlVec dem1_v = Control_Poly_AllocPersistent(&ctx, d1, 2);
-    ControlTransferFunction tf1 = Control_TF_FromPoly(&num1_v, &dem1_v);
+    ControlVec den1_v = Control_Poly_AllocPersistent(&ctx, d1, 2);
+    ControlTransferFunction tf1 = Control_TF_FromPoly(&num1_v, &den1_v);
     ControlVec num2_v = Control_Poly_AllocPersistent(&ctx, n2, 2);
-    ControlVec dem2_v = Control_Poly_AllocPersistent(&ctx, d2, 3);
-    ControlTransferFunction tf2 = Control_TF_FromPoly(&num2_v, &dem2_v);
+    ControlVec den2_v = Control_Poly_AllocPersistent(&ctx, d2, 3);
+    ControlTransferFunction tf2 = Control_TF_FromPoly(&num2_v, &den2_v);
     ControlTransferFunction result = Control_TF_Multiply(&ctx, &tf1, &tf2);
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(n_exp, result.num.coeffs, 3);
-    TEST_ASSERT_EQUAL_FLOAT_ARRAY(d_exp, result.dem.coeffs, 4);
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(d_exp, result.den.coeffs, 4);
     TEST_ASSERT_EQUAL_size_t(3, result.num.size);
-    TEST_ASSERT_EQUAL_size_t(4, result.dem.size);
+    TEST_ASSERT_EQUAL_size_t(4, result.den.size);
 }
 
 TEST(GeneratedFuzz, FuzzMultiply_23) {
@@ -504,16 +504,16 @@ TEST(GeneratedFuzz, FuzzMultiply_23) {
     float n_exp[] = {-10.000000f, 27.000000f, -5.000000f, };
     float d_exp[] = {4.000000f, 15.000000f, -6.000000f, -9.000000f, -4.000000f, };
     ControlVec num1_v = Control_Poly_AllocPersistent(&ctx, n1, 2);
-    ControlVec dem1_v = Control_Poly_AllocPersistent(&ctx, d1, 3);
-    ControlTransferFunction tf1 = Control_TF_FromPoly(&num1_v, &dem1_v);
+    ControlVec den1_v = Control_Poly_AllocPersistent(&ctx, d1, 3);
+    ControlTransferFunction tf1 = Control_TF_FromPoly(&num1_v, &den1_v);
     ControlVec num2_v = Control_Poly_AllocPersistent(&ctx, n2, 2);
-    ControlVec dem2_v = Control_Poly_AllocPersistent(&ctx, d2, 3);
-    ControlTransferFunction tf2 = Control_TF_FromPoly(&num2_v, &dem2_v);
+    ControlVec den2_v = Control_Poly_AllocPersistent(&ctx, d2, 3);
+    ControlTransferFunction tf2 = Control_TF_FromPoly(&num2_v, &den2_v);
     ControlTransferFunction result = Control_TF_Multiply(&ctx, &tf1, &tf2);
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(n_exp, result.num.coeffs, 3);
-    TEST_ASSERT_EQUAL_FLOAT_ARRAY(d_exp, result.dem.coeffs, 5);
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(d_exp, result.den.coeffs, 5);
     TEST_ASSERT_EQUAL_size_t(3, result.num.size);
-    TEST_ASSERT_EQUAL_size_t(5, result.dem.size);
+    TEST_ASSERT_EQUAL_size_t(5, result.den.size);
 }
 
 TEST(GeneratedFuzz, FuzzMultiply_24) {
@@ -524,16 +524,16 @@ TEST(GeneratedFuzz, FuzzMultiply_24) {
     float n_exp[] = {-4.000000f, 10.000000f, 6.000000f, };
     float d_exp[] = {-2.000000f, -5.000000f, 4.000000f, 3.000000f, 0.000000f, };
     ControlVec num1_v = Control_Poly_AllocPersistent(&ctx, n1, 2);
-    ControlVec dem1_v = Control_Poly_AllocPersistent(&ctx, d1, 3);
-    ControlTransferFunction tf1 = Control_TF_FromPoly(&num1_v, &dem1_v);
+    ControlVec den1_v = Control_Poly_AllocPersistent(&ctx, d1, 3);
+    ControlTransferFunction tf1 = Control_TF_FromPoly(&num1_v, &den1_v);
     ControlVec num2_v = Control_Poly_AllocPersistent(&ctx, n2, 2);
-    ControlVec dem2_v = Control_Poly_AllocPersistent(&ctx, d2, 3);
-    ControlTransferFunction tf2 = Control_TF_FromPoly(&num2_v, &dem2_v);
+    ControlVec den2_v = Control_Poly_AllocPersistent(&ctx, d2, 3);
+    ControlTransferFunction tf2 = Control_TF_FromPoly(&num2_v, &den2_v);
     ControlTransferFunction result = Control_TF_Multiply(&ctx, &tf1, &tf2);
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(n_exp, result.num.coeffs, 3);
-    TEST_ASSERT_EQUAL_FLOAT_ARRAY(d_exp, result.dem.coeffs, 5);
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(d_exp, result.den.coeffs, 5);
     TEST_ASSERT_EQUAL_size_t(3, result.num.size);
-    TEST_ASSERT_EQUAL_size_t(5, result.dem.size);
+    TEST_ASSERT_EQUAL_size_t(5, result.den.size);
 }
 
 TEST(GeneratedFuzz, FuzzMultiply_25) {
@@ -544,16 +544,16 @@ TEST(GeneratedFuzz, FuzzMultiply_25) {
     float n_exp[] = {-15.000000f, -9.000000f, 0.000000f, };
     float d_exp[] = {3.000000f, -14.000000f, 20.000000f, -15.000000f, 0.000000f, };
     ControlVec num1_v = Control_Poly_AllocPersistent(&ctx, n1, 2);
-    ControlVec dem1_v = Control_Poly_AllocPersistent(&ctx, d1, 3);
-    ControlTransferFunction tf1 = Control_TF_FromPoly(&num1_v, &dem1_v);
+    ControlVec den1_v = Control_Poly_AllocPersistent(&ctx, d1, 3);
+    ControlTransferFunction tf1 = Control_TF_FromPoly(&num1_v, &den1_v);
     ControlVec num2_v = Control_Poly_AllocPersistent(&ctx, n2, 2);
-    ControlVec dem2_v = Control_Poly_AllocPersistent(&ctx, d2, 3);
-    ControlTransferFunction tf2 = Control_TF_FromPoly(&num2_v, &dem2_v);
+    ControlVec den2_v = Control_Poly_AllocPersistent(&ctx, d2, 3);
+    ControlTransferFunction tf2 = Control_TF_FromPoly(&num2_v, &den2_v);
     ControlTransferFunction result = Control_TF_Multiply(&ctx, &tf1, &tf2);
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(n_exp, result.num.coeffs, 3);
-    TEST_ASSERT_EQUAL_FLOAT_ARRAY(d_exp, result.dem.coeffs, 5);
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(d_exp, result.den.coeffs, 5);
     TEST_ASSERT_EQUAL_size_t(3, result.num.size);
-    TEST_ASSERT_EQUAL_size_t(5, result.dem.size);
+    TEST_ASSERT_EQUAL_size_t(5, result.den.size);
 }
 
 TEST(GeneratedFuzz, FuzzMultiply_26) {
@@ -564,16 +564,16 @@ TEST(GeneratedFuzz, FuzzMultiply_26) {
     float n_exp[] = {5.000000f, 11.000000f, 2.000000f, };
     float d_exp[] = {3.000000f, 3.000000f, -15.000000f, 0.000000f, };
     ControlVec num1_v = Control_Poly_AllocPersistent(&ctx, n1, 2);
-    ControlVec dem1_v = Control_Poly_AllocPersistent(&ctx, d1, 2);
-    ControlTransferFunction tf1 = Control_TF_FromPoly(&num1_v, &dem1_v);
+    ControlVec den1_v = Control_Poly_AllocPersistent(&ctx, d1, 2);
+    ControlTransferFunction tf1 = Control_TF_FromPoly(&num1_v, &den1_v);
     ControlVec num2_v = Control_Poly_AllocPersistent(&ctx, n2, 2);
-    ControlVec dem2_v = Control_Poly_AllocPersistent(&ctx, d2, 3);
-    ControlTransferFunction tf2 = Control_TF_FromPoly(&num2_v, &dem2_v);
+    ControlVec den2_v = Control_Poly_AllocPersistent(&ctx, d2, 3);
+    ControlTransferFunction tf2 = Control_TF_FromPoly(&num2_v, &den2_v);
     ControlTransferFunction result = Control_TF_Multiply(&ctx, &tf1, &tf2);
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(n_exp, result.num.coeffs, 3);
-    TEST_ASSERT_EQUAL_FLOAT_ARRAY(d_exp, result.dem.coeffs, 4);
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(d_exp, result.den.coeffs, 4);
     TEST_ASSERT_EQUAL_size_t(3, result.num.size);
-    TEST_ASSERT_EQUAL_size_t(4, result.dem.size);
+    TEST_ASSERT_EQUAL_size_t(4, result.den.size);
 }
 
 TEST(GeneratedFuzz, FuzzMultiply_27) {
@@ -584,16 +584,16 @@ TEST(GeneratedFuzz, FuzzMultiply_27) {
     float n_exp[] = {15.000000f, -2.000000f, -8.000000f, };
     float d_exp[] = {10.000000f, -14.000000f, -10.000000f, 22.000000f, -8.000000f, };
     ControlVec num1_v = Control_Poly_AllocPersistent(&ctx, n1, 2);
-    ControlVec dem1_v = Control_Poly_AllocPersistent(&ctx, d1, 3);
-    ControlTransferFunction tf1 = Control_TF_FromPoly(&num1_v, &dem1_v);
+    ControlVec den1_v = Control_Poly_AllocPersistent(&ctx, d1, 3);
+    ControlTransferFunction tf1 = Control_TF_FromPoly(&num1_v, &den1_v);
     ControlVec num2_v = Control_Poly_AllocPersistent(&ctx, n2, 2);
-    ControlVec dem2_v = Control_Poly_AllocPersistent(&ctx, d2, 3);
-    ControlTransferFunction tf2 = Control_TF_FromPoly(&num2_v, &dem2_v);
+    ControlVec den2_v = Control_Poly_AllocPersistent(&ctx, d2, 3);
+    ControlTransferFunction tf2 = Control_TF_FromPoly(&num2_v, &den2_v);
     ControlTransferFunction result = Control_TF_Multiply(&ctx, &tf1, &tf2);
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(n_exp, result.num.coeffs, 3);
-    TEST_ASSERT_EQUAL_FLOAT_ARRAY(d_exp, result.dem.coeffs, 5);
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(d_exp, result.den.coeffs, 5);
     TEST_ASSERT_EQUAL_size_t(3, result.num.size);
-    TEST_ASSERT_EQUAL_size_t(5, result.dem.size);
+    TEST_ASSERT_EQUAL_size_t(5, result.den.size);
 }
 
 TEST(GeneratedFuzz, FuzzMultiply_28) {
@@ -604,16 +604,16 @@ TEST(GeneratedFuzz, FuzzMultiply_28) {
     float n_exp[] = {-16.000000f, -8.000000f, 8.000000f, };
     float d_exp[] = {-6.000000f, 2.000000f, -5.000000f, -6.000000f, };
     ControlVec num1_v = Control_Poly_AllocPersistent(&ctx, n1, 2);
-    ControlVec dem1_v = Control_Poly_AllocPersistent(&ctx, d1, 2);
-    ControlTransferFunction tf1 = Control_TF_FromPoly(&num1_v, &dem1_v);
+    ControlVec den1_v = Control_Poly_AllocPersistent(&ctx, d1, 2);
+    ControlTransferFunction tf1 = Control_TF_FromPoly(&num1_v, &den1_v);
     ControlVec num2_v = Control_Poly_AllocPersistent(&ctx, n2, 2);
-    ControlVec dem2_v = Control_Poly_AllocPersistent(&ctx, d2, 3);
-    ControlTransferFunction tf2 = Control_TF_FromPoly(&num2_v, &dem2_v);
+    ControlVec den2_v = Control_Poly_AllocPersistent(&ctx, d2, 3);
+    ControlTransferFunction tf2 = Control_TF_FromPoly(&num2_v, &den2_v);
     ControlTransferFunction result = Control_TF_Multiply(&ctx, &tf1, &tf2);
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(n_exp, result.num.coeffs, 3);
-    TEST_ASSERT_EQUAL_FLOAT_ARRAY(d_exp, result.dem.coeffs, 4);
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(d_exp, result.den.coeffs, 4);
     TEST_ASSERT_EQUAL_size_t(3, result.num.size);
-    TEST_ASSERT_EQUAL_size_t(4, result.dem.size);
+    TEST_ASSERT_EQUAL_size_t(4, result.den.size);
 }
 
 TEST(GeneratedFuzz, FuzzMultiply_29) {
@@ -624,16 +624,16 @@ TEST(GeneratedFuzz, FuzzMultiply_29) {
     float n_exp[] = {-5.000000f, -2.000000f, 3.000000f, };
     float d_exp[] = {16.000000f, 12.000000f, 4.000000f, };
     ControlVec num1_v = Control_Poly_AllocPersistent(&ctx, n1, 2);
-    ControlVec dem1_v = Control_Poly_AllocPersistent(&ctx, d1, 1);
-    ControlTransferFunction tf1 = Control_TF_FromPoly(&num1_v, &dem1_v);
+    ControlVec den1_v = Control_Poly_AllocPersistent(&ctx, d1, 1);
+    ControlTransferFunction tf1 = Control_TF_FromPoly(&num1_v, &den1_v);
     ControlVec num2_v = Control_Poly_AllocPersistent(&ctx, n2, 2);
-    ControlVec dem2_v = Control_Poly_AllocPersistent(&ctx, d2, 3);
-    ControlTransferFunction tf2 = Control_TF_FromPoly(&num2_v, &dem2_v);
+    ControlVec den2_v = Control_Poly_AllocPersistent(&ctx, d2, 3);
+    ControlTransferFunction tf2 = Control_TF_FromPoly(&num2_v, &den2_v);
     ControlTransferFunction result = Control_TF_Multiply(&ctx, &tf1, &tf2);
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(n_exp, result.num.coeffs, 3);
-    TEST_ASSERT_EQUAL_FLOAT_ARRAY(d_exp, result.dem.coeffs, 3);
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(d_exp, result.den.coeffs, 3);
     TEST_ASSERT_EQUAL_size_t(3, result.num.size);
-    TEST_ASSERT_EQUAL_size_t(3, result.dem.size);
+    TEST_ASSERT_EQUAL_size_t(3, result.den.size);
 }
 
 TEST(GeneratedFuzz, FuzzMultiply_30) {
@@ -644,16 +644,16 @@ TEST(GeneratedFuzz, FuzzMultiply_30) {
     float n_exp[] = {12.000000f, -3.000000f, -15.000000f, };
     float d_exp[] = {8.000000f, -10.000000f, 0.000000f, 0.000000f, 0.000000f, };
     ControlVec num1_v = Control_Poly_AllocPersistent(&ctx, n1, 2);
-    ControlVec dem1_v = Control_Poly_AllocPersistent(&ctx, d1, 3);
-    ControlTransferFunction tf1 = Control_TF_FromPoly(&num1_v, &dem1_v);
+    ControlVec den1_v = Control_Poly_AllocPersistent(&ctx, d1, 3);
+    ControlTransferFunction tf1 = Control_TF_FromPoly(&num1_v, &den1_v);
     ControlVec num2_v = Control_Poly_AllocPersistent(&ctx, n2, 2);
-    ControlVec dem2_v = Control_Poly_AllocPersistent(&ctx, d2, 3);
-    ControlTransferFunction tf2 = Control_TF_FromPoly(&num2_v, &dem2_v);
+    ControlVec den2_v = Control_Poly_AllocPersistent(&ctx, d2, 3);
+    ControlTransferFunction tf2 = Control_TF_FromPoly(&num2_v, &den2_v);
     ControlTransferFunction result = Control_TF_Multiply(&ctx, &tf1, &tf2);
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(n_exp, result.num.coeffs, 3);
-    TEST_ASSERT_EQUAL_FLOAT_ARRAY(d_exp, result.dem.coeffs, 5);
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(d_exp, result.den.coeffs, 5);
     TEST_ASSERT_EQUAL_size_t(3, result.num.size);
-    TEST_ASSERT_EQUAL_size_t(5, result.dem.size);
+    TEST_ASSERT_EQUAL_size_t(5, result.den.size);
 }
 
 
