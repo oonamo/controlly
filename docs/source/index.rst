@@ -10,7 +10,7 @@ CControl documentation
    :maxdepth: 2
    :caption: Interactive Examples:
 
-   pid
+   examples/pid
 
 Memory Management
 ======================

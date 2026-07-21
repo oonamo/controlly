@@ -14,7 +14,7 @@ release = "0.1"
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
-extensions = ["breathe", "sphinx.ext.githubpages"]
+extensions = ["breathe", "sphinx.ext.githubpages", "sphinx.ext.mathjax"]
 
 templates_path = ["_templates"]
 exclude_patterns = []
@@ -29,3 +29,4 @@ breathe_default_project = "CControl"
 
 html_theme = "sphinx_rtd_theme"
 html_static_path = ["_static"]
+html_css_files = ["custom.css"]

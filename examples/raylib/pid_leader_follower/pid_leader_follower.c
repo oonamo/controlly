@@ -38,20 +38,6 @@ typedef struct
     float friction;
 } Vehicle;
 
-static Vehicle leader = {
-    .bounds = {SCREEN_WIDTH * 0.5, FLOOR_HEIGHT - VEHICLE_HEIGHT, VEHICLE_WIDTH, VEHICLE_HEIGHT},
-    .acceleration = 0.0f,
-    .velocity = 100.0f,
-    .mass = 1500.0f,
-    .friction = 50.0f};
-
-static Vehicle follower = {
-    .bounds = {-100, FLOOR_HEIGHT - VEHICLE_HEIGHT, VEHICLE_WIDTH, VEHICLE_HEIGHT},
-    .acceleration = 0.0f,
-    .velocity = 0.0f,
-    .mass = 1000.0f,
-    .friction = 50.0f};
-
 // ========================================
 // 2. FORWARD DECLARATIONS (Functions are strictly for simulation)
 // ========================================
@@ -76,14 +62,25 @@ bool VehiclesAreColliding(void);
 static const float TARGET_DISTANCE = 250.0f;
 static ControlPIDController pid = {0};
 
+static Vehicle leader = {
+    .bounds = {SCREEN_WIDTH * 0.5, FLOOR_HEIGHT - VEHICLE_HEIGHT, VEHICLE_WIDTH, VEHICLE_HEIGHT},
+    .acceleration = 0.0f,
+    .velocity = 100.0f,
+    .mass = 1500.0f,
+    .friction = 50.0f};
+
+static Vehicle follower = {
+    .bounds = {-100, FLOOR_HEIGHT - VEHICLE_HEIGHT, VEHICLE_WIDTH, VEHICLE_HEIGHT},
+    .acceleration = 0.0f,
+    .velocity = 0.0f,
+    .mass = 1000.0f,
+    .friction = 50.0f};
+
 static float accumulated_error = 0.0f;
 static float total_time = 0.0f; // NOTE: Reset on variable change, cannot use GetTime()
 
 void ControlSetup()
 {
-    // Initialize Simulation Visuals
-    RaylibSetup();
-
     // Initialize PID Controller
     float kp = 250.0f;
     float ki = 10.0f;
@@ -104,7 +101,7 @@ void ControlLoop()
     }
 
     // ----------------------------------------
-    // [ENVIROMENT] Updates how the lead car drives
+    // [ENVIRONMENT] Updates how the lead car drives
     // ----------------------------------------
     UpdateLeaderPosition(dt);
 
@@ -145,6 +142,7 @@ void ControlLoop()
 
 int main()
 {
+    RaylibSetup();
     ControlSetup();
 #ifdef PLATFORM_WEB
     emscripten_set_main_loop(ControlLoop, 0, 1);
