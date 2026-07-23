@@ -91,15 +91,24 @@ function write_unity_test(fileID, test_name, G1, G2)
     fprintf(fileID, '    float d_exp[] = {'); fprintf(fileID, '%.6ff, ', den_exp); fprintf(fileID, '};\n');
 
     % Write the C logic to test these arrays
-    fprintf(fileID, '    ControlVec num1_v = Control_Poly_AllocPersistent(&ctx, n1, %d);\n', length(num1));
-    fprintf(fileID, '    ControlVec den1_v = Control_Poly_AllocPersistent(&ctx, d1, %d);\n', length(den1));
-    fprintf(fileID, '    ControlTransferFunction tf1 = Control_TF_FromPoly(&num1_v, &den1_v);\n');
+    fprintf(fileID, '    ControlVec num1_v = {0};\n');
+    fprintf(fileID, '    ControlVec dem1_v = {0};\n');
+    fprintf(fileID, '    ControlTransferFunction tf1 = {0};\n');
 
-    fprintf(fileID, '    ControlVec num2_v = Control_Poly_AllocPersistent(&ctx, n2, %d);\n', length(num2));
-    fprintf(fileID, '    ControlVec den2_v = Control_Poly_AllocPersistent(&ctx, d2, %d);\n', length(den2));
-    fprintf(fileID, '    ControlTransferFunction tf2 = Control_TF_FromPoly(&num2_v, &den2_v);\n');
+    fprintf(fileID, '    Control_Poly_AllocPersistent(&ctx, &num1_v, n1, %d);\n', length(num1));
+    fprintf(fileID, '    Control_Poly_AllocPersistent(&ctx, &dem1_v, d1, %d);\n', length(den1));
+    fprintf(fileID, '    TEST_ASSERT_EQUAL(CCONTROL_OK, Control_TF_FromPoly(&ctx, &tf1, &num1_v, &dem1_v));\n');
 
-    fprintf(fileID, '    ControlTransferFunction result = Control_TF_Multiply(&ctx, &tf1, &tf2);\n');
+    fprintf(fileID, '    ControlVec num2_v = {0};\n');
+    fprintf(fileID, '    ControlVec dem2_v = {0};\n');
+    fprintf(fileID, '    ControlTransferFunction tf2 = {0};\n');
+
+    fprintf(fileID, '    Control_Poly_AllocPersistent(&ctx, &num2_v, n2, %d);\n', length(num2));
+    fprintf(fileID, '    Control_Poly_AllocPersistent(&ctx, &dem2_v, d2, %d);\n', length(den2));
+    fprintf(fileID, '    TEST_ASSERT_EQUAL(CCONTROL_OK, Control_TF_FromPoly(&ctx, &tf2, &num2_v, &dem2_v));\n');
+
+    fprintf(fileID, '    ControlTransferFunction result = {0};\n');
+    fprintf(fileID, '    TEST_ASSERT_EQUAL(CCONTROL_OK, Control_TF_Multiply(&ctx, &result, &tf1, &tf2));\n');
 
     % Write the Assertions using the EXACT true lengths
     fprintf(fileID, '    TEST_ASSERT_EQUAL_FLOAT_ARRAY(n_exp, result.num.coeffs, %d);\n', length(num_exp));

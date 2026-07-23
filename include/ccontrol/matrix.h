@@ -21,6 +21,7 @@ typedef struct
 } ControlMatrix;
 
 #define CCONTROL_EMPTY_MATRIX ((ControlMatrix){0})
+#define CCONTOL_INIT_VEC {0}
 
 ControlVec Control_Vec_Alloc(ControlArena *a, size_t size);
 ControlVec Control_Vec_Clone(ControlArena *a, const ControlVec *v);
@@ -30,6 +31,6 @@ ControlVec Control_Matrix_MultiplyVec(ControlArena *a, const ControlMatrix *m, c
 ControlVec Control_Vec_Add(ControlArena *a, ControlVec *lhs, ControlVec *rhs);
 ControlVec Control_Vec_Scale(ControlArena *a, ControlVec *v, float scalar);
 
-bool Control_Matrix_IsValid(ControlMatrix *m);
-bool Control_Vec_IsValid(ControlVec *v);
+bool Control_Matrix_IsValid(const ControlMatrix *m);
+bool Control_Vec_IsValid(const ControlVec *v);
 #endif

@@ -4,7 +4,7 @@
 #include <ccontrol/core.h>
 #include <ccontrol/statespace.h>
 
-static ControlSystemMatrixj __generate_sys_matrix_InPersistent(ControlArena *persistent,
+static ControlSystemMatrix __generate_sys_matrix_InPersistent(ControlArena *persistent,
                                                                const ControlTransferFunction *tf)
 {
     size_t n = tf->den.size - 1;
@@ -94,49 +94,43 @@ __gen_feedthrough_matrix_InPersistent(ControlArena *persistent, const ControlTra
     return D;
 }
 
-ControlStateSpace Control_StateSpace_FromTF(ControlHandle *ctx, ControlTransferFunction *tf)
+ControlResult Control_StateSpace_FromTF(ControlHandle *ctx, ControlStateSpace* out, ControlTransferFunction *tf)
 {
     CCONTROL_REQUIRE(ctx,
                      tf != NULL,
                      CCONTROL_ERROR_INVALID_ARGUMENT,
-                     "Passed NULL transfer function as parameter",
-                     CCONTROL_EMPTY_STATESPACE);
+                     "Passed NULL transfer function as parameter");
 
-    ControlSystemMatrixj A = __generate_sys_matrix_InPersistent(ctx->persistent, tf);
+    ControlSystemMatrix A = __generate_sys_matrix_InPersistent(ctx->persistent, tf);
     CCONTROL_REQUIRE(ctx,
                      Control_Matrix_IsValid(&A),
                      CCONTROL_ERROR_OUT_OF_MEMORY,
-                     "Could not generate A matrix",
-                     CCONTROL_EMPTY_STATESPACE);
+                     "Could not generate A matrix");
 
     ControlInputMatrix B = __gen_input_matrix_InPersistent(ctx->persistent, tf);
     CCONTROL_REQUIRE(ctx,
                      Control_Matrix_IsValid(&B),
                      CCONTROL_ERROR_OUT_OF_MEMORY,
-                     "Could not generate B matrix",
-                     CCONTROL_EMPTY_STATESPACE);
+                     "Could not generate B matrix");
 
     ControlOutputMatrix C = __gen_output_matrix_InPersistent(ctx->persistent, tf);
     CCONTROL_REQUIRE(ctx,
                      Control_Matrix_IsValid(&C),
                      CCONTROL_ERROR_OUT_OF_MEMORY,
-                     "Could not generate C matrix",
-                     CCONTROL_EMPTY_STATESPACE);
+                     "Could not generate C matrix");
 
     ControlFeedbackMatrix D = __gen_feedthrough_matrix_InPersistent(ctx->persistent, tf);
     CCONTROL_REQUIRE(ctx,
                      Control_Matrix_IsValid(&D),
                      CCONTROL_ERROR_OUT_OF_MEMORY,
-                     "Could not generate D matrix",
-                     CCONTROL_EMPTY_STATESPACE);
+                     "Could not generate D matrix");
 
-    ControlStateSpace s = {
-        .A = A,
-        .B = B,
-        .C = C,
-        .D = D,
-    };
-    return s;
+    out->A = A;
+    out->B = B;
+    out->C = C;
+    out->D = D;
+
+    return CCONTROL_OK;
 }
 
 #ifndef MAX_SYSTEM_ORDER

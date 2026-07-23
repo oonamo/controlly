@@ -6,19 +6,15 @@
 #include <stddef.h>
 
 #ifndef CONTROL_PRIVATE_API
-#define CONTROL_PRIVATE_API static
+#    define CONTROL_PRIVATE_API static
 #endif
 
 #ifndef CONTROL_INLINE_API
-#define CONTROL_INLINE_API inline
+#    define CONTROL_INLINE_API inline
 #endif
 
-#define REQUIRE_VALID_VEC(ctx, vec_ptr, msg)                                                       \
-    CCONTROL_REQUIRE(                                                                              \
-        ctx, Control_Vec_IsValid(vec_ptr), CCONTROL_ERROR_OUT_OF_MEMORY, msg, CCONTROL_EMPTY_VEC)
-
-#define REQUIRE_VALID_TF(ctx, tf_ptr, code, msg)                                                   \
-    CCONTROL_REQUIRE(ctx, Control_TF_IsValid(tf_ptr), code, msg, CCONTROL_EMPTY_TF)
+#define REQUIRE_VALID_TF(ctx, tf_ptr, msg)                                                         \
+    CCONTROL_REQUIRE(ctx, Control_TF_IsValid(tf_ptr), CCONTROL_ERROR_INVALID_ARGUMENT, msg, code)
 
 void Control_System_Init(ControlHandle *ctx, ControlArena *p, ControlArena *s)
 {
@@ -32,93 +28,88 @@ void Control_System_DeInit(ControlHandle *ctx)
     Control_Arena_Clear(ctx->persistent);
 }
 
-CONTROL_PRIVATE_API ControlVec __Control_Vec_CreateInArena(ControlArena *a, size_t capacity)
+CONTROL_PRIVATE_API ControlResult __Control_Vec_CreateInArena(ControlHandle *ctx,
+                                                              ControlVec *out,
+                                                              ControlArena *a,
+                                                              size_t capacity)
 {
-    ControlVec v;
-    v.capacity = 0;
-    v.size = 0;
-    v.coeffs = NULL;
+    out->capacity = 0;
+    out->size = 0;
+    out->coeffs = NULL;
 
-    v.coeffs = (float *)Control_Arena_Alloc(a, capacity * sizeof(float));
-    if (!Control_Vec_IsValid(&v))
-    {
-        return CCONTROL_EMPTY_VEC;
-    }
+    out->coeffs = (float *)Control_Arena_Alloc(a, capacity * sizeof(float));
+    CCONTROL_REQUIRE(ctx, out->coeffs, CCONTROL_ERROR_OUT_OF_MEMORY, "out of memory");
 
-    v.capacity = capacity;
-    return v;
+    out->capacity = capacity;
+    return CCONTROL_OK;
 }
 
-static ControlVec __Control_Poly_CreateInArena(ControlArena *a, const float *coeffs, size_t size)
+static ControlResult __Control_Poly_CreateInArena(
+    ControlHandle *ctx, ControlVec *out, ControlArena *a, const float *coeffs, size_t size)
 {
-    if (coeffs == NULL || size <= 0)
-    {
-        return CCONTROL_EMPTY_VEC;
-    }
+    CCONTROL_TRY(__Control_Vec_CreateInArena(ctx, out, a, size));
 
-    ControlVec v = __Control_Vec_CreateInArena(a, size);
-    if (!Control_Vec_IsValid(&v))
-    {
-        return CCONTROL_EMPTY_VEC;
-    }
-
-    v.size = size;
+    out->size = size;
 
     for (size_t i = 0; i < size; i++)
     {
-        v.coeffs[i] = coeffs[i];
+        out->coeffs[i] = coeffs[i];
     }
 
-    return v;
+    return CCONTROL_OK;
 }
 
-ControlVec Control_Poly_Canonicalize(const ControlVec *v)
+ControlResult Control_Poly_Canonicalize(ControlHandle *ctx, ControlVec *out, const ControlVec *v)
 {
-    ControlVec canon = *v;
+    CHECK_CTX(ctx);
+    CHECK_PTR(ctx, out && v, "Null pointer was passed");
 
     size_t i = 0;
-    while (i < v->size - 1 && v->coeffs[i] == 0.0f)
+
+    // TODO: Compare with epsilon
+    while (i + 1 < v->size && v->coeffs[i] == 0.0f)
     {
         i++;
     }
 
-    canon.coeffs = &v->coeffs[i];
-    canon.size = v->size - i;
+    size_t new_capacity = v->capacity - i;
 
-    return canon;
+    out->coeffs = &v->coeffs[i];
+    out->size = v->size - i;
+    out->capacity = new_capacity;
+
+    return CCONTROL_OK;
 }
 
-/**
- * @brief Creates a vector of polynomial coefficients
- *
- * @param coeffs Polynomial coefficients starting from n -> 0
- * @param size size of coefficients
- * @return Vector representation
- */
-ControlVec Control_Poly_AllocScratch(ControlHandle *ctx, const float *coeffs, size_t size)
+ControlResult
+Control_Poly_AllocScratch(ControlHandle *ctx, ControlVec *out, const float *coeffs, size_t size)
 {
-    ControlVec v = __Control_Poly_CreateInArena(ctx->scratch, coeffs, size);
-    REQUIRE_VALID_VEC(ctx, &v, "Could not allocate in scratch arena");
+    CHECK_CTX(ctx);
+    CHECK_PTR(ctx, out && coeffs, "Null pointer was passed");
 
-    return v;
+    return __Control_Poly_CreateInArena(ctx, out, ctx->scratch, coeffs, size);
 }
 
-ControlVec Control_Poly_AllocPersistent(ControlHandle *ctx, const float *coeffs, size_t size)
+ControlResult
+Control_Poly_AllocPersistent(ControlHandle *ctx, ControlVec *out, const float *coeffs, size_t size)
 {
-    ControlVec v = __Control_Poly_CreateInArena(ctx->persistent, coeffs, size);
-    REQUIRE_VALID_VEC(ctx, &v, "Could not allocate in persistent arena");
+    CHECK_CTX(ctx);
+    CHECK_PTR(ctx, out && coeffs, "Null pointer was passed");
 
-    return v;
+    return __Control_Poly_CreateInArena(ctx, out, ctx->persistent, coeffs, size);
 }
 
-static ControlVec
-__Control_Poly_AddInArena(ControlArena *arena, const ControlVec *a, const ControlVec *b)
+ControlResult
+Control_Poly_Add(ControlHandle *ctx, ControlVec *out, const ControlVec *a, const ControlVec *b)
 {
+    CHECK_CTX(ctx);
+    CHECK_PTR(ctx, out && a && b, "Null pointer was passed");
+
     size_t max_size = a->size > b->size ? a->size : b->size;
-    ControlVec vec = __Control_Vec_CreateInArena(arena, max_size);
-    if (!Control_Vec_IsValid(&vec))
+
+    if (out->coeffs == NULL || out->capacity < max_size)
     {
-        return vec;
+        CCONTROL_TRY(__Control_Vec_CreateInArena(ctx, out, ctx->scratch, max_size));
     }
 
     size_t a_offset = max_size - a->size;
@@ -136,126 +127,124 @@ __Control_Poly_AddInArena(ControlArena *arena, const ControlVec *a, const Contro
             sum += b->coeffs[i - b_offset];
         }
 
-        vec.coeffs[i] = sum;
+        out->coeffs[i] = sum;
     }
 
-    vec.size = max_size;
-    return vec;
+    out->size = max_size;
+    return CCONTROL_OK;
 }
 
-ControlVec Control_Poly_Add(ControlHandle *ctx, const ControlVec *a, const ControlVec *b)
+ControlResult
+Control_Poly_Multiply(ControlHandle *ctx, ControlVec *out, const ControlVec *a, const ControlVec *b)
 {
-    ControlVec v = __Control_Poly_AddInArena(ctx->scratch, a, b);
-    REQUIRE_VALID_VEC(ctx, &v, "Could not create vector for polynomial addition in scratch arena");
+    // FIXME: Check !Control_IsVec and nullness
+    CHECK_CTX(ctx);
+    CHECK_PTR(ctx, out && a && b, "Null pointer was passed");
 
-    return v;
-}
-
-static ControlVec __Control_Poly_MultiplyInArena(ControlArena *arena, ControlVec *a, ControlVec *b)
-{
-    if (!Control_Vec_IsValid(a) || !Control_Vec_IsValid(b))
-    {
-        return CCONTROL_EMPTY_VEC;
-    }
     size_t new_size = a->size + b->size - 1;
-
-    ControlVec result = __Control_Vec_CreateInArena(arena, new_size);
-    if (!Control_Vec_IsValid(&result))
+    if (out->coeffs == NULL || out->capacity < new_size)
     {
-        return CCONTROL_EMPTY_VEC;
+        CCONTROL_TRY(__Control_Vec_CreateInArena(ctx, out, ctx->scratch, new_size));
     }
 
-    result.size = new_size;
+    out->size = new_size;
 
     for (size_t i = 0; i < new_size; i++)
     {
-        result.coeffs[i] = 0.0f;
+        out->coeffs[i] = 0.0f;
     }
 
     for (size_t i = 0; i < a->size; i++)
     {
         for (size_t j = 0; j < b->size; j++)
         {
-            result.coeffs[i + j] += a->coeffs[i] * b->coeffs[j];
+            out->coeffs[i + j] += a->coeffs[i] * b->coeffs[j];
         }
     }
 
-    return result;
+    return CCONTROL_OK;
 }
 
-ControlVec Control_Poly_Multiply(ControlHandle *ctx, ControlVec *a, ControlVec *b)
+ControlResult Control_TF_FromPoly(ControlHandle *ctx,
+                                  ControlTransferFunction *out,
+                                  const ControlVec *num,
+                                  const ControlVec *dem)
 {
-    ControlVec v = __Control_Poly_MultiplyInArena(ctx->scratch, a, b);
-    REQUIRE_VALID_VEC(ctx, &v, "Could not multiply polynomials");
+    CHECK_CTX(ctx);
+    CHECK_PTR(ctx, out && num && dem, "Out pointer is NULL");
 
-    return v;
+    // TODO: Check if we can use allocated memory if abailable
+    out->num = *num;
+    out->den = *dem;
+    return CCONTROL_OK;
 }
 
-ControlTransferFunction Control_TF_FromPoly(const ControlVec *num, const ControlVec *dem)
+ControlResult Control_TF_Multiply(ControlHandle *ctx,
+                                  ControlTransferFunction *out,
+                                  const ControlTransferFunction *G1,
+                                  const ControlTransferFunction *G2)
 {
-    ControlTransferFunction G = {
-        .num = *num,
-        .den = *dem,
-    };
-    return G;
+    CHECK_CTX(ctx);
+    CHECK_PTR(ctx, out, "Out pointer is NULL");
+
+    CCONTROL_TRY(Control_TF_Validate(ctx, G1));
+    CCONTROL_TRY(Control_TF_Validate(ctx, G2));
+
+    ControlVec convolved_num = {0};
+    ControlVec convolved_den = {0};
+
+    CCONTROL_TRY(Control_Poly_Multiply(ctx, &convolved_num, &G1->num, &G2->num));
+    CCONTROL_TRY(Control_Poly_Multiply(ctx, &convolved_den, &G1->den, &G2->den));
+
+    CCONTROL_TRY(Control_Poly_Canonicalize(ctx, &convolved_num, &convolved_num));
+    CCONTROL_TRY(Control_Poly_Canonicalize(ctx, &convolved_den, &convolved_den));
+
+    CCONTROL_TRY(Control_TF_FromPoly(ctx, out, &convolved_num, &convolved_den));
+
+    return CCONTROL_OK;
 }
 
-static ControlTransferFunction __Control_TF_MultiplyInArena(ControlArena *a,
-                                                            ControlTransferFunction *G1,
-                                                            ControlTransferFunction *G2)
+inline bool Control_TF_IsValid(const ControlTransferFunction *tf)
 {
-    ControlVec conv_num = __Control_Poly_MultiplyInArena(a, &G1->num, &G2->num);
-    if (!Control_Vec_IsValid(&conv_num))
-    {
-        return CCONTROL_EMPTY_TF;
-    }
-
-    ControlVec conv_dem = __Control_Poly_MultiplyInArena(a, &G1->den, &G2->den);
-    if (!Control_Vec_IsValid(&conv_dem))
-    {
-        return CCONTROL_EMPTY_TF;
-    }
-
-    ControlVec clean_num = Control_Poly_Canonicalize(&conv_num);
-    ControlVec clean_dem = Control_Poly_Canonicalize(&conv_dem);
-
-    return Control_TF_FromPoly(&clean_num, &clean_dem);
+    return tf && tf->den.coeffs && tf->num.coeffs && tf->den.size != 0 && tf->den.coeffs[0] != 0;
 }
 
-ControlTransferFunction
-Control_TF_Multiply(ControlHandle *ctx, ControlTransferFunction *G1, ControlTransferFunction *G2)
+ControlResult Control_TF_Validate(ControlHandle *ctx, const ControlTransferFunction *tf)
 {
-    REQUIRE_VALID_TF(
-        ctx, G1, CCONTROL_ERROR_INVALID_ARGUMENT, "TransferFunction G1 is NULL or invalid");
-    REQUIRE_VALID_TF(
-        ctx, G2, CCONTROL_ERROR_INVALID_ARGUMENT, "TransferFunction G2 is NULL or invalid");
+    CHECK_CTX(ctx);
+    CHECK_PTR(ctx, tf, "Transfer function pointer is NULL");
 
-    ControlTransferFunction tf = __Control_TF_MultiplyInArena(ctx->scratch, G1, G2);
-    REQUIRE_VALID_TF(
-        ctx, &tf, CCONTROL_ERROR_OUT_OF_MEMORY, "Could not multiply transfer function");
-    return tf;
+    CCONTROL_REQUIRE(ctx,
+                     tf->num.coeffs && tf->den.coeffs,
+                     CCONTROL_ERROR_INVALID_ARGUMENT,
+                     "Transfer function pointer is null");
+
+    CCONTROL_REQUIRE(ctx,
+                     tf->den.size != 0 && tf->den.coeffs[0] != 0.0f,
+                     CCONTROL_ERROR_DIVIDE_BY_ZERO,
+                     "Transfer function denominator is zero");
+
+    return CCONTROL_OK;
 }
 
-inline bool Control_TF_IsValid(ControlTransferFunction *tf)
+ControlResult Control_TF_ClosedLoop(ControlHandle *ctx,
+                                    ControlTransferFunction *out,
+                                    const ControlTransferFunction *G,
+                                    float gain,
+                                    ControlFeedbackUnity unity)
 {
-    return tf != NULL && tf->num.coeffs != NULL && tf->den.coeffs != NULL;
-}
+    CHECK_CTX(ctx);
+    CHECK_NOT_NULL(ctx, out, "Null pointer was passed");
+    CCONTROL_TRY(Control_TF_Validate(ctx, G));
 
-ControlTransferFunction Control_TF_ClosedLoop(ControlHandle *ctx,
-                                              ControlTransferFunction *G,
-                                              float gain,
-                                              ControlFeedbackUnity unity)
-{
-    REQUIRE_VALID_TF(
-        ctx, G, CCONTROL_ERROR_DIVIDE_BY_ZERO, "TransferFunction G is NULL or invalid");
     /*
      * G(s) = N(s)/D(s)
      *
-     * H(s) = G(s)/(1 + k*G(s)) = (N(s)/D(s))/(1 + k*(N(s)/D(s))
-     * H(s) = N(s)/(D(s) + k*N(s))
+     * H(s) = G(s)/(1 +/- k*G(s)) = (N(s)/D(s))/(1 +/- k*(N(s)/D(s))
+     * H(s) = N(s)/(D(s) +/- k*N(s))
      */
 
-    if (unity == TF_FEEDBACK_NEGATIVE)
+    if (unity == TF_FEEDBACK_POSITIVE)
     {
         gain = -gain;
     }
@@ -263,13 +252,7 @@ ControlTransferFunction Control_TF_ClosedLoop(ControlHandle *ctx,
     ControlVec scaled_num = {0};
     if (gain != 1.0f)
     {
-        scaled_num = __Control_Vec_CreateInArena(ctx->scratch, G->num.size);
-        CCONTROL_REQUIRE(ctx,
-                         Control_Vec_IsValid(&scaled_num),
-                         CCONTROL_ERROR_OUT_OF_MEMORY,
-                         "Failed to allocate vector in scratch arena",
-                         CCONTROL_EMPTY_TF);
-
+        CCONTROL_TRY(__Control_Vec_CreateInArena(ctx, &scaled_num, ctx->scratch, G->num.size));
         for (size_t i = 0; i < G->num.size; i++)
         {
             scaled_num.coeffs[i] = G->num.coeffs[i] * gain;
@@ -280,27 +263,27 @@ ControlTransferFunction Control_TF_ClosedLoop(ControlHandle *ctx,
         scaled_num = G->num;
     }
 
-    ControlVec denom = __Control_Poly_AddInArena(ctx->scratch, &G->den, &scaled_num);
-    if (!Control_Vec_IsValid(&denom))
-    {
-        CCONTROL_THROW(ctx,
-                       CCONTROL_ERROR_OUT_OF_MEMORY,
-                       "Could not allocate vector for polynomial addition for "
-                       "closed loop");
-        return CCONTROL_EMPTY_TF;
-    }
+    ControlVec denom = {0};
+    CCONTROL_TRY(Control_Poly_Add(ctx, &denom, &G->den, &scaled_num));
+    CCONTROL_TRY(Control_TF_FromPoly(ctx, out, &G->num, &denom));
 
-    return Control_TF_FromPoly(&G->num, &denom);
+    return CCONTROL_OK;
 }
 
-ControlTransferFunction Control_TF_Persist(ControlHandle *ctx, const ControlTransferFunction *tf)
+ControlResult Control_TF_Persist(ControlHandle *ctx,
+                                 ControlTransferFunction *out,
+                                 const ControlTransferFunction *tf)
 {
-    ControlTransferFunction p_tf = {0};
-    CCONTROL_REQUIRE(
-        ctx, tf != NULL, CCONTROL_ERROR_INVALID_ARGUMENT, "Invalid TF", CCONTROL_EMPTY_TF);
+    CHECK_CTX(ctx);
+    CHECK_NOT_NULL(ctx, out, "Out parameter was NULL");
 
-    p_tf.num = __Control_Poly_CreateInArena(ctx->persistent, tf->num.coeffs, tf->num.size);
-    p_tf.den = __Control_Poly_CreateInArena(ctx->persistent, tf->den.coeffs, tf->den.size);
+    // NOTE: We do not validate, invalid state can be copied
+    // CCONTROL_TRY(Control_TF_Validate(ctx, tf));
 
-    return p_tf;
+    CCONTROL_TRY(__Control_Poly_CreateInArena(
+        ctx, &out->num, ctx->persistent, tf->num.coeffs, tf->num.size));
+    CCONTROL_TRY(__Control_Poly_CreateInArena(
+        ctx, &out->den, ctx->persistent, tf->den.coeffs, tf->den.size));
+
+    return CCONTROL_OK;
 }

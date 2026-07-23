@@ -35,18 +35,22 @@ TEST(StateSpace, CanConvertTransferFunction)
     float n[] = {10.0f};
     float d[] = {1.0f, 2.0f, 5.0f};
 
-    ControlVec num = Control_Poly_AllocPersistent(&ctx, n, 1);
-    ControlVec dem = Control_Poly_AllocPersistent(&ctx, d, 3);
-    ControlTransferFunction tf = Control_TF_FromPoly(&num, &dem);
+    ControlVec num = {0}, dem = {0};
+    ControlTransferFunction tf = {0};
+    ControlStateSpace sys = {0};
 
-    ControlStateSpace sys = Control_StateSpace_FromTF(&ctx, &tf);
+    TEST_ASSERT_EQUAL(CCONTROL_OK, Control_Poly_AllocPersistent(&ctx, &num, n, 1));
+    TEST_ASSERT_EQUAL(CCONTROL_OK, Control_Poly_AllocPersistent(&ctx, &dem, d, 3));
+    TEST_ASSERT_EQUAL(CCONTROL_OK, Control_TF_FromPoly(&ctx, &tf, &num, &dem));
+
+    TEST_ASSERT_EQUAL(CCONTROL_OK, Control_StateSpace_FromTF(&ctx, &sys, &tf));
 
     // 2x2 matrix
     float expected_A[] = {0.0f, 1.0f, -5.0f, -2.0f};
     // 2x1
     float expected_B[] = {0.0f, 1.0f};
     // 1x2
-    float expected_C[] = {10, 0};
+    float expected_C[] = {10.0f, 0.0f};
     // 1x1
     float expected_D[] = {0.0f};
 
@@ -61,19 +65,24 @@ TEST(StateSpace, ContinousSISORealizationWithStepResponse)
     float n[] = {10.0f};
     float d[] = {1.0f, 2.0f, 5.0f};
 
-    ControlVec num = Control_Poly_AllocPersistent(&ctx, n, 1);
-    ControlVec dem = Control_Poly_AllocPersistent(&ctx, d, 3);
-    ControlTransferFunction tf = Control_TF_FromPoly(&num, &dem);
+    ControlVec num = {0}, dem = {0};
+    ControlTransferFunction tf = {0};
+    ControlStateSpace sys = {0};
 
-    ControlStateSpace sys = Control_StateSpace_FromTF(&ctx, &tf);
+    TEST_ASSERT_EQUAL(CCONTROL_OK, Control_Poly_AllocPersistent(&ctx, &num, n, 1));
+    TEST_ASSERT_EQUAL(CCONTROL_OK, Control_Poly_AllocPersistent(&ctx, &dem, d, 3));
+    TEST_ASSERT_EQUAL(CCONTROL_OK, Control_TF_FromPoly(&ctx, &tf, &num, &dem));
+
+    TEST_ASSERT_EQUAL(CCONTROL_OK, Control_StateSpace_FromTF(&ctx, &sys, &tf));
 
     float x_data[] = {0.0f, 0.0f}; // Initial states at 0
     float u_data[] = {1.0f};       // Constant step input of 1.0
     float y_data[] = {0.0f};       // Output buffer
 
-    sys.x = (ControlVec){.size = 2, .capacity = 2, x_data};
-    sys.u = (ControlVec){.size = 1, .capacity = 1, u_data};
-    sys.y = (ControlVec){.size = 1, .capacity = 1, y_data};
+    // FIX: Added `.coeffs =` for proper designated initialization
+    sys.x = (ControlVec){.size = 2, .capacity = 2, .coeffs = x_data};
+    sys.u = (ControlVec){.size = 1, .capacity = 1, .coeffs = u_data};
+    sys.y = (ControlVec){.size = 1, .capacity = 1, .coeffs = y_data};
 
     float Ts = 0.1f;
     for (int k = 0; k < 3; k++)
@@ -82,9 +91,7 @@ TEST(StateSpace, ContinousSISORealizationWithStepResponse)
     }
 
     // NOTE: The y output is calculated at the BEGINNING of the 3rd tick (k=2).
-    // Therefore, y reflects the states from the end of the 2nd tick (x1 = 0.01,
-    // x2 = 0.18). y = (10 * 0.01) + (0 * 0.18) = 0.100f.
-    // Generated from MATLAB
+    // y = (10 * 0.01) + (0 * 0.18) = 0.100f.
     float expected_x[] = {0.028f, 0.239f};
     float expected_y[] = {0.100f};
 
@@ -94,21 +101,23 @@ TEST(StateSpace, ContinousSISORealizationWithStepResponse)
 
 TEST(StateSpace, ContinousMIMORealizationWithStepResponse)
 {
-    ControlStateSpace sys;
+    ControlStateSpace sys = {0};
     float a_data[] = {-1.0f, 1.0f, -1.0f, -2.0f};
     float b_data[] = {1.0f, 2.0f, 3.0f, 4.0f};
     float c_data[] = {5.0f, 6.0f, 7.0f, 8.0f};
     float d_data[] = {1.0f, 0.0f, 0.0f, 1.0f};
 
-    float x_data[] = {0.0f, 0.0f}; // 2 inputs
-    float u_data[] = {1.0f, 1.0f}; // 2 Constant step inputs
+    float x_data[] = {0.0f, 0.0f}; // 2 states
+    float u_data[] = {1.0f, 1.0f}; // 2 constant step inputs
     float y_data[] = {0.0f, 0.0f}; // 2 outputs
 
+    // FIX: Corrected `.size` and `.capacity` to 2 for the u and y MIMO vectors.
     sys.x = (ControlVec){.size = 2, .capacity = 2, .coeffs = x_data};
-    sys.u = (ControlVec){.size = 1, .capacity = 1, .coeffs = u_data};
-    sys.y = (ControlVec){.size = 1, .capacity = 1, .coeffs = y_data};
+    sys.u = (ControlVec){.size = 2, .capacity = 2, .coeffs = u_data};
+    sys.y = (ControlVec){.size = 2, .capacity = 2, .coeffs = y_data};
 
-    sys.A = (ControlSystemMatrixj){.data = a_data, .rows = 2, .cols = 2};
+    // FIX: Removed the trailing 'j' from ControlSystemMatrixj
+    sys.A = (ControlSystemMatrix){.data = a_data, .rows = 2, .cols = 2};
     sys.B = (ControlInputMatrix){.data = b_data, .rows = 2, .cols = 2};
     sys.C = (ControlOutputMatrix){.data = c_data, .rows = 2, .cols = 2};
     sys.D = (ControlFeedbackMatrix){.data = d_data, .rows = 2, .cols = 2};

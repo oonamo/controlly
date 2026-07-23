@@ -1,3 +1,4 @@
+#include "ccontrol/core.h"
 #include <ccontrol/arena.h>
 #include <ccontrol/statespace.h>
 #include <ccontrol/tf.h>
@@ -7,14 +8,14 @@
 #include <string.h>
 
 #if defined(PLATFORM_WEB)
-#include <emscripten/emscripten.h>
+#    include <emscripten/emscripten.h>
 #endif
 
 // ========================================
 // 1. CONFIGURATION & MODEL
 // ========================================
-#define SCREEN_WIDTH 850
-#define SCREEN_HEIGHT 450
+#define SCREEN_WIDTH      850
+#define SCREEN_HEIGHT     450
 #define NATURAL_FREQUENCY 8.0f
 
 typedef struct
@@ -56,6 +57,16 @@ void ControlLoop(void);
 void DrawVisuals(int target_x, int actual_x);
 float NextProfile(ControlStateSpace *space);
 
+#define CCONTROL_CHECK(expr)                                                                       \
+    do                                                                                             \
+    {                                                                                              \
+        if ((expr) != CCONTROL_OK)                                                                 \
+        {                                                                                          \
+            TraceLog(LOG_FATAL, "Exiting");                                                        \
+            exit(EXIT_FAILURE);                                                                    \
+        }                                                                                          \
+    } while (0);
+
 void ControlSetup()
 {
     // 1. Raylib Initialization
@@ -80,14 +91,18 @@ void ControlSetup()
     // 3. Define Transfer Function (Second Order Standard Form)
     float n[] = {wn * wn};
     float d[] = {1.0f, 2 * damping_ratio * wn, wn * wn};
+    ControlVec num = {0};
+    ControlVec dem = {0};
 
-    ControlVec num = Control_Poly_AllocScratch(&ctx, n, 1);
-    ControlVec dem = Control_Poly_AllocScratch(&ctx, d, 3);
+    CCONTROL_CHECK(Control_Poly_AllocScratch(&ctx, &num, n, 1));
+    CCONTROL_CHECK(Control_Poly_AllocScratch(&ctx, &dem, d, 3));
 
-    ControlTransferFunction tf = Control_TF_FromPoly(&num, &dem);
+    ControlTransferFunction tf = {0};
+
+    CCONTROL_CHECK(Control_TF_FromPoly(&ctx, &tf, &num, &dem));
 
     // 4. State Space Representation
-    sys = Control_StateSpace_FromTF(&ctx, &tf);
+    CCONTROL_CHECK(Control_StateSpace_FromTF(&ctx, &sys, &tf));
 
     x_data[0] = 100.0f / (NATURAL_FREQUENCY * NATURAL_FREQUENCY);
     x_data[1] = 0.0f;

@@ -173,11 +173,11 @@ ControlVec Control_Vec_Scale(ControlArena *a, ControlVec *v, float scalar)
     return res;
 }
 
-inline bool Control_Matrix_IsValid(ControlMatrix *m)
+inline bool Control_Matrix_IsValid(const ControlMatrix *m)
 {
     return m != NULL && m->data != NULL;
 }
-inline bool Control_Vec_IsValid(ControlVec *v)
+inline bool Control_Vec_IsValid(const ControlVec *v)
 {
     return v != NULL && v->coeffs != NULL;
 }

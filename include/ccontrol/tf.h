@@ -12,8 +12,8 @@
  */
 typedef enum
 {
-    TF_FEEDBACK_POSITIVE = 1, /*!< Describes a system with a positive feedback loop */
-    TF_FEEDBACK_NEGATIVE = 1, /*!< Describes a system with a negative feedback loop */
+    TF_FEEDBACK_NEGATIVE, /*!< Describes a system with a negative feedback loop */
+    TF_FEEDBACK_POSITIVE, /*!< Describes a system with a positive feedback loop */
 } ControlFeedbackUnity;
 
 /**
@@ -25,28 +25,52 @@ typedef struct
     ControlVec den; /*!< Denominator of the transfer function */
 } ControlTransferFunction;
 
+/**
+ * An Empty ControlTransferFunction
+ */
 #define CCONTROL_EMPTY_TF ((ControlTransferFunction){0})
 
-ControlVec Control_Poly_AllocScratch(ControlHandle *ctx, const float *coeffs, size_t size);
-ControlVec Control_Poly_AllocPersistent(ControlHandle *ctx, const float *coeffs, size_t size);
-ControlVec Control_Poly_Canonicalize(const ControlVec *v);
+/*
+ */
+#define CONTROL_TF_INIT   {0}
 
-ControlVec Control_Poly_Add(ControlHandle *ctx, const ControlVec *a, const ControlVec *b);
+ControlResult
+Control_Poly_AllocScratch(ControlHandle *ctx, ControlVec *out, const float *coeffs, size_t size);
 
-ControlVec Control_Poly_Multiply(ControlHandle *ctx, ControlVec *a, ControlVec *b);
+ControlResult
+Control_Poly_AllocPersistent(ControlHandle *ctx, ControlVec *out, const float *coeffs, size_t size);
 
-ControlTransferFunction Control_TF_FromPoly(const ControlVec *num, const ControlVec *dem);
+ControlResult Control_Poly_Canonicalize(ControlHandle *ctx, ControlVec *out, const ControlVec *v);
 
-ControlTransferFunction
-Control_TF_Multiply(ControlHandle *ctx, ControlTransferFunction *G1, ControlTransferFunction *G2);
+ControlResult
+Control_Poly_Add(ControlHandle *ctx, ControlVec *out, const ControlVec *a, const ControlVec *b);
 
-ControlTransferFunction Control_TF_ClosedLoop(ControlHandle *ctx,
-                                              ControlTransferFunction *G,
-                                              float gain,
-                                              ControlFeedbackUnity unity);
+ControlResult Control_Poly_Multiply(ControlHandle *ctx,
+                                    ControlVec *out,
+                                    const ControlVec *a,
+                                    const ControlVec *b);
 
-bool Control_TF_IsValid(ControlTransferFunction *tf);
+ControlResult Control_TF_FromPoly(ControlHandle *ctx,
+                                  ControlTransferFunction *out,
+                                  const ControlVec *num,
+                                  const ControlVec *dem);
 
-ControlTransferFunction Control_TF_Persist(ControlHandle *ctx, const ControlTransferFunction *tf);
+ControlResult Control_TF_Multiply(ControlHandle *ctx,
+                                  ControlTransferFunction *out,
+                                  const ControlTransferFunction *G1,
+                                  const ControlTransferFunction *G2);
+
+ControlResult Control_TF_ClosedLoop(ControlHandle *ctx,
+                                    ControlTransferFunction *out,
+                                    const ControlTransferFunction *G,
+                                    float gain,
+                                    ControlFeedbackUnity unity);
+
+bool Control_TF_IsValid(const ControlTransferFunction* tf);
+ControlResult Control_TF_Validate(ControlHandle *ctx, const ControlTransferFunction *tf);
+
+ControlResult Control_TF_Persist(ControlHandle *ctx,
+                                 ControlTransferFunction *out,
+                                 const ControlTransferFunction *tf);
 
 #endif

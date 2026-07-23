@@ -1,23 +1,23 @@
 #include "unity.h"
 #include <ccontrol/arena.h>
-#include <stdlib.h>
 #include <string.h>
 #include <unity_fixture.h>
 
 TEST_GROUP(Arena);
 
+// TODO: Test this on embedded targets
 #if defined(__GNUC__) || defined(__clang__)
-#define CCONTROL_ALIGN(x) __attribute__((aligned(x)))
+#    define CCONTROL_ALIGN(x) __attribute__((aligned(x)))
 #elif defined(_MSC_VER)
-#define CCONTROL_ALIGN(x) __declspec(align(x))
+#    define CCONTROL_ALIGN(x) __declspec(align(x))
 #elif defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L
 // Fallback to C11 _Alignas if it's a modern, non-GCC/MSVC compiler
-#define CCONTROL_ALIGN(x) _Alignas(x)
+#    define CCONTROL_ALIGN(x) _Alignas(x)
 #else
-#error "Compiler not supported for memory alignment."
+#    error "Compiler not supported for memory alignment."
 #endif
 
-#define STATIC_SIZE 2048
+#define STATIC_SIZE  2048
 #define DYNAMIC_SIZE 2048
 
 CCONTROL_ALIGN(CCONTROL_ARENA_ALIGN_SIZE)

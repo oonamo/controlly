@@ -72,26 +72,19 @@ float Control_PID_Update(ControlPIDController *pid, float setpoint, float measur
     return output;
 }
 
-ControlTransferFunction Control_PID_ToTF(ControlHandle *ctx, ControlPIDController *pid)
+ControlResult Control_PID_ToTF(ControlHandle *ctx, ControlTransferFunction* out, ControlPIDController *pid)
 {
     float num[3] = {pid->kd, pid->kp, pid->ki};
     float den[3] = {1.0f, 0.0f};
 
-    ControlVec num_v = Control_Poly_AllocPersistent(ctx, num, 3);
-    CCONTROL_REQUIRE(ctx,
-                     Control_Vec_IsValid(&num_v),
-                     CCONTROL_ERROR_OUT_OF_MEMORY,
-                     "Could not allocate memory for pid conversion",
-                     CCONTROL_EMPTY_TF);
+    ControlVec num_v = {0};
+    ControlVec den_v = {0};
 
-    ControlVec den_v = Control_Poly_AllocPersistent(ctx, den, 2);
-    CCONTROL_REQUIRE(ctx,
-                     Control_Vec_IsValid(&den_v),
-                     CCONTROL_ERROR_OUT_OF_MEMORY,
-                     "Could not allocate memory for pid conversion",
-                     CCONTROL_EMPTY_TF);
+    CCONTROL_TRY(Control_Poly_AllocPersistent(ctx, &num_v, num, 3));
+    CCONTROL_TRY(Control_Poly_AllocPersistent(ctx, &den_v, den, 3));
 
-    ControlTransferFunction tf = Control_TF_FromPoly(&num_v, &den_v);
+    CCONTROL_TRY(Control_TF_FromPoly(ctx, out, &num_v, &den_v));
 
-    return tf;
+
+    return CCONTROL_OK;
 }

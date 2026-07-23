@@ -30,5 +30,5 @@ void Control_PID_Reset(ControlPIDController *pid);
 
 float Control_PID_Update(ControlPIDController *pid, float target, float measurment, float dt);
 
-ControlTransferFunction Control_PID_ToTF(ControlHandle *ctx, ControlPIDController *pid);
+ControlResult Control_PID_ToTF(ControlHandle *ctx, ControlTransferFunction* out, ControlPIDController *pid);
 #endif

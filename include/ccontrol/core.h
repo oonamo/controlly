@@ -9,11 +9,13 @@
  */
 typedef enum
 {
-    CCONTROL_OK = 0,                    /*!< Ok */
-    CCONTROL_ERROR_OUT_OF_MEMORY,       /*!< Out of memory (arena is full) */
-    CCONTROL_ERROR_DIVIDE_BY_ZERO,      /*!< A division by zero was attempted */
-    CCONTROL_ERROR_INVALID_ARGUMENT,    /*!< An invalid parameter was passed to a function */
-    CCONTROL_ERROR_USE_DISABLE_FEATURE, /*!< A disabled feature was used */
+    CCONTROL_OK = 0,                  /*!< Operation success */
+    CCONTROL_ERROR_CTX_UNINITIALIZED, /*!< A function that requires context was unintialized */
+    CCONTROL_ERROR_OUT_OF_MEMORY,     /*!< Out of memory (arena is full) */
+    CCONTROL_ERROR_DIVIDE_BY_ZERO,    /*!< A division by zero was attempted */
+    CCONTROL_ERROR_INVALID_ARGUMENT,  /*!< An invalid parameter was passed to a function */
+    CCONTROL_ERROR_NULL_PTR,          /*!< An invalid parameter was passed to a function */
+    CCONTROL_ERROR_FEATURE_DISABLED,  /*!< A disabled feature was used */
 } ControlResult;
 
 /*
