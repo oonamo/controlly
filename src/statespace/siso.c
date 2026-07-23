@@ -4,51 +4,43 @@
 #include <ccontrol/core.h>
 #include <ccontrol/statespace.h>
 
-static ControlSystemMatrix __generate_sys_matrix_InPersistent(ControlArena *persistent,
-                                                               const ControlTransferFunction *tf)
+static ControlResult __gen_sys_matrix_InPersistent(ControlHandle *ctx,
+                                                   ControlSystemMatrix *out,
+                                                   const ControlTransferFunction *tf)
 {
     size_t n = tf->den.size - 1;
-    ControlMatrix A = Control_Matrix_Alloc(persistent, n, n);
-    if (!Control_Matrix_IsValid(&A))
-    {
-        return CCONTROL_EMPTY_MATRIX;
-    }
+
+    CCONTROL_TRY(Control_Matrix_AllocPersistent(ctx, out, n, n));
 
     for (size_t i = 0; i < n - 1; i++)
     {
-        A.data[i * n + (i + 1)] = 1;
+        out->data[i * n + (i + 1)] = 1;
     }
 
     for (size_t i = 0; i < n; i++)
     {
-        A.data[(n - 1) * n + i] = -tf->den.coeffs[n - i];
+        out->data[(n - 1) * n + i] = -tf->den.coeffs[n - i];
     }
 
-    return A;
+    return CCONTROL_OK;
 }
 
-static ControlInputMatrix __gen_input_matrix_InPersistent(ControlArena *persistent,
-                                                          const ControlTransferFunction *tf)
+static ControlResult __gen_input_matrix_InPersistent(ControlHandle *ctx,
+                                                     ControlInputMatrix *out,
+                                                     const ControlTransferFunction *tf)
 {
     size_t n = tf->den.size - 1;
-    ControlMatrix B = Control_Matrix_Alloc(persistent, n, 1);
-    if (!Control_Matrix_IsValid(&B))
-    {
-        return CCONTROL_EMPTY_MATRIX;
-    }
-    B.data[n - 1] = 1;
-    return B;
+    CCONTROL_TRY(Control_Matrix_AllocPersistent(ctx, out, n, 1));
+    out->data[n - 1] = 1;
+    return CCONTROL_OK;
 }
 
-static ControlOutputMatrix __gen_output_matrix_InPersistent(ControlArena *persistent,
-                                                            const ControlTransferFunction *tf)
+static ControlResult __gen_output_matrix_InPersistent(ControlHandle *ctx,
+                                                      ControlOutputMatrix *out,
+                                                      const ControlTransferFunction *tf)
 {
     size_t n = tf->den.size - 1;
-    ControlMatrix C = Control_Matrix_Alloc(persistent, 1, n);
-    if (!Control_Matrix_IsValid(&C))
-    {
-        return CCONTROL_EMPTY_MATRIX;
-    }
+    CCONTROL_TRY(Control_Matrix_AllocPersistent(ctx, out, 1, n));
 
     size_t m = tf->num.size - 1;
 
@@ -71,70 +63,43 @@ static ControlOutputMatrix __gen_output_matrix_InPersistent(ControlArena *persis
         {
             bk = tf->num.coeffs[k - offset];
         }
-        C.data[i] = bk - ak * b0;
+        out->data[i] = bk - ak * b0;
     }
-    return C;
+    return CCONTROL_OK;
 }
 
-static ControlFeedbackMatrix
-__gen_feedthrough_matrix_InPersistent(ControlArena *persistent, const ControlTransferFunction *tf)
+static ControlResult __gen_feedthrough_matrix_InPersistent(ControlHandle *ctx,
+                                                           ControlFeedbackMatrix *out,
+                                                           const ControlTransferFunction *tf)
 {
-    ControlFeedbackMatrix D = Control_Matrix_Alloc(persistent, 1, 1);
-    if (!Control_Matrix_IsValid(&D))
-    {
-        return CCONTROL_EMPTY_MATRIX;
-    }
+    CCONTROL_TRY(Control_Matrix_AllocPersistent(ctx, out, 1, 1));
+
     float b0 = 0.0f;
     if (tf->num.size == tf->den.size)
     {
         b0 = tf->num.coeffs[0];
     }
 
-    D.data[0] = b0;
-    return D;
+    out->data[0] = b0;
+    return CCONTROL_OK;
 }
 
-ControlResult Control_StateSpace_FromTF(ControlHandle *ctx, ControlStateSpace* out, ControlTransferFunction *tf)
+ControlResult Control_StateSpace_FromTF(ControlHandle *ctx,
+                                        ControlStateSpace *out,
+                                        const ControlTransferFunction *tf)
 {
-    CCONTROL_REQUIRE(ctx,
-                     tf != NULL,
-                     CCONTROL_ERROR_INVALID_ARGUMENT,
-                     "Passed NULL transfer function as parameter");
-
-    ControlSystemMatrix A = __generate_sys_matrix_InPersistent(ctx->persistent, tf);
-    CCONTROL_REQUIRE(ctx,
-                     Control_Matrix_IsValid(&A),
-                     CCONTROL_ERROR_OUT_OF_MEMORY,
-                     "Could not generate A matrix");
-
-    ControlInputMatrix B = __gen_input_matrix_InPersistent(ctx->persistent, tf);
-    CCONTROL_REQUIRE(ctx,
-                     Control_Matrix_IsValid(&B),
-                     CCONTROL_ERROR_OUT_OF_MEMORY,
-                     "Could not generate B matrix");
-
-    ControlOutputMatrix C = __gen_output_matrix_InPersistent(ctx->persistent, tf);
-    CCONTROL_REQUIRE(ctx,
-                     Control_Matrix_IsValid(&C),
-                     CCONTROL_ERROR_OUT_OF_MEMORY,
-                     "Could not generate C matrix");
-
-    ControlFeedbackMatrix D = __gen_feedthrough_matrix_InPersistent(ctx->persistent, tf);
-    CCONTROL_REQUIRE(ctx,
-                     Control_Matrix_IsValid(&D),
-                     CCONTROL_ERROR_OUT_OF_MEMORY,
-                     "Could not generate D matrix");
-
-    out->A = A;
-    out->B = B;
-    out->C = C;
-    out->D = D;
+    CHECK_CTX(ctx);
+    CHECK_NOT_NULL(ctx, out && tf, "Passed null pointers");
+    CCONTROL_TRY(__gen_sys_matrix_InPersistent(ctx, &out->A, tf));
+    CCONTROL_TRY(__gen_input_matrix_InPersistent(ctx, &out->B, tf));
+    CCONTROL_TRY(__gen_output_matrix_InPersistent(ctx, &out->C, tf));
+    CCONTROL_TRY(__gen_feedthrough_matrix_InPersistent(ctx, &out->D, tf));
 
     return CCONTROL_OK;
 }
 
 #ifndef MAX_SYSTEM_ORDER
-#define MAX_SYSTEM_ORDER 10
+#    define MAX_SYSTEM_ORDER 10
 #endif
 
 void __Control_StateSpace_StepSISO(ControlStateSpace *ss, float dt)

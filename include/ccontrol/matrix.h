@@ -1,6 +1,6 @@
 #ifndef _MATRIX_H
 #define _MATRIX_H
-#include "arena.h"
+#include <ccontrol/core.h>
 #include <stdbool.h>
 #include <stddef.h>
 
@@ -21,15 +21,27 @@ typedef struct
 } ControlMatrix;
 
 #define CCONTROL_EMPTY_MATRIX ((ControlMatrix){0})
-#define CCONTOL_INIT_VEC {0}
+#define CCONTOL_INIT_VEC      {0}
 
-ControlVec Control_Vec_Alloc(ControlArena *a, size_t size);
-ControlVec Control_Vec_Clone(ControlArena *a, const ControlVec *v);
-ControlMatrix Control_Matrix_Alloc(ControlArena *a, size_t rows, size_t cols);
-ControlMatrix Control_Matrix_Clone(ControlArena *a, const ControlMatrix *m);
-ControlVec Control_Matrix_MultiplyVec(ControlArena *a, const ControlMatrix *m, const ControlVec *v);
-ControlVec Control_Vec_Add(ControlArena *a, ControlVec *lhs, ControlVec *rhs);
-ControlVec Control_Vec_Scale(ControlArena *a, ControlVec *v, float scalar);
+ControlResult Control_Vec_AllocScratch(ControlHandle *ctx, ControlVec *out, size_t size);
+ControlResult Control_Vec_AllocPersistent(ControlHandle *ctx, ControlVec *out, size_t size);
+
+ControlResult Control_Vec_Persist(ControlHandle *ctx, ControlVec *out, const ControlVec *v);
+ControlResult
+Control_Matrix_AllocPersistent(ControlHandle *ctx, ControlMatrix *out, size_t rows, size_t cols);
+
+ControlResult
+Control_Matrix_AllocScratch(ControlHandle *ctx, ControlMatrix *out, size_t rows, size_t cols);
+
+ControlResult
+Control_Matrix_Persist(ControlHandle *ctx, ControlMatrix *out, const ControlMatrix *m);
+ControlResult Control_Matrix_MultiplyVec(ControlHandle *ctx,
+                                         ControlVec *out,
+                                         const ControlMatrix *m,
+                                         const ControlVec *v);
+ControlResult
+Control_Vec_Add(ControlHandle *ctx, ControlVec *out, const ControlVec *lhs, const ControlVec *rhs);
+ControlResult Control_Vec_Scale(ControlHandle *ctx, ControlVec *out, const ControlVec *v, float scalar);
 
 bool Control_Matrix_IsValid(const ControlMatrix *m);
 bool Control_Vec_IsValid(const ControlVec *v);

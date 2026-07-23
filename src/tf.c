@@ -14,7 +14,7 @@
 #endif
 
 #define REQUIRE_VALID_TF(ctx, tf_ptr, msg)                                                         \
-    CCONTROL_REQUIRE(ctx, Control_TF_IsValid(tf_ptr), CCONTROL_ERROR_INVALID_ARGUMENT, msg, code)
+    CCONTROL_REQUIRE(ctx, Control_TF_IsValid(tf_ptr), CCONTROL_ERROR_INVALID_ARGUMENT, msg)
 
 void Control_System_Init(ControlHandle *ctx, ControlArena *p, ControlArena *s)
 {
@@ -62,7 +62,7 @@ static ControlResult __Control_Poly_CreateInArena(
 ControlResult Control_Poly_Canonicalize(ControlHandle *ctx, ControlVec *out, const ControlVec *v)
 {
     CHECK_CTX(ctx);
-    CHECK_PTR(ctx, out && v, "Null pointer was passed");
+    CHECK_NOT_NULL(ctx, out && v, "Null pointer was passed");
 
     size_t i = 0;
 
@@ -85,7 +85,7 @@ ControlResult
 Control_Poly_AllocScratch(ControlHandle *ctx, ControlVec *out, const float *coeffs, size_t size)
 {
     CHECK_CTX(ctx);
-    CHECK_PTR(ctx, out && coeffs, "Null pointer was passed");
+    CHECK_NOT_NULL(ctx, out && coeffs, "Null pointer was passed");
 
     return __Control_Poly_CreateInArena(ctx, out, ctx->scratch, coeffs, size);
 }
@@ -94,7 +94,7 @@ ControlResult
 Control_Poly_AllocPersistent(ControlHandle *ctx, ControlVec *out, const float *coeffs, size_t size)
 {
     CHECK_CTX(ctx);
-    CHECK_PTR(ctx, out && coeffs, "Null pointer was passed");
+    CHECK_NOT_NULL(ctx, out && coeffs, "Null pointer was passed");
 
     return __Control_Poly_CreateInArena(ctx, out, ctx->persistent, coeffs, size);
 }
@@ -103,7 +103,7 @@ ControlResult
 Control_Poly_Add(ControlHandle *ctx, ControlVec *out, const ControlVec *a, const ControlVec *b)
 {
     CHECK_CTX(ctx);
-    CHECK_PTR(ctx, out && a && b, "Null pointer was passed");
+    CHECK_NOT_NULL(ctx, out && a && b, "Null pointer was passed");
 
     size_t max_size = a->size > b->size ? a->size : b->size;
 
@@ -137,9 +137,8 @@ Control_Poly_Add(ControlHandle *ctx, ControlVec *out, const ControlVec *a, const
 ControlResult
 Control_Poly_Multiply(ControlHandle *ctx, ControlVec *out, const ControlVec *a, const ControlVec *b)
 {
-    // FIXME: Check !Control_IsVec and nullness
     CHECK_CTX(ctx);
-    CHECK_PTR(ctx, out && a && b, "Null pointer was passed");
+    CHECK_NOT_NULL(ctx, out && a && b, "Null pointer was passed");
 
     size_t new_size = a->size + b->size - 1;
     if (out->coeffs == NULL || out->capacity < new_size)
@@ -171,7 +170,7 @@ ControlResult Control_TF_FromPoly(ControlHandle *ctx,
                                   const ControlVec *dem)
 {
     CHECK_CTX(ctx);
-    CHECK_PTR(ctx, out && num && dem, "Out pointer is NULL");
+    CHECK_NOT_NULL(ctx, out && num && dem, "Out pointer is NULL");
 
     // TODO: Check if we can use allocated memory if abailable
     out->num = *num;
@@ -185,7 +184,7 @@ ControlResult Control_TF_Multiply(ControlHandle *ctx,
                                   const ControlTransferFunction *G2)
 {
     CHECK_CTX(ctx);
-    CHECK_PTR(ctx, out, "Out pointer is NULL");
+    CHECK_NOT_NULL(ctx, out, "Out pointer is NULL");
 
     CCONTROL_TRY(Control_TF_Validate(ctx, G1));
     CCONTROL_TRY(Control_TF_Validate(ctx, G2));
@@ -212,7 +211,7 @@ inline bool Control_TF_IsValid(const ControlTransferFunction *tf)
 ControlResult Control_TF_Validate(ControlHandle *ctx, const ControlTransferFunction *tf)
 {
     CHECK_CTX(ctx);
-    CHECK_PTR(ctx, tf, "Transfer function pointer is NULL");
+    CHECK_NOT_NULL(ctx, tf, "Transfer function pointer is NULL");
 
     CCONTROL_REQUIRE(ctx,
                      tf->num.coeffs && tf->den.coeffs,

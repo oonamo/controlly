@@ -1,75 +1,113 @@
-#include "ccontrol/arena.h"
+#include "internal_common.h"
+#include <ccontrol/core.h>
 #include <ccontrol/matrix.h>
 
-ControlVec Control_Vec_Alloc(ControlArena *a, size_t size)
-{
-    ControlVec v;
-    v.capacity = size;
-    v.size = 0;
+// TODO: Add testing
+//  1. Does it currently support aliasing?
 
-    v.coeffs = (float *)Control_Arena_Alloc(a, size * sizeof(float));
-    if (!v.coeffs)
-    {
-        return CCONTROL_EMPTY_VEC;
-    }
+static ControlResult
+__Control_Vec_AllocInArena(ControlHandle *ctx, ControlVec *out, ControlArena *a, size_t size)
+{
+
+    out->size = 0;
+    out->coeffs = (float *)Control_Arena_Alloc(a, size * sizeof(float));
+    CCONTROL_REQUIRE(ctx, out->coeffs, CCONTROL_ERROR_OUT_OF_MEMORY, "out of memory");
+
+    out->capacity = size;
 
     // TODO: Does this need to be reset?
     for (size_t i = 0; i < size; i++)
     {
-        v.coeffs[i] = 0.0f;
+        out->coeffs[i] = 0.0f;
     }
-    return v;
+    return CCONTROL_OK;
 }
 
-ControlVec Control_Vec_Clone(ControlArena *a, const ControlVec *v)
+ControlResult Control_Vec_AllocScratch(ControlHandle *ctx, ControlVec *out, size_t size)
 {
-    ControlVec cloned = Control_Vec_Alloc(a, v->size);
-    if (!Control_Vec_IsValid(&cloned))
-    {
-        return CCONTROL_EMPTY_VEC;
-    }
+    CHECK_CTX(ctx);
+    CHECK_OUT(ctx, out);
 
-    cloned.size = v->size;
+    CCONTROL_TRY(__Control_Vec_AllocInArena(ctx, out, ctx->scratch, size));
+    return CCONTROL_OK;
+}
+ControlResult Control_Vec_AllocPersistent(ControlHandle *ctx, ControlVec *out, size_t size)
+
+{
+    CHECK_CTX(ctx);
+    CHECK_OUT(ctx, out);
+
+    CCONTROL_TRY(__Control_Vec_AllocInArena(ctx, out, ctx->persistent, size));
+    return CCONTROL_OK;
+}
+
+ControlResult Control_Vec_Persist(ControlHandle *ctx, ControlVec *out, const ControlVec *v)
+{
+    CHECK_CTX(ctx);
+    CHECK_OUT(ctx, out);
+
+    if (out->capacity < v->capacity)
+    {
+        CCONTROL_TRY(Control_Vec_AllocPersistent(ctx, out, v->size));
+    }
 
     // TODO: Abstract into CCONTROL_MEMCPY
     for (size_t i = 0; i < v->size; i++)
     {
-        cloned.coeffs[i] = v->coeffs[i];
+        out->coeffs[i] = v->coeffs[i];
     }
 
-    return cloned;
+    return CCONTROL_OK;
 }
 
-ControlMatrix Control_Matrix_Alloc(ControlArena *a, size_t rows, size_t cols)
+ControlResult __Control_Matrix_Alloc(
+    ControlHandle *ctx, ControlMatrix *out, ControlArena *a, size_t rows, size_t cols)
 {
-    ControlMatrix m = {0};
-
-    m.data = (float *)Control_Arena_Alloc(a, rows * cols * sizeof(float));
-    if (!m.data)
-    {
-        return CCONTROL_EMPTY_MATRIX;
-    }
+    out->data = (float *)Control_Arena_Alloc(a, rows * cols * sizeof(float));
+    CCONTROL_REQUIRE(ctx, out->data, CCONTROL_ERROR_OUT_OF_MEMORY, "out of memory");
 
     // TODO: Does this need to be set to 0.0f?
     for (size_t i = 0; i < rows; i++)
     {
         for (size_t j = 0; j < cols; j++)
         {
-            m.data[i * cols + j] = 0.0f;
+            out->data[i * cols + j] = 0.0f;
         }
     }
 
-    m.rows = rows;
-    m.cols = cols;
-    return m;
+    out->rows = rows;
+    out->cols = cols;
+    return CCONTROL_OK;
 }
 
-ControlMatrix Control_Matrix_Clone(ControlArena *a, const ControlMatrix *m)
+ControlResult
+Control_Matrix_AllocScratch(ControlHandle *ctx, ControlMatrix *out, size_t rows, size_t cols)
 {
-    ControlMatrix cloned = Control_Matrix_Alloc(a, m->rows, m->cols);
-    if (!Control_Matrix_IsValid(&cloned))
+    CHECK_CTX(ctx);
+    CHECK_OUT(ctx, out);
+
+    CCONTROL_TRY(__Control_Matrix_Alloc(ctx, out, ctx->scratch, rows, cols));
+    return CCONTROL_OK;
+}
+
+ControlResult
+Control_Matrix_AllocPersistent(ControlHandle *ctx, ControlMatrix *out, size_t rows, size_t cols)
+{
+    CHECK_CTX(ctx);
+    CHECK_OUT(ctx, out);
+
+    CCONTROL_TRY(__Control_Matrix_Alloc(ctx, out, ctx->persistent, rows, cols));
+    return CCONTROL_OK;
+}
+
+ControlResult Control_Matrix_Persist(ControlHandle *ctx, ControlMatrix *out, const ControlMatrix *m)
+{
+    CHECK_CTX(ctx);
+    CHECK_OUT(ctx, out);
+
+    if (out->rows != m->rows || out->cols != m->cols)
     {
-        return CCONTROL_EMPTY_MATRIX;
+        CCONTROL_TRY(Control_Matrix_AllocPersistent(ctx, out, m->rows, m->cols));
     }
 
     // TODO: Abstract into CCONTROL_MEMCPY
@@ -77,36 +115,38 @@ ControlMatrix Control_Matrix_Clone(ControlArena *a, const ControlMatrix *m)
     {
         for (size_t j = 0; j < m->cols; j++)
         {
-            cloned.data[i * m->cols + j] = m->data[i * m->cols + j];
+            out->data[i * m->cols + j] = m->data[i * m->cols + j];
         }
     }
 
-    return cloned;
+    return CCONTROL_OK;
 }
 
-ControlVec _CreateVectorInArena(ControlArena *a, size_t capacity)
+ControlResult __Control_Vec_CreateInArenaRaw(ControlHandle *ctx,
+                                             ControlVec *out,
+                                             ControlArena *a,
+                                             size_t capacity)
 {
-    ControlVec v;
-    v.capacity = capacity;
-    v.size = 0;
+    out->size = 0;
+    out->coeffs = (float *)Control_Arena_Alloc(a, capacity * sizeof(float));
+    CCONTROL_REQUIRE(ctx, out->coeffs, CCONTROL_ERROR_OUT_OF_MEMORY, "Out of memory");
 
-    v.coeffs = (float *)Control_Arena_Alloc(a, capacity * sizeof(float));
-    return v;
+    out->capacity = capacity;
+    return CCONTROL_OK;
 }
 
-ControlVec Control_Matrix_MultiplyVec(ControlArena *a, const ControlMatrix *m, const ControlVec *v)
+ControlResult Control_Matrix_MultiplyVec(ControlHandle *ctx,
+                                         ControlVec *out,
+                                         const ControlMatrix *m,
+                                         const ControlVec *v)
 {
-    if (!m || !v || m->cols != v->size)
-    {
-        return CCONTROL_EMPTY_VEC;
-    }
+    CHECK_CTX(ctx);
+    CHECK_NOT_NULL(ctx, out && m && v, "Passed null pointers");
+
     size_t new_size = m->rows;
 
-    ControlVec res = _CreateVectorInArena(a, new_size);
-    if (Control_Vec_IsValid(&res))
-    {
-        return res;
-    }
+    ControlVec res = {0};
+    CCONTROL_TRY(__Control_Vec_CreateInArenaRaw(ctx, &res, ctx->scratch, new_size));
 
     res.size = new_size;
 
@@ -121,56 +161,71 @@ ControlVec Control_Matrix_MultiplyVec(ControlArena *a, const ControlMatrix *m, c
         res.coeffs[i] = dot_prod;
     }
 
-    return res;
-}
-
-ControlVec Control_Vec_Add(ControlArena *a, ControlVec *lhs, ControlVec *rhs)
-{
-    size_t max_size = lhs->size > rhs->size ? lhs->size : rhs->size;
-
-    ControlVec res = _CreateVectorInArena(a, max_size);
-    if (!Control_Vec_IsValid(&res))
+    if (out->capacity < new_size)
     {
-        return res;
+        CCONTROL_TRY(__Control_Vec_CreateInArenaRaw(ctx, out, ctx->scratch, new_size));
     }
 
-    res.size = max_size;
+    out->size = new_size;
+    for (size_t i = 0; i < new_size; i++)
+    {
+        out->coeffs[i] = res.coeffs[i];
+    }
+
+    return CCONTROL_OK;
+}
+
+ControlResult
+Control_Vec_Add(ControlHandle *ctx, ControlVec *out, const ControlVec *lhs, const ControlVec *rhs)
+{
+    CHECK_CTX(ctx);
+    CHECK_NOT_NULL(ctx, out && lhs && rhs, "Passed null pointers");
+
+    size_t max_size = lhs->size > rhs->size ? lhs->size : rhs->size;
+    if (out->capacity < max_size)
+    {
+        CCONTROL_TRY(__Control_Vec_CreateInArenaRaw(ctx, out, ctx->scratch, max_size));
+    }
+
+    out->size = max_size;
 
     for (size_t i = 0; i < max_size; i++)
     {
         float sum = 0.0f;
-        if (i < lhs->size - 1)
+        if (i < lhs->size)
         {
             sum += lhs->coeffs[i];
         }
-        if (i < rhs->size - 1)
+        if (i < rhs->size)
         {
             sum += rhs->coeffs[i];
         }
 
-        res.coeffs[i] = sum;
+        out->coeffs[i] = sum;
     }
 
-    return res;
+    return CCONTROL_OK;
 }
 
-ControlVec Control_Vec_Scale(ControlArena *a, ControlVec *v, float scalar)
+ControlResult
+Control_Vec_Scale(ControlHandle *ctx, ControlVec *out, const ControlVec *v, float scalar)
 {
-    ControlVec res = _CreateVectorInArena(a, v->size);
+    CHECK_CTX(ctx);
+    CHECK_NOT_NULL(ctx, out && v, "Passed null pointers");
 
-    if (!Control_Vec_IsValid(&res))
+    if (out->capacity < v->size)
     {
-        return CCONTROL_EMPTY_VEC;
+        CCONTROL_TRY(__Control_Vec_CreateInArenaRaw(ctx, out, ctx->scratch, v->size));
     }
 
-    res.size = v->size;
+    out->size = v->size;
 
     for (size_t i = 0; i < v->size; i++)
     {
-        res.coeffs[i] *= scalar;
+        out->coeffs[i] = v->coeffs[i] * scalar;
     }
 
-    return res;
+    return CCONTROL_OK;
 }
 
 inline bool Control_Matrix_IsValid(const ControlMatrix *m)

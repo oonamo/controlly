@@ -49,7 +49,8 @@ TEST(Matrix, CanDeepCloneAVector)
         .coeffs = coeffs,
     };
 
-    ControlVec v2 = Control_Vec_Clone(ctx.persistent, &v);
+    ControlVec v2 = {0};
+    TEST_ASSERT_EQUAL(CCONTROL_OK, Control_Vec_Persist(&ctx, &v2, &v));
     TEST_ASSERT_TRUE(Control_Vec_IsValid(&v2));
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(coeffs, v2.coeffs, 4);
     TEST_ASSERT_TRUE(v.coeffs != v2.coeffs);
@@ -65,7 +66,8 @@ TEST(Matrix, CanDeepCloneAMatrix)
         .data = coeffs,
     };
 
-    ControlMatrix m2 = Control_Matrix_Clone(ctx.persistent, &m);
+    ControlMatrix m2 = {0};
+    TEST_ASSERT_EQUAL(CCONTROL_OK, Control_Matrix_Persist(&ctx, &m2, &m));
     TEST_ASSERT_TRUE(Control_Matrix_IsValid(&m2));
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(coeffs, m2.data, 4);
     TEST_ASSERT_TRUE(m.data != m2.data);

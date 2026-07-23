@@ -30,10 +30,7 @@
 #define CHECK_OUT(ctx, out)                                                                        \
     CCONTROL_REQUIRE((ctx), (out), CCONTROL_ERROR_NULL_PTR, "Out parameter was NULL")
 
-#define CHECK_PTR(ctx, ptr, msg) CCONTROL_REQUIRE((ctx), (ptr), CCONTROL_ERROR_NULL_PTR, msg)
-
-#define CHECK_NOT_NULL(ctx, ptrs_cond, msg)                                                        \
-    CCONTROL_REQUIRE((ctx), (ptrs_cond), CCONTROL_ERROR_NULL_PTR, msg)
+#define CHECK_NOT_NULL(ctx, ptr, msg) CCONTROL_REQUIRE((ctx), (ptr), CCONTROL_ERROR_NULL_PTR, msg)
 
 #define CCONTROL_TRY(expr)                                                                         \
     do                                                                                             \
