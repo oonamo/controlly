@@ -4,8 +4,8 @@
 #include <ccontrol/core.h>
 #include <ccontrol/statespace.h>
 
-static ControlResult __gen_sys_matrix_InPersistent(ControlHandle *ctx,
-                                                   ControlSystemMatrix *out,
+static ControlResult __gen_sys_matrix_InPersistent(ControlHandle                 *ctx,
+                                                   ControlSystemMatrix           *out,
                                                    const ControlTransferFunction *tf)
 {
     size_t n = tf->den.size - 1;
@@ -25,8 +25,8 @@ static ControlResult __gen_sys_matrix_InPersistent(ControlHandle *ctx,
     return CCONTROL_OK;
 }
 
-static ControlResult __gen_input_matrix_InPersistent(ControlHandle *ctx,
-                                                     ControlInputMatrix *out,
+static ControlResult __gen_input_matrix_InPersistent(ControlHandle                 *ctx,
+                                                     ControlInputMatrix            *out,
                                                      const ControlTransferFunction *tf)
 {
     size_t n = tf->den.size - 1;
@@ -35,8 +35,8 @@ static ControlResult __gen_input_matrix_InPersistent(ControlHandle *ctx,
     return CCONTROL_OK;
 }
 
-static ControlResult __gen_output_matrix_InPersistent(ControlHandle *ctx,
-                                                      ControlOutputMatrix *out,
+static ControlResult __gen_output_matrix_InPersistent(ControlHandle                 *ctx,
+                                                      ControlOutputMatrix           *out,
                                                       const ControlTransferFunction *tf)
 {
     size_t n = tf->den.size - 1;
@@ -68,8 +68,8 @@ static ControlResult __gen_output_matrix_InPersistent(ControlHandle *ctx,
     return CCONTROL_OK;
 }
 
-static ControlResult __gen_feedthrough_matrix_InPersistent(ControlHandle *ctx,
-                                                           ControlFeedbackMatrix *out,
+static ControlResult __gen_feedthrough_matrix_InPersistent(ControlHandle                 *ctx,
+                                                           ControlFeedbackMatrix         *out,
                                                            const ControlTransferFunction *tf)
 {
     CCONTROL_TRY(Control_Matrix_AllocPersistent(ctx, out, 1, 1));
@@ -84,8 +84,8 @@ static ControlResult __gen_feedthrough_matrix_InPersistent(ControlHandle *ctx,
     return CCONTROL_OK;
 }
 
-ControlResult Control_StateSpace_FromTF(ControlHandle *ctx,
-                                        ControlStateSpace *out,
+ControlResult Control_StateSpace_FromTF(ControlHandle                 *ctx,
+                                        ControlStateSpace             *out,
                                         const ControlTransferFunction *tf)
 {
     CHECK_CTX(ctx);
@@ -99,7 +99,7 @@ ControlResult Control_StateSpace_FromTF(ControlHandle *ctx,
 }
 
 #ifndef MAX_SYSTEM_ORDER
-#    define MAX_SYSTEM_ORDER 10
+    #define MAX_SYSTEM_ORDER 10
 #endif
 
 void __Control_StateSpace_StepSISO(ControlStateSpace *ss, float dt)

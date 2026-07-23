@@ -8,9 +8,9 @@ ControlArena *Control_Arena_Create(void *backing_buffer, size_t capacity)
         return NULL;
     }
     ControlArena *arena = (ControlArena *)backing_buffer;
-    arena->_buffer = (uint8_t *)backing_buffer + sizeof(ControlArena);
-    arena->_capacity = capacity - sizeof(ControlArena);
-    arena->_offset = 0;
+    arena->_buffer      = (uint8_t *)backing_buffer + sizeof(ControlArena);
+    arena->_capacity    = capacity - sizeof(ControlArena);
+    arena->_offset      = 0;
 
     return arena;
 }

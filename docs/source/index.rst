@@ -11,8 +11,15 @@ CControl documentation
    :caption: Interactive Examples:
 
    examples/pid
+   examples/statespace_second_order
 
-Memory Management
-======================
-.. doxygenfile:: ccontrol/arena.h
-  :project CControl
+
+.. toctree::
+   :maxdepth: 2
+   :caption: API Reference:
+
+   api/arena
+   api/core
+   api/matrix
+   api/tf
+   api/statespace

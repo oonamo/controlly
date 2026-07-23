@@ -9,7 +9,7 @@ static ControlResult
 __Control_Vec_AllocInArena(ControlHandle *ctx, ControlVec *out, ControlArena *a, size_t size)
 {
 
-    out->size = 0;
+    out->size   = 0;
     out->coeffs = (float *)Control_Arena_Alloc(a, size * sizeof(float));
     CCONTROL_REQUIRE(ctx, out->coeffs, CCONTROL_ERROR_OUT_OF_MEMORY, "out of memory");
 
@@ -46,12 +46,14 @@ ControlResult Control_Vec_Persist(ControlHandle *ctx, ControlVec *out, const Con
     CHECK_CTX(ctx);
     CHECK_OUT(ctx, out);
 
-    if (out->capacity < v->capacity)
+    if (out->capacity < v->size)
     {
         CCONTROL_TRY(Control_Vec_AllocPersistent(ctx, out, v->size));
     }
 
-    // TODO: Abstract into CCONTROL_MEMCPY
+    out->size = v->size;
+
+    // TODO: Abstract into some sort of memcpy (either from ControlHandle or macro)
     for (size_t i = 0; i < v->size; i++)
     {
         out->coeffs[i] = v->coeffs[i];
@@ -123,11 +125,11 @@ ControlResult Control_Matrix_Persist(ControlHandle *ctx, ControlMatrix *out, con
 }
 
 ControlResult __Control_Vec_CreateInArenaRaw(ControlHandle *ctx,
-                                             ControlVec *out,
-                                             ControlArena *a,
-                                             size_t capacity)
+                                             ControlVec    *out,
+                                             ControlArena  *a,
+                                             size_t         capacity)
 {
-    out->size = 0;
+    out->size   = 0;
     out->coeffs = (float *)Control_Arena_Alloc(a, capacity * sizeof(float));
     CCONTROL_REQUIRE(ctx, out->coeffs, CCONTROL_ERROR_OUT_OF_MEMORY, "Out of memory");
 
@@ -135,13 +137,15 @@ ControlResult __Control_Vec_CreateInArenaRaw(ControlHandle *ctx,
     return CCONTROL_OK;
 }
 
-ControlResult Control_Matrix_MultiplyVec(ControlHandle *ctx,
-                                         ControlVec *out,
+ControlResult Control_Matrix_MultiplyVec(ControlHandle       *ctx,
+                                         ControlVec          *out,
                                          const ControlMatrix *m,
-                                         const ControlVec *v)
+                                         const ControlVec    *v)
 {
     CHECK_CTX(ctx);
     CHECK_NOT_NULL(ctx, out && m && v, "Passed null pointers");
+    CCONTROL_REQUIRE(
+        ctx, m->cols == v->size, CCONTROL_ERROR_DIMENSION_MISMATCH, "Dimension mismatch");
 
     size_t new_size = m->rows;
 
@@ -180,16 +184,18 @@ Control_Vec_Add(ControlHandle *ctx, ControlVec *out, const ControlVec *lhs, cons
 {
     CHECK_CTX(ctx);
     CHECK_NOT_NULL(ctx, out && lhs && rhs, "Passed null pointers");
+    CCONTROL_REQUIRE(
+        ctx, lhs->size == rhs->size, CCONTROL_ERROR_DIMENSION_MISMATCH, "dimension mismatch");
 
-    size_t max_size = lhs->size > rhs->size ? lhs->size : rhs->size;
-    if (out->capacity < max_size)
+    size_t size = lhs->size;
+    if (out->capacity < size)
     {
-        CCONTROL_TRY(__Control_Vec_CreateInArenaRaw(ctx, out, ctx->scratch, max_size));
+        CCONTROL_TRY(__Control_Vec_CreateInArenaRaw(ctx, out, ctx->scratch, size));
     }
 
-    out->size = max_size;
+    out->size = size;
 
-    for (size_t i = 0; i < max_size; i++)
+    for (size_t i = 0; i < size; i++)
     {
         float sum = 0.0f;
         if (i < lhs->size)

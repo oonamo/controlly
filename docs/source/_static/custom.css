@@ -13,3 +13,43 @@
   border-radius: 8px;
   display: block;
 }
+
+/* _static/custom.css (Icon Style) */
+span.dir-badge {
+    display: inline-block;
+    padding: 0.2em 0.5em;
+    margin-right: 0.5em;
+    font-size: 0.7em;
+    font-weight: 600;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1;
+    text-align: center;
+    vertical-align: middle;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    /* Neutral background */
+    background-color: #f0f2f4;
+    color: #5c6975;
+    border: 1px solid #d1d5da;
+}
+
+/* Style the icon specifically */
+span.dir-icon {
+    font-size: 1.1em;      /* Make the arrow slightly larger */
+    font-weight: 900;
+    margin-right: 0.2em;   /* Space between arrow and text */
+    color: #24292e;        /* Darker color to make the icon pop */
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+    span.dir-badge {
+        background-color: #2f363d;
+        color: #d1d5da;
+        border-color: #444d56;
+    }
+    span.dir-icon {
+        color: #fafbfc; /* Brighter icon for dark mode */
+    }
+}

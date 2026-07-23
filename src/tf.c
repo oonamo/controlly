@@ -5,21 +5,13 @@
 #include <ccontrol/tf.h>
 #include <stddef.h>
 
-#ifndef CONTROL_PRIVATE_API
-#    define CONTROL_PRIVATE_API static
-#endif
-
-#ifndef CONTROL_INLINE_API
-#    define CONTROL_INLINE_API inline
-#endif
-
 #define REQUIRE_VALID_TF(ctx, tf_ptr, msg)                                                         \
     CCONTROL_REQUIRE(ctx, Control_TF_IsValid(tf_ptr), CCONTROL_ERROR_INVALID_ARGUMENT, msg)
 
 void Control_System_Init(ControlHandle *ctx, ControlArena *p, ControlArena *s)
 {
     ctx->persistent = p;
-    ctx->scratch = s;
+    ctx->scratch    = s;
 }
 
 void Control_System_DeInit(ControlHandle *ctx)
@@ -29,13 +21,13 @@ void Control_System_DeInit(ControlHandle *ctx)
 }
 
 CONTROL_PRIVATE_API ControlResult __Control_Vec_CreateInArena(ControlHandle *ctx,
-                                                              ControlVec *out,
-                                                              ControlArena *a,
-                                                              size_t capacity)
+                                                              ControlVec    *out,
+                                                              ControlArena  *a,
+                                                              size_t         capacity)
 {
     out->capacity = 0;
-    out->size = 0;
-    out->coeffs = NULL;
+    out->size     = 0;
+    out->coeffs   = NULL;
 
     out->coeffs = (float *)Control_Arena_Alloc(a, capacity * sizeof(float));
     CCONTROL_REQUIRE(ctx, out->coeffs, CCONTROL_ERROR_OUT_OF_MEMORY, "out of memory");
@@ -74,8 +66,8 @@ ControlResult Control_Poly_Canonicalize(ControlHandle *ctx, ControlVec *out, con
 
     size_t new_capacity = v->capacity - i;
 
-    out->coeffs = &v->coeffs[i];
-    out->size = v->size - i;
+    out->coeffs   = &v->coeffs[i];
+    out->size     = v->size - i;
     out->capacity = new_capacity;
 
     return CCONTROL_OK;
@@ -164,10 +156,10 @@ Control_Poly_Multiply(ControlHandle *ctx, ControlVec *out, const ControlVec *a, 
     return CCONTROL_OK;
 }
 
-ControlResult Control_TF_FromPoly(ControlHandle *ctx,
+ControlResult Control_TF_FromPoly(ControlHandle           *ctx,
                                   ControlTransferFunction *out,
-                                  const ControlVec *num,
-                                  const ControlVec *dem)
+                                  const ControlVec        *num,
+                                  const ControlVec        *dem)
 {
     CHECK_CTX(ctx);
     CHECK_NOT_NULL(ctx, out && num && dem, "Out pointer is NULL");
@@ -178,8 +170,8 @@ ControlResult Control_TF_FromPoly(ControlHandle *ctx,
     return CCONTROL_OK;
 }
 
-ControlResult Control_TF_Multiply(ControlHandle *ctx,
-                                  ControlTransferFunction *out,
+ControlResult Control_TF_Multiply(ControlHandle                 *ctx,
+                                  ControlTransferFunction       *out,
                                   const ControlTransferFunction *G1,
                                   const ControlTransferFunction *G2)
 {
@@ -226,11 +218,11 @@ ControlResult Control_TF_Validate(ControlHandle *ctx, const ControlTransferFunct
     return CCONTROL_OK;
 }
 
-ControlResult Control_TF_ClosedLoop(ControlHandle *ctx,
-                                    ControlTransferFunction *out,
+ControlResult Control_TF_ClosedLoop(ControlHandle                 *ctx,
+                                    ControlTransferFunction       *out,
                                     const ControlTransferFunction *G,
-                                    float gain,
-                                    ControlFeedbackUnity unity)
+                                    float                          gain,
+                                    ControlFeedbackType            unity)
 {
     CHECK_CTX(ctx);
     CHECK_NOT_NULL(ctx, out, "Null pointer was passed");
@@ -269,8 +261,8 @@ ControlResult Control_TF_ClosedLoop(ControlHandle *ctx,
     return CCONTROL_OK;
 }
 
-ControlResult Control_TF_Persist(ControlHandle *ctx,
-                                 ControlTransferFunction *out,
+ControlResult Control_TF_Persist(ControlHandle                 *ctx,
+                                 ControlTransferFunction       *out,
                                  const ControlTransferFunction *tf)
 {
     CHECK_CTX(ctx);

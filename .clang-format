@@ -20,6 +20,11 @@ PointerAlignment: Right
 SpaceBeforeParens: ControlStatements
 
 InsertBraces: true
-AlignConsecutiveMacros: AcrossEmptyLinesAndComments
-IndentPPDirectives: AfterHash
+AlignConsecutiveDeclarations: true
+AlignConsecutiveAssignments: true
+AlignConsecutiveBitFields: true
+CommentPragmas: '^/\*'
+IndentPPDirectives: BeforeHash
+
+ReflowComments: true
 ...

@@ -5,13 +5,13 @@
 #include <stddef.h>
 
 void Control_PID_Init(
-    ControlPIDController *pid, float kp, float ki, float kd, ControlPIDConfig *config)
+    ControlPIDController *pid, float kp, float ki, float kd, const ControlPIDConfig *config)
 {
     pid->kp = kp;
     pid->ki = ki;
     pid->kd = kd;
 
-    pid->integral = 0.0f;
+    pid->integral   = 0.0f;
     pid->prev_error = 0.0f;
 
     if (config != NULL)
@@ -21,25 +21,25 @@ void Control_PID_Init(
     else
     {
         pid->config.enable_anti_windup = false;
-        pid->config.max_out = 0.0f;
-        pid->config.min_out = 0.0f;
+        pid->config.max_out            = 0.0f;
+        pid->config.min_out            = 0.0f;
     }
 }
 
 void Control_PID_Reset(ControlPIDController *pid)
 {
-    pid->integral = 0.0f;
+    pid->integral   = 0.0f;
     pid->prev_error = 0.0f;
 }
 
-float Control_PID_Update(ControlPIDController *pid, float setpoint, float measurment, float dt)
+float Control_PID_Update(ControlPIDController *pid, float setpoint, float measurement, float dt)
 {
     if (dt <= 0.0f)
     {
         return 0.0f;
     }
 
-    float error = setpoint - measurment;
+    float error = setpoint - measurement;
 
     float p_term = pid->kp * error;
 
@@ -48,7 +48,7 @@ float Control_PID_Update(ControlPIDController *pid, float setpoint, float measur
     float i_term = pid->ki * pid->integral;
 
     float derivative = (error - pid->prev_error) / dt;
-    float d_term = pid->kd * derivative;
+    float d_term     = pid->kd * derivative;
 
     float output = p_term + i_term + d_term;
 
@@ -72,7 +72,8 @@ float Control_PID_Update(ControlPIDController *pid, float setpoint, float measur
     return output;
 }
 
-ControlResult Control_PID_ToTF(ControlHandle *ctx, ControlTransferFunction* out, ControlPIDController *pid)
+ControlResult
+Control_PID_ToTF(ControlHandle *ctx, ControlTransferFunction *out, const ControlPIDController *pid)
 {
     float num[3] = {pid->kd, pid->kp, pid->ki};
     float den[3] = {1.0f, 0.0f};
@@ -84,7 +85,6 @@ ControlResult Control_PID_ToTF(ControlHandle *ctx, ControlTransferFunction* out,
     CCONTROL_TRY(Control_Poly_AllocPersistent(ctx, &den_v, den, 3));
 
     CCONTROL_TRY(Control_TF_FromPoly(ctx, out, &num_v, &den_v));
-
 
     return CCONTROL_OK;
 }
