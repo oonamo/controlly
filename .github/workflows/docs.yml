@@ -61,7 +61,7 @@ jobs:
       - name: Build and move files
         run: |
           cd build_web
-          emcmake cmake .. -DCCONTROL_BUILD_EXAMPLES=ON
+          emcmake cmake .. -DCONTROLLY_BUILD_EXAMPLES=ON
           cmake --build .
           mkdir -p ../docs/source/_static/wasm
 
