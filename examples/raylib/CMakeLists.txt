@@ -38,7 +38,7 @@ foreach(SRC_FILE IN LISTS EXAMPLE_SOURCES)
     target_compile_definitions(${TARGET_NAME} PRIVATE CCONTROL_EXAMPLE_SHOWCASE)
   endif()
 
-  target_link_libraries(${TARGET_NAME} PRIVATE controls raylib)
+  target_link_libraries(${TARGET_NAME} PRIVATE controlly raylib)
 
   if(EMSCRIPTEN)
     set_target_properties(${TARGET_NAME} PROPERTIES SUFFIX ".html")
