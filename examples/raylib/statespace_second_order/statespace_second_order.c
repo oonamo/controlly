@@ -43,6 +43,7 @@ static const DampingProfile profiles[NUM_PROFILES] = {
 void  RaylibSetup(void);
 void  ControlSetup(void);
 void  ControlLoop(void);
+void  MainLoop(void);
 void  DrawVisuals(int target_x, int actual_x);
 float NextProfile(ControlStateSpace *space);
 float PrevProfile(ControlStateSpace *space);
@@ -144,20 +145,6 @@ void ControlLoop()
 #endif
 
     // ----------------------------------------
-    // [SYSTEM CONFIG] Update Damping profile
-    // ----------------------------------------
-    if (IsKeyPressed(KEY_RIGHT) || IsKeyPressed(KEY_UP) || IsKeyPressed(KEY_SPACE) ||
-        IsMouseButtonPressed(MOUSE_LEFT_BUTTON))
-    {
-        damping_ratio = NextProfile(&sys);
-    }
-    else if (IsKeyPressed(KEY_LEFT) || IsKeyPressed(KEY_DOWN) ||
-             IsMouseButtonPressed(MOUSE_RIGHT_BUTTON))
-    {
-        damping_ratio = PrevProfile(&sys);
-    }
-
-    // ----------------------------------------
     // [STEP] Calculate the next step to the mathematical system
     // ----------------------------------------
     Control_StateSpace_StepContinuous(&ctx, &sys, dt);
@@ -172,16 +159,34 @@ void ControlLoop()
 }
 // [DOC_END: statespace_example]
 
+void MainLoop(void)
+{
+    // ----------------------------------------
+    // [SYSTEM CONFIG] Update Damping profile
+    // ----------------------------------------
+    if (IsKeyPressed(KEY_RIGHT) || IsKeyPressed(KEY_UP) || IsKeyPressed(KEY_SPACE) ||
+        IsMouseButtonPressed(MOUSE_LEFT_BUTTON))
+    {
+        damping_ratio = NextProfile(&sys);
+    }
+    else if (IsKeyPressed(KEY_LEFT) || IsKeyPressed(KEY_DOWN) ||
+             IsMouseButtonPressed(MOUSE_RIGHT_BUTTON))
+    {
+        damping_ratio = PrevProfile(&sys);
+    }
+    ControlLoop();
+}
+
 int main(void)
 {
     RaylibSetup();
     ControlSetup();
 #ifdef PLATFORM_WEB
-    emscripten_set_main_loop(ControlLoop, 0, 1);
+    emscripten_set_main_loop(MainLoop, 0, 1);
 #else
     while (!WindowShouldClose())
     {
-        ControlLoop();
+        MainLoop();
     }
 #endif
 
@@ -200,9 +205,7 @@ int main(void)
 // ========================================
 void RaylibSetup()
 {
-    const int screenWidth  = SCREEN_WIDTH;
-    const int screenHeight = SCREEN_HEIGHT;
-    InitWindow(screenWidth, screenHeight, "ccontrol + raylib : State Space System");
+    InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "ccontrol + raylib : State Space System");
     SetTargetFPS(60);
     SetMouseCursor(MOUSE_CURSOR_CROSSHAIR);
 }
@@ -220,11 +223,9 @@ void DrawVisuals(int target_x, int actual_x)
         DrawRectangle(actual_x - 20, SCREEN_HEIGHT / 2 - 20, 40, 40, MAROON);
         DrawText("System Output", actual_x - 50, SCREEN_HEIGHT / 2 + 30, 20, MAROON);
 
-        DrawText("Use Up/Right Arrows or Left/Right Mouse buttons to change the physical system",
-                 10,
-                 SCREEN_HEIGHT - 80,
-                 20,
-                 GRAY);
+        DrawText("UP/RIGHT/RIGHT Click: Next System", 10, SCREEN_HEIGHT - 120, 20, GRAY);
+
+        DrawText("DOWN/LEFT/LEFT Click: Previous System", 10, SCREEN_HEIGHT - 80, 20, GRAY);
 
         DrawText(TextFormat("Mode: %s [%d/%d]",
                             profiles[current_profile].name,
