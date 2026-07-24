@@ -27,10 +27,10 @@ endif()
 
 add_subdirectory(src)
 
-option(CCONTROL_BUILD_EXAMPLES "Build example applications" OFF)
+option(CONTROLLY_BUILD_EXAMPLES "Build example applications" OFF)
 
-if (CCONTROL_BUILD_EXAMPLES)
-  option(CCONTROL_AS_SHOWCASE "Apply showcase features to example applications" OFF)
+if (CONTROLLY_BUILD_EXAMPLES)
+  option(CONTROLLY_AS_SHOWCASE "Apply showcase features to example applications" OFF)
   add_subdirectory(examples)
 endif()
 

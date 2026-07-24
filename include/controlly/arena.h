@@ -6,16 +6,16 @@
  * is designed to prevent memory fragmentation
  * The arena can be used standalone, without the need of any other header
  */
-#ifndef _CCONTROL_ARENA_H
-#define _CCONTROL_ARENA_H
+#ifndef _CONTROLLY_ARENA_H
+#define _CONTROLLY_ARENA_H
 #include <stddef.h>
 #include <stdint.h>
 
-#ifndef CCONTROL_ARENA_ALIGN_SIZE
+#ifndef CONTROLLY_ARENA_ALIGN_SIZE
     /*
      * @brief Size of arena alignment
      */
-    #define CCONTROL_ARENA_ALIGN_SIZE 8
+    #define CONTROLLY_ARENA_ALIGN_SIZE 8
 #endif
 
 /**
@@ -80,4 +80,4 @@ size_t Control_Arena_RemainingSpace(ControlArena *arena);
  * enough capacity.
  */
 void *Control_Arena_Alloc(ControlArena *arena, size_t size);
-#endif // _CCONTROL_ARENA_H
+#endif // _CONTROLLY_ARENA_H

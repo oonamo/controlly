@@ -23,9 +23,9 @@ target_sources(controlly
     BASE_DIRS
       ${PROJECT_SOURCE_DIR}/include
     FILES
-      ${PROJECT_SOURCE_DIR}/include/ccontrol/tf.h
-      ${PROJECT_SOURCE_DIR}/include/ccontrol/arena.h
-      ${PROJECT_SOURCE_DIR}/include/ccontrol/matrix.h
-      ${PROJECT_SOURCE_DIR}/include/ccontrol/statespace.h
-      ${PROJECT_SOURCE_DIR}/include/ccontrol/controllers/pid.h
+      ${PROJECT_SOURCE_DIR}/include/controlly/tf.h
+      ${PROJECT_SOURCE_DIR}/include/controlly/arena.h
+      ${PROJECT_SOURCE_DIR}/include/controlly/matrix.h
+      ${PROJECT_SOURCE_DIR}/include/controlly/statespace.h
+      ${PROJECT_SOURCE_DIR}/include/controlly/controllers/pid.h
 )

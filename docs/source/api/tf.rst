@@ -1,4 +1,4 @@
 Transfer Functions
 ======================
-.. doxygenfile:: ccontrol/tf.h
-  :project CControl
+.. doxygenfile:: controlly/tf.h
+  :project Controlly

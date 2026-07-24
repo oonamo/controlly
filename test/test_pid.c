@@ -1,18 +1,18 @@
 #include <unity.h>
 #include <unity_fixture.h>
 
-#include <ccontrol/controllers/pid.h>
+#include <controlly/controllers/pid.h>
 
 TEST_GROUP(PID);
 
 static ControlPIDController pid;
-static ControlPIDConfig cfg;
+static ControlPIDConfig     cfg;
 
 TEST_SETUP(PID)
 {
     cfg.enable_anti_windup = false;
-    cfg.max_out = 0.0f;
-    cfg.min_out = 0.0f;
+    cfg.max_out            = 0.0f;
+    cfg.min_out            = 0.0f;
 }
 
 TEST_TEAR_DOWN(PID)

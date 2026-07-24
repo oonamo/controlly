@@ -1,4 +1,4 @@
 Arena
 ======================
-.. doxygenfile:: ccontrol/arena.h
-  :project CControl
+.. doxygenfile:: controlly/arena.h
+  :project Controlly

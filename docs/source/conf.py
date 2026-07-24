@@ -6,7 +6,7 @@
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-project = "CControl"
+project = "Controlly"
 copyright = "2026, Onam Hernandez"
 author = "Onam Hernandez"
 release = "0.1"
@@ -19,8 +19,8 @@ extensions = ["breathe", "sphinx.ext.githubpages", "sphinx.ext.mathjax"]
 templates_path = ["_templates"]
 exclude_patterns = []
 
-breathe_projects = {"CControl": "../../docs/xml"}
-breathe_default_project = "CControl"
+breathe_projects = {"Controlly": "../../docs/xml"}
+breathe_default_project = "Controlly"
 
 
 # -- Options for HTML output -------------------------------------------------

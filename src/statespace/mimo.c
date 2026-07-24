@@ -1,8 +1,8 @@
 #include "ss_internal.h"
-#include <ccontrol/statespace.h>
+#include <controlly/statespace.h>
 
 #ifndef MAX_SYSTEM_ORDER
-#define MAX_SYSTEM_ORDER 10
+    #define MAX_SYSTEM_ORDER 10
 #endif
 
 void __Control_StateSpace_StepMIMO(ControlStateSpace *ss, float dt)

@@ -1,15 +1,15 @@
 /**
  * @file statespace.h
- * @brief State space module of CControl
+ * @brief State space module of Controlly
  *
  * This module contains support for modeling of state space systems
  */
-#ifndef _CCONTROL_STATESPACE_H
-#define _CCONTROL_STATESPACE_H
+#ifndef _CONTROLLY_STATESPACE_H
+#define _CONTROLLY_STATESPACE_H
 
-#include <ccontrol/core.h>
-#include <ccontrol/matrix.h>
-#include <ccontrol/tf.h>
+#include <controlly/core.h>
+#include <controlly/matrix.h>
+#include <controlly/tf.h>
 
 typedef ControlMatrix ControlSystemMatrix;
 typedef ControlMatrix ControlInputMatrix;
@@ -34,7 +34,7 @@ typedef struct
 /**
  * @brief Helper function for initializing an empty State Space structure.
  */
-#define CCONTROL_EMPTY_STATESPACE (ControlStateSpace){0}
+#define CONTROL_EMPTY_STATESPACE (ControlStateSpace){0}
 
 /**
  * @brief Mathematically steps into the next iteration of the state space equation.
@@ -64,13 +64,13 @@ void Control_StateSpace_StepContinuous(ControlHandle *ctx, ControlStateSpace *ss
  * @param[out]    out Pointer to the destination ControlStateSpace.
  * @param[in]     tf  Pointer to the transform function to convert.
  *
- * @return CCONTROL_OK on success.
- * @return CCONTROL_ERROR_OUT_OF_MEMORY if the persistent arena is exhausted.
- * @return CCONTROL_ERROR_INVALID_ARGUMENT if the transfer function is invalid or improper.
- * @return CCONTROL_ERROR_NULL_PTR if any pointer is NULL.
+ * @return CONTROL_OK on success.
+ * @return CONTROL_ERROR_OUT_OF_MEMORY if the persistent arena is exhausted.
+ * @return CONTROL_ERROR_INVALID_ARGUMENT if the transfer function is invalid or improper.
+ * @return CONTROL_ERROR_NULL_PTR if any pointer is NULL.
  */
 ControlResult Control_StateSpace_FromTF(ControlHandle                 *ctx,
                                         ControlStateSpace             *out,
                                         const ControlTransferFunction *tf);
 
-#endif // _CCONTROL_STATESPACE_H
+#endif // _CONTROLLY_STATESPACE_H

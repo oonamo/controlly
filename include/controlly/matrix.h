@@ -3,12 +3,12 @@
  * @brief Minimal vector and matrix math implementations
  *
  * This module contains a minimal support of common linear algebra functions for use with the
- * CControl library.
+ * Controlly library.
  */
-#ifndef _CCONTROL_MATRIX_H
-#define _CCONTROL_MATRIX_H
+#ifndef _CONTROLLY_MATRIX_H
+#define _CONTROLLY_MATRIX_H
 
-#include <ccontrol/core.h>
+#include <controlly/core.h>
 #include <stdbool.h>
 #include <stddef.h>
 
@@ -25,7 +25,7 @@ typedef struct
 /**
  * @brief A helper macro for initializing an empty ControlVec.
  */
-#define CCONTROL_EMPTY_VEC ((ControlVec){0})
+#define CONTROL_EMPTY_VEC ((ControlVec){0})
 
 /**
  * @brief A standard definition of a matrix.
@@ -40,7 +40,7 @@ typedef struct
 /**
  * @brief A helper macro for initializing an empty ControlMatrix.
  */
-#define CCONTROL_EMPTY_MATRIX ((ControlMatrix){0})
+#define CONTROL_EMPTY_MATRIX ((ControlMatrix){0})
 
 /**
  * @brief Allocates a ControlVec in a scratch arena.
@@ -51,10 +51,10 @@ typedef struct
  * @param[out]    out  Pointer to the the destination ControlVec
  * @param[in]     size Amount of elements to allocate
  *
- * @return CCONTROL_OK on success.
- * @return CCONTROL_ERROR_OUT_OF_MEMORY if the scratch arena is exhausted.
- * @return CCONTROL_ERROR_CTX_UNINITIALIZED if the system context is uninitialized.
- * @return CCONTROL_ERROR_NULL_PTR if the out vector is NULL.
+ * @return CONTROL_OK on success.
+ * @return CONTROL_ERROR_OUT_OF_MEMORY if the scratch arena is exhausted.
+ * @return CONTROL_ERROR_CTX_UNINITIALIZED if the system context is uninitialized.
+ * @return CONTROL_ERROR_NULL_PTR if the out vector is NULL.
  */
 ControlResult Control_Vec_AllocScratch(ControlHandle *ctx, ControlVec *out, size_t size);
 
@@ -67,10 +67,10 @@ ControlResult Control_Vec_AllocScratch(ControlHandle *ctx, ControlVec *out, size
  * @param[out] out  Pointer to the destination ControlVec
  * @param[in]  size Amount of elements to allocate
  *
- * @return CCONTROL_OK on success.
- * @return CCONTROL_ERROR_OUT_OF_MEMORY if the scratch persistent is exhausted.
- * @return CCONTROL_ERROR_CTX_UNINITIALIZED if the system context is uninitialized.
- * @return CCONTROL_ERROR_NULL_PTR if the out vector is NULL.
+ * @return CONTROL_OK on success.
+ * @return CONTROL_ERROR_OUT_OF_MEMORY if the scratch persistent is exhausted.
+ * @return CONTROL_ERROR_CTX_UNINITIALIZED if the system context is uninitialized.
+ * @return CONTROL_ERROR_NULL_PTR if the out vector is NULL.
  */
 ControlResult Control_Vec_AllocPersistent(ControlHandle *ctx, ControlVec *out, size_t size);
 
@@ -87,10 +87,10 @@ ControlResult Control_Vec_AllocPersistent(ControlHandle *ctx, ControlVec *out, s
  * @param[out]    out Pointer to the destination ControlVec>
  * @param[in]     v   Pointer to the source ControlVec to copy.
  *
- * @return CCONTROL_OK on success.
- * @return CCONTROL_ERROR_OUT_OF_MEMORY if the scratch persistent is exhausted.
- * @return CCONTROL_ERROR_CTX_UNINITIALIZED if the system context is uninitialized.
- * @return CCONTROL_ERROR_NULL_PTR if the out vector is NULL.
+ * @return CONTROL_OK on success.
+ * @return CONTROL_ERROR_OUT_OF_MEMORY if the scratch persistent is exhausted.
+ * @return CONTROL_ERROR_CTX_UNINITIALIZED if the system context is uninitialized.
+ * @return CONTROL_ERROR_NULL_PTR if the out vector is NULL.
  */
 ControlResult Control_Vec_Persist(ControlHandle *ctx, ControlVec *out, const ControlVec *v);
 
@@ -104,10 +104,10 @@ ControlResult Control_Vec_Persist(ControlHandle *ctx, ControlVec *out, const Con
  * @param[in]  rows Number of rows to allocate.
  * @param[in]  cols Number of columns to allocate.
  *
- * @return CCONTROL_OK on success.
- * @return CCONTROL_ERROR_OUT_OF_MEMORY if the scratch persistent is exhausted.
- * @return CCONTROL_ERROR_CTX_UNINITIALIZED if the system context is uninitialized.
- * @return CCONTROL_ERROR_NULL_PTR if the out vector is NULL.
+ * @return CONTROL_OK on success.
+ * @return CONTROL_ERROR_OUT_OF_MEMORY if the scratch persistent is exhausted.
+ * @return CONTROL_ERROR_CTX_UNINITIALIZED if the system context is uninitialized.
+ * @return CONTROL_ERROR_NULL_PTR if the out vector is NULL.
  */
 ControlResult
 Control_Matrix_AllocPersistent(ControlHandle *ctx, ControlMatrix *out, size_t rows, size_t cols);
@@ -122,10 +122,10 @@ Control_Matrix_AllocPersistent(ControlHandle *ctx, ControlMatrix *out, size_t ro
  * @param[in]  rows Number of rows to allocate.
  * @param[in]  cols Number of columns to allocate.
  *
- * @return CCONTROL_OK on success.
- * @return CCONTROL_ERROR_OUT_OF_MEMORY if the scratch scratch is exhausted.
- * @return CCONTROL_ERROR_CTX_UNINITIALIZED if the system context is uninitialized.
- * @return CCONTROL_ERROR_NULL_PTR if the out vector is NULL.
+ * @return CONTROL_OK on success.
+ * @return CONTROL_ERROR_OUT_OF_MEMORY if the scratch scratch is exhausted.
+ * @return CONTROL_ERROR_CTX_UNINITIALIZED if the system context is uninitialized.
+ * @return CONTROL_ERROR_NULL_PTR if the out vector is NULL.
  */
 ControlResult
 Control_Matrix_AllocScratch(ControlHandle *ctx, ControlMatrix *out, size_t rows, size_t cols);
@@ -140,10 +140,10 @@ Control_Matrix_AllocScratch(ControlHandle *ctx, ControlMatrix *out, size_t rows,
  * @param[out]    out  Pointer to the destination ControlMatrix.
  * @param[in]     m    Pointer to the source ControlMatrix to copy.
  *
- * @return CCONTROL_OK on success.
- * @return CCONTROL_ERROR_OUT_OF_MEMORY if the scratch persistent is exhausted.
- * @return CCONTROL_ERROR_CTX_UNINITIALIZED if the system context is uninitialized.
- * @return CCONTROL_ERROR_NULL_PTR if the out vector is NULL.
+ * @return CONTROL_OK on success.
+ * @return CONTROL_ERROR_OUT_OF_MEMORY if the scratch persistent is exhausted.
+ * @return CONTROL_ERROR_CTX_UNINITIALIZED if the system context is uninitialized.
+ * @return CONTROL_ERROR_NULL_PTR if the out vector is NULL.
  */
 ControlResult
 Control_Matrix_Persist(ControlHandle *ctx, ControlMatrix *out, const ControlMatrix *m);
@@ -165,9 +165,9 @@ Control_Matrix_Persist(ControlHandle *ctx, ControlMatrix *out, const ControlMatr
  * @param[in]     m   Pointer to the input ControlMatrix.
  * @param[in]     v   Pointer to the input ControlVec.
  *
- * @return CCONTROL_OK on success.
- * @return CCONTROL_ERROR_DIMENSION_MISMATCH if m->cols != v->size.
- * @return CCONTROL_ERROR_NULL_PTR if any pointer is NULL.
+ * @return CONTROL_OK on success.
+ * @return CONTROL_ERROR_DIMENSION_MISMATCH if m->cols != v->size.
+ * @return CONTROL_ERROR_NULL_PTR if any pointer is NULL.
  */
 ControlResult Control_Matrix_MultiplyVec(ControlHandle       *ctx,
                                          ControlVec          *out,
@@ -191,9 +191,9 @@ ControlResult Control_Matrix_MultiplyVec(ControlHandle       *ctx,
  * @param[in]     lhs Pointer to the left-hand side ControlVec.
  * @param[in]     rhs Pointer to the right-hand side ControlVec.
  *
- * @return CCONTROL_OK on success.
- * @return CCONTROL_ERROR_DIMENSION_MISMATCH if lhs->size != rhs->size.
- * @return CCONTROL_ERROR_NULL_PTR if any pointer is NULL.
+ * @return CONTROL_OK on success.
+ * @return CONTROL_ERROR_DIMENSION_MISMATCH if lhs->size != rhs->size.
+ * @return CONTROL_ERROR_NULL_PTR if any pointer is NULL.
  */
 ControlResult
 Control_Vec_Add(ControlHandle *ctx, ControlVec *out, const ControlVec *lhs, const ControlVec *rhs);
@@ -215,8 +215,8 @@ Control_Vec_Add(ControlHandle *ctx, ControlVec *out, const ControlVec *lhs, cons
  * @param[in]     v      Pointer to the input ControlVec.
  * @param[in]     scalar The float multiplier.
  *
- * @return CCONTROL_OK on success.
- * @return CCONTROL_ERROR_NULL_PTR if any pointer is NULL.
+ * @return CONTROL_OK on success.
+ * @return CONTROL_ERROR_NULL_PTR if any pointer is NULL.
  */
 ControlResult
 Control_Vec_Scale(ControlHandle *ctx, ControlVec *out, const ControlVec *v, float scalar);
@@ -237,4 +237,4 @@ bool Control_Matrix_IsValid(const ControlMatrix *m);
  */
 bool Control_Vec_IsValid(const ControlVec *v);
 
-#endif // _CCONTROL_MATRIX_H
+#endif // _CONTROLLY_MATRIX_H

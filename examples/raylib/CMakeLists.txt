@@ -34,8 +34,8 @@ foreach(SRC_FILE IN LISTS EXAMPLE_SOURCES)
 
   target_compile_options(${TARGET_NAME} PRIVATE ${RELAXED_WARNINGS})
 
-  if(CCONTROL_AS_SHOWCASE)
-    target_compile_definitions(${TARGET_NAME} PRIVATE CCONTROL_EXAMPLE_SHOWCASE)
+  if(CONTROLLY_AS_SHOWCASE)
+    target_compile_definitions(${TARGET_NAME} PRIVATE CONTROLLY_EXAMPLE_SHOWCASE)
   endif()
 
   target_link_libraries(${TARGET_NAME} PRIVATE controlly raylib)

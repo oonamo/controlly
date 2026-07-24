@@ -1,4 +1,4 @@
 Core
 ======================
-.. doxygenfile:: ccontrol/core.h
-  :project CControl
+.. doxygenfile:: controlly/core.h
+  :project Controlly

@@ -1,13 +1,13 @@
-# CControl Examples
+# Controlly Examples
 
 ## Reading the Source Code
 The [Raylib](http://www.raylib.com/) examples contain both rendering and UI code,
 which may make it difficult to find the relevant control parts.
 
-To understand the **CControl** API, look for the following *code beacons*.
+To understand the **Controlly** API, look for the following *code beacons*.
 
 ### 1. Setup: `ControlSetup()`
-This function contains relevant steps for initializing the **CControl** library.
+This function contains relevant steps for initializing the **Controlly** library.
 To see how to start the library, look here.
 
 Typically, the following will appear:
@@ -27,7 +27,7 @@ To distinguish the different process of the loop, the function is divided into t
 - `[VISUALIZATION]` : Signifies a visualization step of the loop. This block is safe to ignore
 
 #### Transfer Functions and PID
-- `[CONTROLLER]` : Calls a **CControl** Controller object to computed correction
+- `[CONTROLLER]` : Calls a **Controlly** Controller object to computed correction
 - `[PLANT]` : Applies computed correction to a modeled system (typically a physics environment)
 
 #### State Space
@@ -38,7 +38,7 @@ Functions like `RaylibSetup()` and `DrawVisuals()` are strictly for
 rendering the graphics.
 
 > [!TIP]
-> If you care only about the **CControl** and the relevant *control theory*,
+> If you care only about the **Controlly** and the relevant *control theory*,
 > The graphic functions can be safely ignored
 
 ## Current Graphical Simulations
@@ -54,7 +54,7 @@ To build the examples:
 # in the project root:
 mkdir build
 cd build
-cmake .. -DCCONTROL_BUILD_EXAMPLES
+cmake .. -DCONTROLLY_BUILD_EXAMPLES
 make
 ```
 

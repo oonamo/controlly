@@ -1,8 +1,8 @@
-#include "ccontrol/matrix.h"
-#include <ccontrol/arena.h>
-#include <ccontrol/core.h>
-#include <ccontrol/statespace.h>
-#include <ccontrol/tf.h>
+#include <controlly/arena.h>
+#include <controlly/core.h>
+#include <controlly/matrix.h>
+#include <controlly/statespace.h>
+#include <controlly/tf.h>
 #include <raylib.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -63,11 +63,11 @@ ControlHandle     ctx;
 void             *persistent_mem = NULL;
 void             *scratch_mem    = NULL;
 
-// If any call to the CControl library fails, this function will be called before returning
+// If any call to the Controlly library fails, this function will be called before returning
 void Control_ExitOnFailure(ControlResult result, const char *message, void *user_data)
 {
     (void)user_data;
-    if (result != CCONTROL_OK)
+    if (result != CONTROL_OK)
     {
         TraceLog(LOG_FATAL, "Exiting, Reason: %s", message);
         exit(EXIT_FAILURE);
@@ -137,7 +137,7 @@ void ControlLoop()
         dt = 0.1f;
     }
 
-#ifndef CCONTROL_EXAMPLE_SHOWCASE
+#ifndef CONTROLLY_EXAMPLE_SHOWCASE
     // ----------------------------------------
     // [INPUT] Mouse acts as the reference target (Step Input)
     // ----------------------------------------
@@ -205,7 +205,7 @@ int main(void)
 // ========================================
 void RaylibSetup()
 {
-    InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "ccontrol + raylib : State Space System");
+    InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "controlly + raylib : State Space System");
     SetTargetFPS(60);
     SetMouseCursor(MOUSE_CURSOR_CROSSHAIR);
 }

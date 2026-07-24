@@ -1,5 +1,5 @@
-#include "ccontrol/arena.h"
-#include <ccontrol/tf.h>
+#include <controlly/arena.h>
+#include <controlly/tf.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -9,15 +9,15 @@
 
 TEST_GROUP(PolyMath);
 
-static void *p_pool;
-static void *s_pool;
+static void         *p_pool;
+static void         *s_pool;
 static ControlHandle ctx;
 
 TEST_SETUP(PolyMath)
 {
     const static size_t MEMSIZE = 1024;
-    p_pool = malloc(sizeof(uint8_t) * MEMSIZE);
-    s_pool = malloc(sizeof(uint8_t) * MEMSIZE);
+    p_pool                      = malloc(sizeof(uint8_t) * MEMSIZE);
+    s_pool                      = malloc(sizeof(uint8_t) * MEMSIZE);
 
     ControlArena *p = Control_Arena_Create(p_pool, MEMSIZE);
     ControlArena *s = Control_Arena_Create(s_pool, MEMSIZE);
@@ -39,8 +39,8 @@ TEST(PolyMath, PolynomialMultiplication)
     float b[2] = {1, 2};
 
     ControlVec a_coeffs = {0}, b_coeffs = {0};
-    TEST_ASSERT_EQUAL(CCONTROL_OK, Control_Poly_AllocScratch(&ctx, &a_coeffs, a, 3));
-    TEST_ASSERT_EQUAL(CCONTROL_OK, Control_Poly_AllocScratch(&ctx, &b_coeffs, b, 2));
+    TEST_ASSERT_EQUAL(CONTROL_OK, Control_Poly_AllocScratch(&ctx, &a_coeffs, a, 3));
+    TEST_ASSERT_EQUAL(CONTROL_OK, Control_Poly_AllocScratch(&ctx, &b_coeffs, b, 2));
 
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(a, a_coeffs.coeffs, 3);
     TEST_ASSERT_EQUAL_size_t(3, a_coeffs.size);
@@ -50,7 +50,7 @@ TEST(PolyMath, PolynomialMultiplication)
 
     // s^3 + 4s^2 + 7s + 6
     ControlVec result = {0};
-    TEST_ASSERT_EQUAL(CCONTROL_OK, Control_Poly_Multiply(&ctx, &result, &a_coeffs, &b_coeffs));
+    TEST_ASSERT_EQUAL(CONTROL_OK, Control_Poly_Multiply(&ctx, &result, &a_coeffs, &b_coeffs));
 
     float expected_result[] = {1, 4, 7, 6};
 
@@ -64,10 +64,10 @@ TEST(PolyMath, PolynomialAdditionSameSize)
     float b[3] = {4.0f, 5.0f, 6.0f};
 
     ControlVec a_coeffs = {0}, b_coeffs = {0}, result = {0};
-    TEST_ASSERT_EQUAL(CCONTROL_OK, Control_Poly_AllocScratch(&ctx, &a_coeffs, a, 3));
-    TEST_ASSERT_EQUAL(CCONTROL_OK, Control_Poly_AllocScratch(&ctx, &b_coeffs, b, 3));
+    TEST_ASSERT_EQUAL(CONTROL_OK, Control_Poly_AllocScratch(&ctx, &a_coeffs, a, 3));
+    TEST_ASSERT_EQUAL(CONTROL_OK, Control_Poly_AllocScratch(&ctx, &b_coeffs, b, 3));
 
-    TEST_ASSERT_EQUAL(CCONTROL_OK, Control_Poly_Add(&ctx, &result, &a_coeffs, &b_coeffs));
+    TEST_ASSERT_EQUAL(CONTROL_OK, Control_Poly_Add(&ctx, &result, &a_coeffs, &b_coeffs));
 
     float expected[] = {5.0f, 7.0f, 9.0f};
     TEST_ASSERT_EQUAL_size_t(3, result.size);
@@ -81,10 +81,10 @@ TEST(PolyMath, PolynomialAdditionDifferentSize)
     float b[2] = {4.0f, 5.0f};
 
     ControlVec a_coeffs = {0}, b_coeffs = {0}, result = {0};
-    TEST_ASSERT_EQUAL(CCONTROL_OK, Control_Poly_AllocScratch(&ctx, &a_coeffs, a, 3));
-    TEST_ASSERT_EQUAL(CCONTROL_OK, Control_Poly_AllocScratch(&ctx, &b_coeffs, b, 2));
+    TEST_ASSERT_EQUAL(CONTROL_OK, Control_Poly_AllocScratch(&ctx, &a_coeffs, a, 3));
+    TEST_ASSERT_EQUAL(CONTROL_OK, Control_Poly_AllocScratch(&ctx, &b_coeffs, b, 2));
 
-    TEST_ASSERT_EQUAL(CCONTROL_OK, Control_Poly_Add(&ctx, &result, &a_coeffs, &b_coeffs));
+    TEST_ASSERT_EQUAL(CONTROL_OK, Control_Poly_Add(&ctx, &result, &a_coeffs, &b_coeffs));
 
     float expected[] = {1.0f, 6.0f, 8.0f};
 
@@ -99,8 +99,8 @@ TEST(PolyMath, RepeatedMathDoesNotOOM)
 
     // FIX: These must be in the PERSISTENT arena for this test loop!
     ControlVec a_coeffs = {0}, b_coeffs = {0};
-    TEST_ASSERT_EQUAL(CCONTROL_OK, Control_Poly_AllocPersistent(&ctx, &a_coeffs, a, 3));
-    TEST_ASSERT_EQUAL(CCONTROL_OK, Control_Poly_AllocPersistent(&ctx, &b_coeffs, b, 2));
+    TEST_ASSERT_EQUAL(CONTROL_OK, Control_Poly_AllocPersistent(&ctx, &a_coeffs, a, 3));
+    TEST_ASSERT_EQUAL(CONTROL_OK, Control_Poly_AllocPersistent(&ctx, &b_coeffs, b, 2));
 
     ControlVec temp = {0};
 
@@ -111,7 +111,7 @@ TEST(PolyMath, RepeatedMathDoesNotOOM)
         // We must reset temp to 0 so the math function knows to re-allocate it.
         temp = (ControlVec){0};
 
-        TEST_ASSERT_EQUAL(CCONTROL_OK, Control_Poly_Multiply(&ctx, &temp, &a_coeffs, &b_coeffs));
+        TEST_ASSERT_EQUAL(CONTROL_OK, Control_Poly_Multiply(&ctx, &temp, &a_coeffs, &b_coeffs));
         Control_Arena_Clear(ctx.scratch);
     }
 
@@ -120,13 +120,13 @@ TEST(PolyMath, RepeatedMathDoesNotOOM)
 
 TEST(PolyMath, CanonicalizeRemovesLeadingZeroes)
 {
-    float c[] = {0.0f, 0.0f, 1.0f, 0.0f, 2.0f};
+    float c[]        = {0.0f, 0.0f, 1.0f, 0.0f, 2.0f};
     float expected[] = {1.0f, 0.0f, 2.0f};
 
     ControlVec uncanon_vec = {0}, canon_vec = {0};
-    TEST_ASSERT_EQUAL(CCONTROL_OK, Control_Poly_AllocScratch(&ctx, &uncanon_vec, c, 5));
+    TEST_ASSERT_EQUAL(CONTROL_OK, Control_Poly_AllocScratch(&ctx, &uncanon_vec, c, 5));
 
-    TEST_ASSERT_EQUAL(CCONTROL_OK, Control_Poly_Canonicalize(&ctx, &canon_vec, &uncanon_vec));
+    TEST_ASSERT_EQUAL(CONTROL_OK, Control_Poly_Canonicalize(&ctx, &canon_vec, &uncanon_vec));
 
     TEST_ASSERT_EQUAL_size_t(3, canon_vec.size);
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(expected, canon_vec.coeffs, 3);
