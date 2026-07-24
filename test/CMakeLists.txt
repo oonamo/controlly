@@ -11,6 +11,15 @@ set(UNITY_EXTENSION_FIXTURE ON CACHE BOOL "Enable Unity Fixtures" FORCE)
 
 FetchContent_MakeAvailable(unity)
 
+if (CMAKE_C_COMPILER_ID MATCHES "MSVC")
+  message("Detected MSVC, silencing Unity compilation warnings")
+  target_compile_options(unity PRIVATE
+    # Disable the following to get rid of cmake noise for Unity
+    /wd4711
+    /wd5045
+  )
+endif()
+
 find_program(MATLAB_EXE matlab)
 
 if(MATLAB_EXE)
@@ -36,7 +45,7 @@ endif()
 add_executable(test_runner)
 
 target_compile_definitions(unity
-  PUBLIC
+  PRIVATE
   UNITY_OUTPUT_COLOR # Show colored output
   UNITY_INCLUDE_COMMAND_LINE_ARGS # Allows for parsing command line arguments
   UNITY_FIXTURE_NO_EXTRAS
