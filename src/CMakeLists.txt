@@ -1,14 +1,14 @@
-add_library(controls STATIC)
+add_library(controlly STATIC)
 
-set_target_properties(controls PROPERTIES
+set_target_properties(controlly PROPERTIES
   C_STANDARD 99
   C_STANDARD_REQUIRED ON
   C_EXTENSIONS OFF
 )
 
-target_compile_options(controls PRIVATE ${STRICT_WARNINGS})
+target_compile_options(controlly PRIVATE ${STRICT_WARNINGS})
 
-target_sources(controls
+target_sources(controlly
   PRIVATE
     tf.c
     arena.c

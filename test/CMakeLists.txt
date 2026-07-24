@@ -63,7 +63,7 @@ target_sources(test_runner PRIVATE
   matlab_test_data.h
 )
 
-target_link_libraries(test_runner PRIVATE controls unity)
+target_link_libraries(test_runner PRIVATE controlly unity)
 
 # Add verbosity to unit tests
 add_test(NAME UnitTests COMMAND test_runner -v)
