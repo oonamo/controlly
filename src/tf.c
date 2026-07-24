@@ -8,18 +8,6 @@
 #define REQUIRE_VALID_TF(ctx, tf_ptr, msg)                                                         \
     CCONTROL_REQUIRE(ctx, Control_TF_IsValid(tf_ptr), CCONTROL_ERROR_INVALID_ARGUMENT, msg)
 
-void Control_System_Init(ControlHandle *ctx, ControlArena *p, ControlArena *s)
-{
-    ctx->persistent = p;
-    ctx->scratch    = s;
-}
-
-void Control_System_DeInit(ControlHandle *ctx)
-{
-    Control_Arena_Clear(ctx->scratch);
-    Control_Arena_Clear(ctx->persistent);
-}
-
 CONTROL_PRIVATE_API ControlResult __Control_Vec_CreateInArena(ControlHandle *ctx,
                                                               ControlVec    *out,
                                                               ControlArena  *a,

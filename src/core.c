@@ -1,4 +1,3 @@
-#include "internal_common.h"
 #include <ccontrol/core.h>
 
 void Control_System_Init(ControlHandle *ctx, ControlArena *p, ControlArena *s)
@@ -9,5 +8,6 @@ void Control_System_Init(ControlHandle *ctx, ControlArena *p, ControlArena *s)
 
 void Control_System_DeInit(ControlHandle *ctx)
 {
-    CCONTROL_UNUSED(ctx);
+    Control_Arena_Clear(ctx->scratch);
+    Control_Arena_Clear(ctx->persistent);
 }

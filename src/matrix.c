@@ -234,11 +234,12 @@ Control_Vec_Scale(ControlHandle *ctx, ControlVec *out, const ControlVec *v, floa
     return CCONTROL_OK;
 }
 
-inline bool Control_Matrix_IsValid(const ControlMatrix *m)
+bool Control_Matrix_IsValid(const ControlMatrix *m)
 {
     return m != NULL && m->data != NULL;
 }
-inline bool Control_Vec_IsValid(const ControlVec *v)
+
+bool Control_Vec_IsValid(const ControlVec *v)
 {
     return v != NULL && v->coeffs != NULL;
 }
