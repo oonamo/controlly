@@ -11,15 +11,15 @@
 #include <raygui.h>
 
 #if defined(PLATFORM_WEB)
-#include <emscripten/emscripten.h>
+    #include <emscripten/emscripten.h>
 #endif
 
 #if defined(PLATFORM_WEB)
-#define SCREEN_WIDTH 800
-#define SCREEN_HEIGHT 600
+    #define SCREEN_WIDTH 800
+    #define SCREEN_HEIGHT 600
 #else
-#define SCREEN_WIDTH 1250
-#define SCREEN_HEIGHT 750
+    #define SCREEN_WIDTH 1250
+    #define SCREEN_HEIGHT 750
 #endif
 
 #define FLOOR_HEIGHT SCREEN_HEIGHT * 0.6
@@ -32,20 +32,20 @@
 typedef struct
 {
     Rectangle bounds;
-    float acceleration;
-    float velocity;
-    float mass;
-    float friction;
+    float     acceleration;
+    float     velocity;
+    float     mass;
+    float     friction;
 } Vehicle;
 
 // ========================================
 // 2. FORWARD DECLARATIONS (Functions are strictly for simulation)
 // ========================================
-Camera2D camera = {0};
-static const char *collision_msg = "Vehicles Are Colliding!";
-static const char *braking_msg = "BRAKING!";
-float collision_msg_len = 0.0f;
-float braking_msg_len = 0.0f;
+Camera2D           camera            = {0};
+static const char *collision_msg     = "Vehicles Are Colliding!";
+static const char *braking_msg       = "BRAKING!";
+float              collision_msg_len = 0.0f;
+float              braking_msg_len   = 0.0f;
 
 void RaylibSetup(void);
 void UpdateLeaderPosition(float dt);
@@ -59,25 +59,25 @@ bool VehiclesAreColliding(void);
 // 3. GLOBAL STATE & TARGET
 // ========================================
 // [DOC_START: pid_example]
-static const float TARGET_DISTANCE = 250.0f;
-static ControlPIDController pid = {0};
+static const float          TARGET_DISTANCE = 250.0f;
+static ControlPIDController pid             = {0};
 
 static Vehicle leader = {
     .bounds = {SCREEN_WIDTH * 0.5, FLOOR_HEIGHT - VEHICLE_HEIGHT, VEHICLE_WIDTH, VEHICLE_HEIGHT},
     .acceleration = 0.0f,
-    .velocity = 100.0f,
-    .mass = 1500.0f,
-    .friction = 50.0f};
+    .velocity     = 100.0f,
+    .mass         = 1500.0f,
+    .friction     = 50.0f};
 
 static Vehicle follower = {
-    .bounds = {-100, FLOOR_HEIGHT - VEHICLE_HEIGHT, VEHICLE_WIDTH, VEHICLE_HEIGHT},
+    .bounds       = {-100, FLOOR_HEIGHT - VEHICLE_HEIGHT, VEHICLE_WIDTH, VEHICLE_HEIGHT},
     .acceleration = 0.0f,
-    .velocity = 0.0f,
-    .mass = 1000.0f,
-    .friction = 50.0f};
+    .velocity     = 0.0f,
+    .mass         = 1000.0f,
+    .friction     = 50.0f};
 
 static float accumulated_error = 0.0f;
-static float total_time = 0.0f; // NOTE: Reset on variable change, cannot use GetTime()
+static float total_time        = 0.0f; // NOTE: Reset on variable change, cannot use GetTime()
 
 void ControlSetup()
 {
@@ -159,15 +159,15 @@ int main()
 
 void RaylibSetup()
 {
-    camera.offset = (Vector2){SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT / 2.0f};
+    camera.offset   = (Vector2){SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT / 2.0f};
     camera.rotation = 0.0f;
-    camera.zoom = 1.0f;
+    camera.zoom     = 1.0f;
     camera.target.y = 0.0f;
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "ccontrol + raylib : Adapative Cruise Control");
     SetTargetFPS(60);
 
     collision_msg_len = MeasureText(collision_msg, 20);
-    braking_msg_len = MeasureText(braking_msg, 20);
+    braking_msg_len   = MeasureText(braking_msg, 20);
 
     GuiSetStyle(DEFAULT, TEXT_SIZE, 20);
 }
@@ -180,7 +180,7 @@ void UpdateLeaderPosition(float dt)
         next_leader_velocity = 0.0f;
     }
     leader.acceleration = -(float)(leader.velocity > next_leader_velocity);
-    leader.velocity = next_leader_velocity;
+    leader.velocity     = next_leader_velocity;
 
     leader.bounds.x += leader.velocity * dt;
 }
@@ -207,7 +207,7 @@ void DrawVisuals(float cur_dist, float target, ControlPIDController *pid)
 
             // PHYSICAL DISTANCE LINE
             Vector2 start_line = {follower.bounds.x + follower.bounds.width, FLOOR_HEIGHT - 10.0f};
-            Vector2 end_line = {leader.bounds.x, start_line.y};
+            Vector2 end_line   = {leader.bounds.x, start_line.y};
 
             Color color = GREEN;
             if (start_line.x > end_line.x)
@@ -218,9 +218,9 @@ void DrawVisuals(float cur_dist, float target, ControlPIDController *pid)
             DrawLineEx(start_line, end_line, 3.0f, color);
 
             // TARGET LINE
-            float target_pos = leader.bounds.x - TARGET_DISTANCE;
+            float   target_pos        = leader.bounds.x - TARGET_DISTANCE;
             Vector2 target_line_start = {target_pos, FLOOR_HEIGHT};
-            Vector2 target_line_end = {target_pos, FLOOR_HEIGHT - 170.0f};
+            Vector2 target_line_end   = {target_pos, FLOOR_HEIGHT - 170.0f};
 
             DrawLineEx(target_line_start, target_line_end, 3.0f, Fade(DARKGREEN, 0.6f));
 
@@ -229,9 +229,9 @@ void DrawVisuals(float cur_dist, float target, ControlPIDController *pid)
             DrawText("TARGET", target_pos - 22, target_line_end.y - 11.0f, 10, WHITE);
 
             // ERROR LINE
-            float target_diff_y = FLOOR_HEIGHT - 110.0f;
+            float   target_diff_y     = FLOOR_HEIGHT - 110.0f;
             Vector2 target_diff_start = {follower.bounds.x + follower.bounds.width, target_diff_y};
-            Vector2 target_diff_end = {target_line_end.x, target_diff_start.y};
+            Vector2 target_diff_end   = {target_line_end.x, target_diff_start.y};
 
             // Connecting Error Line to the Follower
             DrawLineEx((Vector2){target_diff_start.x, leader.bounds.y - 30.0f},
@@ -241,15 +241,15 @@ void DrawVisuals(float cur_dist, float target, ControlPIDController *pid)
 
             if (target_line_start.x > target_line_end.x)
             {
-                float tmp = target_diff_start.x;
+                float tmp           = target_diff_start.x;
                 target_diff_start.x = target_diff_end.x;
-                target_diff_end.x = tmp;
+                target_diff_end.x   = tmp;
             }
 
-            float error = cur_dist - TARGET_DISTANCE;
+            float       error     = cur_dist - TARGET_DISTANCE;
             const char *error_msg = TextFormat("Error: %.0f px", error);
-            int error_len = MeasureText(error_msg, 20);
-            int err_mid_x = target_diff_start.x + (target_diff_end.x - target_diff_start.x) / 2.0f;
+            int         error_len = MeasureText(error_msg, 20);
+            int err_mid_x  = target_diff_start.x + (target_diff_end.x - target_diff_start.x) / 2.0f;
             int err_text_x = err_mid_x - (error_len / 2.0f);
             int err_text_y = target_diff_start.y - 24.0f;
 
@@ -258,10 +258,10 @@ void DrawVisuals(float cur_dist, float target, ControlPIDController *pid)
             DrawText(error_msg, err_text_x, err_text_y, 20, WHITE);
 
             // Local Info, Render last
-            const char *distance_str = TextFormat("%.0f px", cur_dist);
-            int distance_str_len = MeasureText(distance_str, 20);
+            const char *distance_str     = TextFormat("%.0f px", cur_dist);
+            int         distance_str_len = MeasureText(distance_str, 20);
 
-            float mid_x = start_line.x + (end_line.x - start_line.x) / 2.0f;
+            float mid_x  = start_line.x + (end_line.x - start_line.x) / 2.0f;
             float text_x = mid_x - (distance_str_len / 2.0f);
             float text_y = start_line.y - 25.0f;
 
@@ -271,9 +271,9 @@ void DrawVisuals(float cur_dist, float target, ControlPIDController *pid)
         EndMode2D();
 
         static Rectangle outer_rect = {
-            .x = 10,
-            .y = 10,
-            .width = 300,
+            .x      = 10,
+            .y      = 10,
+            .width  = 300,
             .height = 80,
         };
 
@@ -284,19 +284,19 @@ void DrawVisuals(float cur_dist, float target, ControlPIDController *pid)
         float avg_error = (total_time > 0.0f) ? (accumulated_error / total_time) : 0.0f;
         DrawText(TextFormat("Avg Error (MAE): %1.f px", avg_error), outer_rect.x + 5, 65, 20, RED);
 
-        static const float padding = 10;
-        static const float width = 350;
-        static const float height = 140;
-        static const float panelX = SCREEN_WIDTH - width;
+        static const float     padding    = 10;
+        static const float     width      = 350;
+        static const float     height     = 140;
+        static const float     panelX     = SCREEN_WIDTH - width;
         static const Rectangle window_box = {
-            .x = panelX - padding,
-            .y = 10,
-            .width = width,
+            .x      = panelX - padding,
+            .y      = 10,
+            .width  = width,
             .height = height,
         };
 
         static const float slider_width = (window_box.width - 2.0f * padding) * 0.8f;
-        static const float slider_x = panelX + (padding * 2.0f);
+        static const float slider_x     = panelX + (padding * 2.0f);
 
         GuiPanel(window_box, "PID Control Panel");
 
@@ -341,7 +341,7 @@ void DrawVisuals(float cur_dist, float target, ControlPIDController *pid)
         if (pid->kp != old_kp || pid->ki != old_ki || pid->kd != old_kd)
         {
             Control_PID_Reset(pid);
-            total_time = 0.0f;
+            total_time        = 0.0f;
             accumulated_error = 0.0f;
         }
     }
@@ -350,7 +350,7 @@ void DrawVisuals(float cur_dist, float target, ControlPIDController *pid)
 
 void CalculateZoom()
 {
-    float leader_center = leader.bounds.x + (leader.bounds.width / 2.0f);
+    float leader_center   = leader.bounds.x + (leader.bounds.width / 2.0f);
     float follower_center = follower.bounds.x + (follower.bounds.width / 2.0f);
 
     // Center camera
@@ -360,7 +360,7 @@ void CalculateZoom()
 
     float dist = fabs(leader_center - follower_center);
 
-    float padding = 300.0f;
+    float padding    = 300.0f;
     float view_width = dist + padding;
 
     camera.zoom = SCREEN_WIDTH / view_width;
@@ -381,7 +381,7 @@ void DrawVehicle(Vehicle *car, Color color)
     DrawRectangleRec(car->bounds, color);
 
     // Draw Wheels
-    Vector2 rear_wheel = {car->bounds.x + 20, car->bounds.y + car->bounds.height};
+    Vector2 rear_wheel  = {car->bounds.x + 20, car->bounds.y + car->bounds.height};
     Vector2 front_wheel = {car->bounds.x + car->bounds.width - 20, rear_wheel.y};
 
     DrawCircleV(rear_wheel, 12.0f, BLACK);
@@ -391,9 +391,9 @@ void DrawVehicle(Vehicle *car, Color color)
     if (car->acceleration < 0 || car->velocity == 0.0f)
     {
         Rectangle brake_light = {
-            .x = car->bounds.x,
-            .y = car->bounds.y + car->bounds.height * 0.2,
-            .width = 10.0f,
+            .x      = car->bounds.x,
+            .y      = car->bounds.y + car->bounds.height * 0.2,
+            .width  = 10.0f,
             .height = car->bounds.height * 0.4f,
         };
 
@@ -401,9 +401,9 @@ void DrawVehicle(Vehicle *car, Color color)
     }
 
     const char *velocity_str = TextFormat("%1.f px/s", car->velocity);
-    int velocity_len = MeasureText(velocity_str, 20);
+    int         velocity_len = MeasureText(velocity_str, 20);
 
-    float mid_x = car->bounds.x + (car->bounds.width / 2.0f);
+    float mid_x  = car->bounds.x + (car->bounds.width / 2.0f);
     float text_x = mid_x - (velocity_len / 2.0f);
     float text_y = car->bounds.y - 30.0f;
 
@@ -419,21 +419,21 @@ void DrawVehicle(Vehicle *car, Color color)
 void DrawSkyline()
 {
     float view_width = GetRenderWidth();
-    float start_x = camera.target.x - view_width;
-    float end_x = camera.target.x + view_width;
+    float start_x    = camera.target.x - view_width;
+    float end_x      = camera.target.x + view_width;
 
-    static const int grid_size = 150;
-    int snapped_start = ((int)start_x / grid_size) * grid_size;
+    static const int grid_size     = 150;
+    int              snapped_start = ((int)start_x / grid_size) * grid_size;
 
     for (int x = snapped_start; x < end_x; x += grid_size)
     {
-        int pseudo_random = abs(x * 12345);
-        float bldg_height = 50.0f + (pseudo_random % 200);
-        float bldg_width = 40.0f + (pseudo_random % 60);
+        int   pseudo_random = abs(x * 12345);
+        float bldg_height   = 50.0f + (pseudo_random % 200);
+        float bldg_width    = 40.0f + (pseudo_random % 60);
 
-        Rectangle building = {.x = (float)x,
-                              .y = FLOOR_HEIGHT - bldg_height,
-                              .width = bldg_width,
+        Rectangle building = {.x      = (float)x,
+                              .y      = FLOOR_HEIGHT - bldg_height,
+                              .width  = bldg_width,
                               .height = bldg_height};
 
         // Draw Buildings
@@ -442,9 +442,9 @@ void DrawSkyline()
 
         // Draw Lanes
         Rectangle lane = {
-            .x = (float)x,
-            .y = FLOOR_HEIGHT + 10,
-            .width = grid_size * 0.5,
+            .x      = (float)x,
+            .y      = FLOOR_HEIGHT + 10,
+            .width  = grid_size * 0.5,
             .height = 10,
         };
         DrawRectangleRec(lane, WHITE);
