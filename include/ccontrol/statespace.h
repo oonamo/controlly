@@ -58,7 +58,7 @@ void Control_StateSpace_StepContinuous(ControlHandle *ctx, ControlStateSpace *ss
  * This function uses the **Controllable Canonical Form** model to convert the transfer function
  * into a state space system.
  *
- * @note Performs allocation in the `ctx->scratch` arena.
+ * @note Performs allocation in the `ctx->persistent` arena.
  *
  * @param[in,out] ctx Pointer to the initialized control context.
  * @param[out]    out Pointer to the destination ControlStateSpace.
