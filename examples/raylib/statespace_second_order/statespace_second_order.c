@@ -16,8 +16,8 @@
 // 1. CONFIGURATION & MODEL
 // ========================================
 #if defined(PLATFORM_WEB)
-    #define SCREEN_WIDTH 850
-    #define SCREEN_HEIGHT 450
+    #define SCREEN_WIDTH 800
+    #define SCREEN_HEIGHT 600
 #else
     #define SCREEN_WIDTH 1250
     #define SCREEN_HEIGHT 750
