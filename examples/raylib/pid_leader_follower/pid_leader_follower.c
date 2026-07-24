@@ -2,8 +2,8 @@
  * Cruise Control Example
  * TODO: Link to derivations
  */
-#include <ccontrol/controllers/pid.h>
-#include <ccontrol/tf.h>
+#include <controlly/controllers/pid.h>
+#include <controlly/tf.h>
 #include <math.h>
 #include <raylib.h>
 
@@ -163,7 +163,7 @@ void RaylibSetup()
     camera.rotation = 0.0f;
     camera.zoom     = 1.0f;
     camera.target.y = 0.0f;
-    InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "ccontrol + raylib : Adapative Cruise Control");
+    InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "controlly + raylib : Adapative Cruise Control");
     SetTargetFPS(60);
 
     collision_msg_len = MeasureText(collision_msg, 20);

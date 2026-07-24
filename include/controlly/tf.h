@@ -5,10 +5,10 @@
  * This module provides dynamic polynomial arithmetic and transfer function
  * operations for linear time-invariant (LTI) systems.
  */
-#ifndef _CCONTROL_TF_H
-#define _CCONTROL_TF_H
-#include <ccontrol/core.h>
-#include <ccontrol/matrix.h>
+#ifndef _CONTROLLY_TF_H
+#define _CONTROLLY_TF_H
+#include <controlly/core.h>
+#include <controlly/matrix.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -40,7 +40,7 @@ typedef struct
 /**
  * @brief A helper macro for initializing an empty ControlTransferFunction.
  */
-#define CCONTROL_EMPTY_TF ((ControlTransferFunction){0})
+#define CONTROL_EMPTY_TF ((ControlTransferFunction){0})
 
 /**
  * @brief Allocates and initializes a polynomial in the scratch arena.
@@ -53,10 +53,10 @@ typedef struct
  * @param[in]     size   Number of coefficients in the array.
  *
  * @return
- *        - CCONTROL_OK on success.
- *        - CCONTROL_ERROR_CTX_UNINITIALIZED if the system context is uninitialized.
- *        - CCONTROL_ERROR_OUT_OF_MEMORY if the scratch arena is exhausted.
- *        - CCONTROL_ERROR_NULL_PTR if any pointer is NULL.
+ *        - CONTROL_OK on success.
+ *        - CONTROL_ERROR_CTX_UNINITIALIZED if the system context is uninitialized.
+ *        - CONTROL_ERROR_OUT_OF_MEMORY if the scratch arena is exhausted.
+ *        - CONTROL_ERROR_NULL_PTR if any pointer is NULL.
  */
 ControlResult
 Control_Poly_AllocScratch(ControlHandle *ctx, ControlVec *out, const float *coeffs, size_t size);
@@ -72,10 +72,10 @@ Control_Poly_AllocScratch(ControlHandle *ctx, ControlVec *out, const float *coef
  * @param[in]     size   Number of coefficients in the array.
  *
  * @return
- *        - CCONTROL_OK on success.
- *        - CCONTROL_ERROR_CTX_UNINITIALIZED if the system context is uninitialized.
- *        - CCONTROL_ERROR_OUT_OF_MEMORY if the persistent arena is exhausted.
- *        - CCONTROL_ERROR_NULL_PTR if any pointer is NULL.
+ *        - CONTROL_OK on success.
+ *        - CONTROL_ERROR_CTX_UNINITIALIZED if the system context is uninitialized.
+ *        - CONTROL_ERROR_OUT_OF_MEMORY if the persistent arena is exhausted.
+ *        - CONTROL_ERROR_NULL_PTR if any pointer is NULL.
  */
 ControlResult
 Control_Poly_AllocPersistent(ControlHandle *ctx, ControlVec *out, const float *coeffs, size_t size);
@@ -92,9 +92,9 @@ Control_Poly_AllocPersistent(ControlHandle *ctx, ControlVec *out, const float *c
  * @param[in]  v   Pointer to the input polynomial.
  *
  * @return
- *        - CCONTROL_OK on success.
- *        - CCONTROL_ERROR_CTX_UNINITIALIZED if the system context is uninitialized.
- *        - CCONTROL_ERROR_NULL_PTR if any pointer is NULL.
+ *        - CONTROL_OK on success.
+ *        - CONTROL_ERROR_CTX_UNINITIALIZED if the system context is uninitialized.
+ *        - CONTROL_ERROR_NULL_PTR if any pointer is NULL.
  */
 ControlResult Control_Poly_Canonicalize(ControlHandle *ctx, ControlVec *out, const ControlVec *v);
 
@@ -114,10 +114,10 @@ ControlResult Control_Poly_Canonicalize(ControlHandle *ctx, ControlVec *out, con
  * @param[in]     b   Pointer to the second polynomial.
  *
  * @return
- *        - CCONTROL_OK on success.
- *        - CCONTROL_ERROR_CTX_UNINITIALIZED if the system context is uninitialized.
- *        - CCONTROL_ERROR_OUT_OF_MEMORY if the scratch arena is exhausted.
- *        - CCONTROL_ERROR_NULL_PTR if any pointer is NULL.
+ *        - CONTROL_OK on success.
+ *        - CONTROL_ERROR_CTX_UNINITIALIZED if the system context is uninitialized.
+ *        - CONTROL_ERROR_OUT_OF_MEMORY if the scratch arena is exhausted.
+ *        - CONTROL_ERROR_NULL_PTR if any pointer is NULL.
  */
 ControlResult
 Control_Poly_Add(ControlHandle *ctx, ControlVec *out, const ControlVec *a, const ControlVec *b);
@@ -138,10 +138,10 @@ Control_Poly_Add(ControlHandle *ctx, ControlVec *out, const ControlVec *a, const
  * @param[in]     b   Pointer to the second polynomial.
  *
  * @return
- *        - CCONTROL_OK on success.
- *        - CCONTROL_ERROR_CTX_UNINITIALIZED if the system context is uninitialized.
- *        - CCONTROL_ERROR_OUT_OF_MEMORY if the scratch arena is exhausted.
- *        - CCONTROL_ERROR_NULL_PTR if any pointer is NULL.
+ *        - CONTROL_OK on success.
+ *        - CONTROL_ERROR_CTX_UNINITIALIZED if the system context is uninitialized.
+ *        - CONTROL_ERROR_OUT_OF_MEMORY if the scratch arena is exhausted.
+ *        - CONTROL_ERROR_NULL_PTR if any pointer is NULL.
  */
 ControlResult Control_Poly_Multiply(ControlHandle    *ctx,
                                     ControlVec       *out,
@@ -160,9 +160,9 @@ ControlResult Control_Poly_Multiply(ControlHandle    *ctx,
  * @param[in]  dem Pointer to the denominator polynomial.
  *
  * @return
- *        - CCONTROL_OK on success.
- *        - CCONTROL_ERROR_CTX_UNINITIALIZED if the system context is uninitialized.
- *        - CCONTROL_ERROR_NULL_PTR if any pointer is NULL.
+ *        - CONTROL_OK on success.
+ *        - CONTROL_ERROR_CTX_UNINITIALIZED if the system context is uninitialized.
+ *        - CONTROL_ERROR_NULL_PTR if any pointer is NULL.
  */
 ControlResult Control_TF_FromPoly(ControlHandle           *ctx,
                                   ControlTransferFunction *out,
@@ -185,11 +185,11 @@ ControlResult Control_TF_FromPoly(ControlHandle           *ctx,
  * @param[in]     G2  Pointer to the second transfer function.
  *
  * @return
- *        - CCONTROL_OK on success.
- *        - CCONTROL_ERROR_CTX_UNINITIALIZED if the system context is uninitialized.
- *        - CCONTROL_ERROR_OUT_OF_MEMORY if the scratch arena is exhausted.
- *        - CCONTROL_ERROR_INVALID_ARGUMENT if G1 or G2 are improperly initialized.
- *        - CCONTROL_ERROR_NULL_PTR if any pointer is NULL.
+ *        - CONTROL_OK on success.
+ *        - CONTROL_ERROR_CTX_UNINITIALIZED if the system context is uninitialized.
+ *        - CONTROL_ERROR_OUT_OF_MEMORY if the scratch arena is exhausted.
+ *        - CONTROL_ERROR_INVALID_ARGUMENT if G1 or G2 are improperly initialized.
+ *        - CONTROL_ERROR_NULL_PTR if any pointer is NULL.
  */
 ControlResult Control_TF_Multiply(ControlHandle                 *ctx,
                                   ControlTransferFunction       *out,
@@ -214,10 +214,10 @@ ControlResult Control_TF_Multiply(ControlHandle                 *ctx,
  * @param[in]     unity The sign of the feedback (TF_FEEDBACK_NEGATIVE or TF_FEEDBACK_POSITIVE).
  *
  * @return
- *        - CCONTROL_OK on success.
- *        - CCONTROL_ERROR_CTX_UNINITIALIZED if the system context is uninitialized.
- *        - CCONTROL_ERROR_OUT_OF_MEMORY if the scratch arena is exhausted.
- *        - CCONTROL_ERROR_NULL_PTR if any pointer is NULL.
+ *        - CONTROL_OK on success.
+ *        - CONTROL_ERROR_CTX_UNINITIALIZED if the system context is uninitialized.
+ *        - CONTROL_ERROR_OUT_OF_MEMORY if the scratch arena is exhausted.
+ *        - CONTROL_ERROR_NULL_PTR if any pointer is NULL.
  */
 ControlResult Control_TF_ClosedLoop(ControlHandle                 *ctx,
                                     ControlTransferFunction       *out,
@@ -246,11 +246,11 @@ bool Control_TF_IsValid(const ControlTransferFunction *tf);
  * @param[in] tf  Pointer to the transfer function to validate.
  *
  * @return
- *        - CCONTROL_OK if valid.
- *        - CCONTROL_ERROR_CTX_UNINITIALIZED if the system context is uninitialized.
- *        - CCONTROL_ERROR_INVALID_ARGUMENT if pointers are null, sizes are zero, or coefficents are
+ *        - CONTROL_OK if valid.
+ *        - CONTROL_ERROR_CTX_UNINITIALIZED if the system context is uninitialized.
+ *        - CONTROL_ERROR_INVALID_ARGUMENT if pointers are null, sizes are zero, or coefficents are
  * NULL.
- *        - CCONTROL_ERROR_DIVIDE_BY_ZERO if the leading denominator coefficient is zero.
+ *        - CONTROL_ERROR_DIVIDE_BY_ZERO if the leading denominator coefficient is zero.
  */
 ControlResult Control_TF_Validate(ControlHandle *ctx, const ControlTransferFunction *tf);
 
@@ -271,13 +271,13 @@ ControlResult Control_TF_Validate(ControlHandle *ctx, const ControlTransferFunct
  * @param[in]     tf  Pointer to the source transfer function to copy.
  *
  * @return
- *        - CCONTROL_OK on success.
- *        - CCONTROL_ERROR_CTX_UNINITIALIZED if the system context is uninitialized.
- *        - CCONTROL_ERROR_OUT_OF_MEMORY if the persistent arena is exhausted.
- *        - CCONTROL_ERROR_NULL_PTR if any pointer is NULL.
+ *        - CONTROL_OK on success.
+ *        - CONTROL_ERROR_CTX_UNINITIALIZED if the system context is uninitialized.
+ *        - CONTROL_ERROR_OUT_OF_MEMORY if the persistent arena is exhausted.
+ *        - CONTROL_ERROR_NULL_PTR if any pointer is NULL.
  */
 ControlResult Control_TF_Persist(ControlHandle                 *ctx,
                                  ControlTransferFunction       *out,
                                  const ControlTransferFunction *tf);
 
-#endif // _CCONTROL_TF_H
+#endif // _CONTROLLY_TF_H

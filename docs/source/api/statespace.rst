@@ -1,4 +1,4 @@
 State Space
 ======================
-.. doxygenfile:: ccontrol/statespace.h
-  :project CControl
+.. doxygenfile:: controlly/statespace.h
+  :project Controlly

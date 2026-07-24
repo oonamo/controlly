@@ -5,10 +5,10 @@
  * This module provides a standard PID controller implementation with
  * optional anti-windup and output clamping features.
  */
-#ifndef _CCONTROL_PID_H
-#define _CCONTROL_PID_H
+#ifndef _CONTROLLY_PID_H
+#define _CONTROLLY_PID_H
 
-#include <ccontrol/tf.h>
+#include <controlly/tf.h>
 #include <stdbool.h>
 
 /**
@@ -87,11 +87,11 @@ float Control_PID_Update(ControlPIDController *pid, float target, float measurem
  * @param[out]    out Pointer to the destination transfer function.
  * @param[in]     pid Pointer to the source PID controller.
  *
- * @return CCONTROL_OK on success.
- * @return CCONTROL_ERROR_OUT_OF_MEMORY if the persistent arena is exhausted.
- * @return CCONTROL_ERROR_NULL_PTR if any pointer is NULL.
+ * @return CONTROL_OK on success.
+ * @return CONTROL_ERROR_OUT_OF_MEMORY if the persistent arena is exhausted.
+ * @return CONTROL_ERROR_NULL_PTR if any pointer is NULL.
  */
 ControlResult
 Control_PID_ToTF(ControlHandle *ctx, ControlTransferFunction *out, const ControlPIDController *pid);
 
-#endif // _CCONTROL_PID_H
+#endif // _CONTROLLY_PID_H

@@ -1,4 +1,4 @@
 Matrix
 ======================
-.. doxygenfile:: ccontrol/matrix.h
-  :project CControl
+.. doxygenfile:: controlly/matrix.h
+  :project Controlly

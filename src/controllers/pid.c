@@ -1,7 +1,7 @@
 #include "../internal_common.h"
-#include <ccontrol/controllers/pid.h>
-#include <ccontrol/matrix.h>
-#include <ccontrol/tf.h>
+#include <controlly/controllers/pid.h>
+#include <controlly/matrix.h>
+#include <controlly/tf.h>
 #include <stddef.h>
 
 void Control_PID_Init(
@@ -81,10 +81,10 @@ Control_PID_ToTF(ControlHandle *ctx, ControlTransferFunction *out, const Control
     ControlVec num_v = {0};
     ControlVec den_v = {0};
 
-    CCONTROL_TRY(Control_Poly_AllocPersistent(ctx, &num_v, num, 3));
-    CCONTROL_TRY(Control_Poly_AllocPersistent(ctx, &den_v, den, 3));
+    CONTROL_TRY(Control_Poly_AllocPersistent(ctx, &num_v, num, 3));
+    CONTROL_TRY(Control_Poly_AllocPersistent(ctx, &den_v, den, 3));
 
-    CCONTROL_TRY(Control_TF_FromPoly(ctx, out, &num_v, &den_v));
+    CONTROL_TRY(Control_TF_FromPoly(ctx, out, &num_v, &den_v));
 
-    return CCONTROL_OK;
+    return CONTROL_OK;
 }

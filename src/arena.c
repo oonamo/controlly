@@ -1,5 +1,5 @@
 #include "internal_common.h"
-#include <ccontrol/arena.h>
+#include <controlly/arena.h>
 
 ControlArena *Control_Arena_Create(void *backing_buffer, size_t capacity)
 {
@@ -37,7 +37,7 @@ void *Control_Arena_Alloc(ControlArena *a, size_t size)
         return NULL;
     }
 
-    size_t align_size = ALIGN_UP(size, CCONTROL_ARENA_ALIGN_SIZE);
+    size_t align_size = ALIGN_UP(size, CONTROLLY_ARENA_ALIGN_SIZE);
     if (a->_offset + align_size <= a->_capacity)
     {
         void *ptr = &a->_buffer[a->_offset];

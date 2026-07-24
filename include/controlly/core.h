@@ -1,22 +1,22 @@
 /**
  * @file core.h
- * @brief Core module of CControl
+ * @brief Core module of Controlly
  *
- * This module contains the core definitions needed for the CControl library.
+ * This module contains the core definitions needed for the Controlly library.
  * It exposes error codes, memory management, and the ControlHandle for handling library operations
  */
-#ifndef _CCONTROL_CORE_H
-#define _CCONTROL_CORE_H
+#ifndef _CONTROLLY_CORE_H
+#define _CONTROLLY_CORE_H
 
-#include <ccontrol/arena.h>
+#include <controlly/arena.h>
 #include <stddef.h>
 
-#ifndef CONTROL_PRIVATE_API
-    #define CONTROL_PRIVATE_API static
+#ifndef CONTROLLY_PRIVATE_API
+    #define CONTROLLY_PRIVATE_API static
 #endif
 
-#ifndef CONTROL_INLINE_API
-    #define CONTROL_INLINE_API inline
+#ifndef CONTROLLY_INLINE_API
+    #define CONTROLLY_INLINE_API inline
 #endif
 
 /**
@@ -24,16 +24,16 @@
  */
 typedef enum
 {
-    CCONTROL_OK = 0,                  /*!< Operation success */
-    CCONTROL_ERROR_CTX_UNINITIALIZED, /*!< A function that requires context was unintialized */
-    CCONTROL_ERROR_OUT_OF_MEMORY,     /*!< Out of memory (arena is full) */
-    CCONTROL_ERROR_DIVIDE_BY_ZERO,    /*!< A division by zero was attempted */
-    CCONTROL_ERROR_INVALID_ARGUMENT,  /*!< An invalid parameter was passed to a function */
-    CCONTROL_ERROR_NULL_PTR,          /*!< A required pointer parameter was NULL */
-    CCONTROL_ERROR_FEATURE_DISABLED,  /*!< A disabled feature was used */
+    CONTROL_OK = 0,                  /*!< Operation success */
+    CONTROL_ERROR_CTX_UNINITIALIZED, /*!< A function that requires context was unintialized */
+    CONTROL_ERROR_OUT_OF_MEMORY,     /*!< Out of memory (arena is full) */
+    CONTROL_ERROR_DIVIDE_BY_ZERO,    /*!< A division by zero was attempted */
+    CONTROL_ERROR_INVALID_ARGUMENT,  /*!< An invalid parameter was passed to a function */
+    CONTROL_ERROR_NULL_PTR,          /*!< A required pointer parameter was NULL */
+    CONTROL_ERROR_FEATURE_DISABLED,  /*!< A disabled feature was used */
 
     /* Math Errors */
-    CCONTROL_ERROR_DIMENSION_MISMATCH, /*!< Mismatched dimensions error */
+    CONTROL_ERROR_DIMENSION_MISMATCH, /*!< Mismatched dimensions error */
 } ControlResult;
 
 /**
@@ -46,7 +46,7 @@ typedef enum
 typedef void (*ControlErrorCallback)(ControlResult code, const char *message, void *user_data);
 
 /*
- * @brief Structure for CControl context
+ * @brief Structure for Controlly context
  *
  */
 typedef struct
@@ -75,4 +75,4 @@ void Control_System_Init(ControlHandle *ctx, ControlArena *p, ControlArena *s);
  */
 void Control_System_DeInit(ControlHandle *ctx);
 
-#endif // _CCONTROL_CORE_H
+#endif // _CONTROLLY_CORE_H

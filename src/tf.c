@@ -1,33 +1,33 @@
 #include "internal_common.h"
-#include <ccontrol/arena.h>
-#include <ccontrol/core.h>
-#include <ccontrol/matrix.h>
-#include <ccontrol/tf.h>
+#include <controlly/arena.h>
+#include <controlly/core.h>
+#include <controlly/matrix.h>
+#include <controlly/tf.h>
 #include <stddef.h>
 
 #define REQUIRE_VALID_TF(ctx, tf_ptr, msg)                                                         \
-    CCONTROL_REQUIRE(ctx, Control_TF_IsValid(tf_ptr), CCONTROL_ERROR_INVALID_ARGUMENT, msg)
+    CONTROL_REQUIRE(ctx, Control_TF_IsValid(tf_ptr), CONTROL_ERROR_INVALID_ARGUMENT, msg)
 
-CONTROL_PRIVATE_API ControlResult __Control_Vec_CreateInArena(ControlHandle *ctx,
-                                                              ControlVec    *out,
-                                                              ControlArena  *a,
-                                                              size_t         capacity)
+CONTROLLY_PRIVATE_API ControlResult __Control_Vec_CreateInArena(ControlHandle *ctx,
+                                                                ControlVec    *out,
+                                                                ControlArena  *a,
+                                                                size_t         capacity)
 {
     out->capacity = 0;
     out->size     = 0;
     out->coeffs   = NULL;
 
     out->coeffs = (float *)Control_Arena_Alloc(a, capacity * sizeof(float));
-    CCONTROL_REQUIRE(ctx, out->coeffs, CCONTROL_ERROR_OUT_OF_MEMORY, "out of memory");
+    CONTROL_REQUIRE(ctx, out->coeffs, CONTROL_ERROR_OUT_OF_MEMORY, "out of memory");
 
     out->capacity = capacity;
-    return CCONTROL_OK;
+    return CONTROL_OK;
 }
 
 static ControlResult __Control_Poly_CreateInArena(
     ControlHandle *ctx, ControlVec *out, ControlArena *a, const float *coeffs, size_t size)
 {
-    CCONTROL_TRY(__Control_Vec_CreateInArena(ctx, out, a, size));
+    CONTROL_TRY(__Control_Vec_CreateInArena(ctx, out, a, size));
 
     out->size = size;
 
@@ -36,7 +36,7 @@ static ControlResult __Control_Poly_CreateInArena(
         out->coeffs[i] = coeffs[i];
     }
 
-    return CCONTROL_OK;
+    return CONTROL_OK;
 }
 
 ControlResult Control_Poly_Canonicalize(ControlHandle *ctx, ControlVec *out, const ControlVec *v)
@@ -58,7 +58,7 @@ ControlResult Control_Poly_Canonicalize(ControlHandle *ctx, ControlVec *out, con
     out->size     = v->size - i;
     out->capacity = new_capacity;
 
-    return CCONTROL_OK;
+    return CONTROL_OK;
 }
 
 ControlResult
@@ -89,7 +89,7 @@ Control_Poly_Add(ControlHandle *ctx, ControlVec *out, const ControlVec *a, const
 
     if (out->coeffs == NULL || out->capacity < max_size)
     {
-        CCONTROL_TRY(__Control_Vec_CreateInArena(ctx, out, ctx->scratch, max_size));
+        CONTROL_TRY(__Control_Vec_CreateInArena(ctx, out, ctx->scratch, max_size));
     }
 
     size_t a_offset = max_size - a->size;
@@ -111,7 +111,7 @@ Control_Poly_Add(ControlHandle *ctx, ControlVec *out, const ControlVec *a, const
     }
 
     out->size = max_size;
-    return CCONTROL_OK;
+    return CONTROL_OK;
 }
 
 ControlResult
@@ -123,7 +123,7 @@ Control_Poly_Multiply(ControlHandle *ctx, ControlVec *out, const ControlVec *a, 
     size_t new_size = a->size + b->size - 1;
     if (out->coeffs == NULL || out->capacity < new_size)
     {
-        CCONTROL_TRY(__Control_Vec_CreateInArena(ctx, out, ctx->scratch, new_size));
+        CONTROL_TRY(__Control_Vec_CreateInArena(ctx, out, ctx->scratch, new_size));
     }
 
     out->size = new_size;
@@ -141,7 +141,7 @@ Control_Poly_Multiply(ControlHandle *ctx, ControlVec *out, const ControlVec *a, 
         }
     }
 
-    return CCONTROL_OK;
+    return CONTROL_OK;
 }
 
 ControlResult Control_TF_FromPoly(ControlHandle           *ctx,
@@ -155,7 +155,7 @@ ControlResult Control_TF_FromPoly(ControlHandle           *ctx,
     // TODO: Check if we can use allocated memory if abailable
     out->num = *num;
     out->den = *dem;
-    return CCONTROL_OK;
+    return CONTROL_OK;
 }
 
 ControlResult Control_TF_Multiply(ControlHandle                 *ctx,
@@ -166,21 +166,21 @@ ControlResult Control_TF_Multiply(ControlHandle                 *ctx,
     CHECK_CTX(ctx);
     CHECK_NOT_NULL(ctx, out, "Out pointer is NULL");
 
-    CCONTROL_TRY(Control_TF_Validate(ctx, G1));
-    CCONTROL_TRY(Control_TF_Validate(ctx, G2));
+    CONTROL_TRY(Control_TF_Validate(ctx, G1));
+    CONTROL_TRY(Control_TF_Validate(ctx, G2));
 
     ControlVec convolved_num = {0};
     ControlVec convolved_den = {0};
 
-    CCONTROL_TRY(Control_Poly_Multiply(ctx, &convolved_num, &G1->num, &G2->num));
-    CCONTROL_TRY(Control_Poly_Multiply(ctx, &convolved_den, &G1->den, &G2->den));
+    CONTROL_TRY(Control_Poly_Multiply(ctx, &convolved_num, &G1->num, &G2->num));
+    CONTROL_TRY(Control_Poly_Multiply(ctx, &convolved_den, &G1->den, &G2->den));
 
-    CCONTROL_TRY(Control_Poly_Canonicalize(ctx, &convolved_num, &convolved_num));
-    CCONTROL_TRY(Control_Poly_Canonicalize(ctx, &convolved_den, &convolved_den));
+    CONTROL_TRY(Control_Poly_Canonicalize(ctx, &convolved_num, &convolved_num));
+    CONTROL_TRY(Control_Poly_Canonicalize(ctx, &convolved_den, &convolved_den));
 
-    CCONTROL_TRY(Control_TF_FromPoly(ctx, out, &convolved_num, &convolved_den));
+    CONTROL_TRY(Control_TF_FromPoly(ctx, out, &convolved_num, &convolved_den));
 
-    return CCONTROL_OK;
+    return CONTROL_OK;
 }
 
 inline bool Control_TF_IsValid(const ControlTransferFunction *tf)
@@ -193,17 +193,17 @@ ControlResult Control_TF_Validate(ControlHandle *ctx, const ControlTransferFunct
     CHECK_CTX(ctx);
     CHECK_NOT_NULL(ctx, tf, "Transfer function pointer is NULL");
 
-    CCONTROL_REQUIRE(ctx,
-                     tf->num.coeffs && tf->den.coeffs,
-                     CCONTROL_ERROR_INVALID_ARGUMENT,
-                     "Transfer function pointer is null");
+    CONTROL_REQUIRE(ctx,
+                    tf->num.coeffs && tf->den.coeffs,
+                    CONTROL_ERROR_INVALID_ARGUMENT,
+                    "Transfer function pointer is null");
 
-    CCONTROL_REQUIRE(ctx,
-                     tf->den.size != 0 && tf->den.coeffs[0] != 0.0f,
-                     CCONTROL_ERROR_DIVIDE_BY_ZERO,
-                     "Transfer function denominator is zero");
+    CONTROL_REQUIRE(ctx,
+                    tf->den.size != 0 && tf->den.coeffs[0] != 0.0f,
+                    CONTROL_ERROR_DIVIDE_BY_ZERO,
+                    "Transfer function denominator is zero");
 
-    return CCONTROL_OK;
+    return CONTROL_OK;
 }
 
 ControlResult Control_TF_ClosedLoop(ControlHandle                 *ctx,
@@ -214,7 +214,7 @@ ControlResult Control_TF_ClosedLoop(ControlHandle                 *ctx,
 {
     CHECK_CTX(ctx);
     CHECK_NOT_NULL(ctx, out, "Null pointer was passed");
-    CCONTROL_TRY(Control_TF_Validate(ctx, G));
+    CONTROL_TRY(Control_TF_Validate(ctx, G));
 
     /*
      * G(s) = N(s)/D(s)
@@ -231,7 +231,7 @@ ControlResult Control_TF_ClosedLoop(ControlHandle                 *ctx,
     ControlVec scaled_num = {0};
     if (gain != 1.0f)
     {
-        CCONTROL_TRY(__Control_Vec_CreateInArena(ctx, &scaled_num, ctx->scratch, G->num.size));
+        CONTROL_TRY(__Control_Vec_CreateInArena(ctx, &scaled_num, ctx->scratch, G->num.size));
         for (size_t i = 0; i < G->num.size; i++)
         {
             scaled_num.coeffs[i] = G->num.coeffs[i] * gain;
@@ -243,10 +243,10 @@ ControlResult Control_TF_ClosedLoop(ControlHandle                 *ctx,
     }
 
     ControlVec denom = {0};
-    CCONTROL_TRY(Control_Poly_Add(ctx, &denom, &G->den, &scaled_num));
-    CCONTROL_TRY(Control_TF_FromPoly(ctx, out, &G->num, &denom));
+    CONTROL_TRY(Control_Poly_Add(ctx, &denom, &G->den, &scaled_num));
+    CONTROL_TRY(Control_TF_FromPoly(ctx, out, &G->num, &denom));
 
-    return CCONTROL_OK;
+    return CONTROL_OK;
 }
 
 ControlResult Control_TF_Persist(ControlHandle                 *ctx,
@@ -257,12 +257,12 @@ ControlResult Control_TF_Persist(ControlHandle                 *ctx,
     CHECK_NOT_NULL(ctx, out, "Out parameter was NULL");
 
     // NOTE: We do not validate, invalid state can be copied
-    // CCONTROL_TRY(Control_TF_Validate(ctx, tf));
+    // CONTROL_TRY(Control_TF_Validate(ctx, tf));
 
-    CCONTROL_TRY(__Control_Poly_CreateInArena(
+    CONTROL_TRY(__Control_Poly_CreateInArena(
         ctx, &out->num, ctx->persistent, tf->num.coeffs, tf->num.size));
-    CCONTROL_TRY(__Control_Poly_CreateInArena(
+    CONTROL_TRY(__Control_Poly_CreateInArena(
         ctx, &out->den, ctx->persistent, tf->den.coeffs, tf->den.size));
 
-    return CCONTROL_OK;
+    return CONTROL_OK;
 }

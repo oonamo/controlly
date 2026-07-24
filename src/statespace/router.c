@@ -1,10 +1,10 @@
 #include "../internal_common.h"
 #include "ss_internal.h"
-#include <ccontrol/statespace.h>
+#include <controlly/statespace.h>
 
 void Control_StateSpace_StepContinuous(ControlHandle *ctx, ControlStateSpace *ss, float dt)
 {
-    CCONTROL_UNUSED(ctx);
+    CONTROL_UNUSED(ctx);
 
     if (ss->B.cols == 1 && ss->C.rows == 1)
     {
