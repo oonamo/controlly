@@ -1,5 +1,11 @@
 add_library(controls STATIC)
 
+set_target_properties(controls PROPERTIES
+  C_STANDARD 99
+  C_STANDARD_REQUIRED ON
+  C_EXTENSIONS OFF
+)
+
 target_compile_options(controls PRIVATE ${STRICT_WARNINGS})
 
 target_sources(controls

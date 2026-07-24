@@ -6,6 +6,14 @@
 CControl documentation
 ======================
 
+CControl is a determinsitic, Zero-Dependency C-based control systems library designed for performance and memory safety.
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Getting Started:
+
+   getting_started/installation
+
 .. toctree::
    :maxdepth: 2
    :caption: Interactive Examples:

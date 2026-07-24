@@ -8,3 +8,16 @@ State Space Second Order
       </iframe>
    </div>
 
+The Control Theory
+----------------------
+
+Nothing yet!
+
+Relevant Source Code
+----------------------
+
+.. literalinclude:: ../../../examples/raylib/statespace_second_order/statespace_second_order.c
+   :linenos:
+   :start-after: // [DOC_START: statespace_example]
+   :end-before: // [DOC_END: statespace_example]
+   :caption: State Space Loop
