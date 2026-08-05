@@ -31,3 +31,4 @@ Controlly is a determinsitic, Zero-Dependency C-based control systems library de
    api/matrix
    api/tf
    api/statespace
+   api/controllers/pid
