@@ -2,6 +2,7 @@ build/
 /docs/xml
 /latex/
 build_web/
+build_avr/
 build_windows/
 .cache
 wasm
