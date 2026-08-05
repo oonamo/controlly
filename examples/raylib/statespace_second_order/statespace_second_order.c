@@ -1,5 +1,5 @@
-#include <controlly/arena.h>
 #include <controlly/core.h>
+#include <controlly/arena.h>
 #include <controlly/matrix.h>
 #include <controlly/statespace.h>
 #include <controlly/tf.h>
@@ -122,7 +122,7 @@ void ControlSetup()
 
     // Allocate state, input, and output vectors in the Persistent arena
     Control_Poly_AllocPersistent(&ctx, &sys.x, x_data, 2);
-    Control_Poly_AllocPersistent(&ctx, &sys.y, y_data, 2);
+    Control_Poly_AllocPersistent(&ctx, &sys.y, y_data, 1);
     Control_Poly_AllocPersistent(&ctx, &sys.u, u_data, 1);
 }
 
