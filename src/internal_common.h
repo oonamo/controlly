@@ -5,14 +5,6 @@
 
 #define ALIGN_UP(size, align) (((size_t)(size) + ((size_t)(align) - 1)) & ~((size_t)(align) - 1))
 
-#ifdef CONTROLLY_VERBOSE_ERRORS
-    #ifndef CONTROLLY_VERBOSE_ERROR_FMT
-        #define CONTROLLY_VERBOSE_ERROR_FMT __func__
-    #endif
-#else
-    #define CONTROLLY_VERBOSE_ERROR_FMT NULL
-#endif
-
 #define CONTROL_THROW(ctx, code)                                                                   \
     do                                                                                             \
     {                                                                                              \
