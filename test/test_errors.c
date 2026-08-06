@@ -1,4 +1,8 @@
-#include <controlly/core.h>
+#ifdef HEADERLIB_TEST
+    #include "controlly.h"
+#else
+    #include <controlly/core.h>
+#endif
 #include <unity_fixture.h>
 
 #include "../src/internal_common.h"

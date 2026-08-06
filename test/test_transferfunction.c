@@ -1,5 +1,10 @@
-#include <controlly/core.h>
-#include <controlly/tf.h>
+#ifdef HEADERLIB_TEST
+    #include "controlly.h"
+#else
+    #include <controlly/core.h>
+    #include <controlly/tf.h>
+#endif
+
 #include <stdlib.h>
 #include <string.h>
 #include <unity.h>
@@ -12,7 +17,8 @@ static void         *s_pool;
 static ControlHandle ctx;
 static ControlResult last_error_code = CONTROL_OK;
 
-static void MockErrorHandler(ControlResult code, const char *msg, const char* verbose_msg, void *user_data)
+static void
+MockErrorHandler(ControlResult code, const char *msg, const char *verbose_msg, void *user_data)
 {
     last_error_code = code;
 }

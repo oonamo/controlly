@@ -1,7 +1,11 @@
 #include <unity.h>
 #include <unity_fixture.h>
 
-#include <controlly/controllers/pid.h>
+#ifdef HEADERLIB_TEST
+    #include "controlly.h"
+#else
+    #include <controlly/controllers/pid.h>
+#endif
 
 TEST_GROUP(PID);
 

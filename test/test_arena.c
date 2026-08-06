@@ -1,4 +1,9 @@
-#include <controlly/arena.h>
+#ifdef HEADERLIB_TEST
+    #include "controlly.h"
+#else
+    #include <controlly/arena.h>
+#endif
+
 #include <string.h>
 #include <unity.h>
 #include <unity_fixture.h>
