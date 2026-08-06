@@ -1,5 +1,7 @@
 #include "internal_common.h"
 #include <controlly/arena.h>
+#include <stddef.h>
+#include <stdint.h>
 
 ControlArena *Control_Arena_Create(void *backing_buffer, size_t capacity)
 {

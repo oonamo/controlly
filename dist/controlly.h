@@ -1173,6 +1173,8 @@ void Control_System_DeInit(ControlHandle *ctx)
 
 
 
+#include <stddef.h>
+#include <stdint.h>
 
 ControlArena *Control_Arena_Create(void *backing_buffer, size_t capacity)
 {

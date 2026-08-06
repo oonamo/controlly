@@ -12,6 +12,18 @@ set_target_properties(controlly PROPERTIES
   C_EXTENSIONS OFF
 )
 
+find_program(IWYU_PATH NAMES include-what-you-use iwyu)
+
+if(IWYU_PATH)
+    set_target_properties(controlly PROPERTIES
+      C_INCLUDE_WHAT_YOU_USE "${IWYU_PATH}"
+      CXX_INCLUDE_WHAT_YOU_USE "${IWYU_PATH}"
+    )
+    message(STATUS "IWYU enabled")
+else()
+    message(WARNING "include-what-you-use not found")
+endif()
+
 target_compile_options(controlly PRIVATE ${STRICT_WARNINGS})
 
 set(CONTROLLY_PRIVATE_SOURCES
