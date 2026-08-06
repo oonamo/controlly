@@ -12,7 +12,7 @@ static void         *s_pool;
 static ControlHandle ctx;
 static ControlResult last_error_code = CONTROL_OK;
 
-static void MockErrorHandler(ControlResult code, const char *msg, void *user_data)
+static void MockErrorHandler(ControlResult code, const char *msg, const char* verbose_msg, void *user_data)
 {
     last_error_code = code;
 }

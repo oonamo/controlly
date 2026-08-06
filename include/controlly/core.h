@@ -36,14 +36,55 @@ typedef enum
     CONTROL_ERROR_DIMENSION_MISMATCH, /*!< Mismatched dimensions error */
 } ControlResult;
 
+#ifndef CONTROLLY_ERROR_OK_MSG
+    #define CONTROLLY_ERROR_OK_MSG "Operation success"
+#endif
+#ifndef CONTROLLY_ERROR_CTX_UNINITIALIZED_MSG
+    #define CONTROLLY_ERROR_CTX_UNINITIALIZED_MSG "Context was unintialized"
+#endif
+#ifndef CONTROLLY_ERROR_OUT_OF_MEMORY_MSG
+    #define CONTROLLY_ERROR_OUT_OF_MEMORY_MSG "Out of memory"
+#endif
+#ifndef CONTROLLY_ERROR_DIVIDE_BY_ZERO_MSG
+    #define CONTROLLY_ERROR_DIVIDE_BY_ZERO_MSG "Division by zero"
+#endif
+#ifndef CONTROLLY_ERROR_INVALID_ARGUMENT_MSG
+    #define CONTROLLY_ERROR_INVALID_ARGUMENT_MSG "An invalid argument was passed"
+#endif
+#ifndef CONTROLLY_ERROR_NULL_PTR_MSG
+    #define CONTROLLY_ERROR_NULL_PTR_MSG "A null pointer was passed"
+#endif
+#ifndef CONTROLLY_ERROR_FEATURE_DISABLED_MSG
+    #define CONTROLLY_ERROR_FEATURE_DISABLED_MSG "Disabled feature was used"
+#endif
+#ifndef CONTROLLY_ERROR_DIMENSION_MISMATCH_MSG
+    #define CONTROLLY_ERROR_DIMENSION_MISMATCH_MSG "Dimensions are mismatched"
+#endif
+#ifndef CONTROLLY_ERROR_UNKNOWN_MSG
+    #define CONTROLLY_ERROR_UNKNOWN_MSG "An unknown error occured"
+#endif
+
+/**
+ * @brief Gets an error string from a ControlResult
+ *
+ * @param[in] result The result error code
+ * @return string of the resulting error code
+ */
+const char *Control_GetErrorString(ControlResult result);
+
 /**
  * @brief Function signature for handling errors.
  *
- * @param[in] code      The resulting error code thrown by the library.
- * @param[in] message   The resulting error code thrown by the library.
- * @param[in] user_data A pointer to user-defined data passed from the ControlHandle struct.
+ * @param[in] code         The resulting error code thrown by the library.
+ * @param[in] message      The resulting error code thrown by the library.
+ * @param[in] verbose_data Contextual information (e.g. the function name). WARNING: This may be
+ *                         NULL if not compiled with verbose errors
+ * @param[in] user_data    A pointer to user-defined data passed from the ControlHandle struct.
  */
-typedef void (*ControlErrorCallback)(ControlResult code, const char *message, void *user_data);
+typedef void (*ControlErrorCallback)(ControlResult code,
+                                     const char   *message,
+                                     const char   *verbose_data,
+                                     void         *user_data);
 
 /*
  * @brief Structure for Controlly context

@@ -89,7 +89,7 @@ ControlResult Control_StateSpace_FromTF(ControlHandle                 *ctx,
                                         const ControlTransferFunction *tf)
 {
     CHECK_CTX(ctx);
-    CHECK_NOT_NULL(ctx, out && tf, "Passed null pointers");
+    CHECK_NOT_NULL(ctx, out && tf);
     CONTROL_TRY(__gen_sys_matrix_InPersistent(ctx, &out->A, tf));
     CONTROL_TRY(__gen_input_matrix_InPersistent(ctx, &out->B, tf));
     CONTROL_TRY(__gen_output_matrix_InPersistent(ctx, &out->C, tf));
