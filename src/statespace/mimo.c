@@ -56,3 +56,5 @@ void __Control_StateSpace_StepMIMO(ControlStateSpace *ss, float dt)
         ss->x.coeffs[i] += x_dot[i] * dt;
     }
 }
+
+#undef MAX_SYSTEM_ORDER

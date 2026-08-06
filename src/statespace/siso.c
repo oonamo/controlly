@@ -88,8 +88,8 @@ ControlResult Control_StateSpace_FromTF(ControlHandle                 *ctx,
                                         ControlStateSpace             *out,
                                         const ControlTransferFunction *tf)
 {
-    CHECK_CTX(ctx);
-    CHECK_NOT_NULL(ctx, out && tf);
+    CONTROL_CHECK_CTX(ctx);
+    CONTROL_CHECK_NOT_NULL(ctx, out && tf);
     CONTROL_TRY(__gen_sys_matrix_InPersistent(ctx, &out->A, tf));
     CONTROL_TRY(__gen_input_matrix_InPersistent(ctx, &out->B, tf));
     CONTROL_TRY(__gen_output_matrix_InPersistent(ctx, &out->C, tf));
@@ -142,3 +142,5 @@ void __Control_StateSpace_StepSISO(ControlStateSpace *ss, float dt)
         ss->x.coeffs[i] += x_dot[i] * dt;
     }
 }
+
+#undef MAX_SYSTEM_ORDER

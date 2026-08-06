@@ -1,4 +1,8 @@
-#include <controlly/tf.h>
+#ifdef HEADERLIB_TEST
+    #include "controlly.h"
+#else
+    #include <controlly/tf.h>
+#endif
 #include <stdint.h>
 #include <unity.h>
 #include <unity_fixture.h>
@@ -13,6 +17,7 @@ static void runAllTests(void)
     RUN_TEST_GROUP(Matrix);
     RUN_TEST_GROUP(Arena);
     RUN_TEST_GROUP(ErrorHandler);
+    RUN_TEST_GROUP(SingleHeader);
 }
 
 int main(int argc, const char *argv[])

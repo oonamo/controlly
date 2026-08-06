@@ -14,8 +14,7 @@ set_target_properties(controlly PROPERTIES
 
 target_compile_options(controlly PRIVATE ${STRICT_WARNINGS})
 
-target_sources(controlly
-  PRIVATE
+set(CONTROLLY_PRIVATE_SOURCES
     tf.c
     arena.c
     matrix.c
@@ -24,14 +23,40 @@ target_sources(controlly
     statespace/siso.c
     statespace/router.c
     controllers/pid.c
+)
+
+set(CONTROLLY_PUBLIC_HEADERS
+    ${PROJECT_SOURCE_DIR}/include/controlly/tf.h
+    ${PROJECT_SOURCE_DIR}/include/controlly/arena.h
+    ${PROJECT_SOURCE_DIR}/include/controlly/matrix.h
+    ${PROJECT_SOURCE_DIR}/include/controlly/statespace.h
+    ${PROJECT_SOURCE_DIR}/include/controlly/controllers/pid.h
+)
+
+target_sources(controlly
+  PRIVATE
+    ${CONTROLLY_PRIVATE_SOURCES}
   PUBLIC
     FILE_SET HEADERS
     BASE_DIRS
       ${PROJECT_SOURCE_DIR}/include
     FILES
-      ${PROJECT_SOURCE_DIR}/include/controlly/tf.h
-      ${PROJECT_SOURCE_DIR}/include/controlly/arena.h
-      ${PROJECT_SOURCE_DIR}/include/controlly/matrix.h
-      ${PROJECT_SOURCE_DIR}/include/controlly/statespace.h
-      ${PROJECT_SOURCE_DIR}/include/controlly/controllers/pid.h
+      ${CONTROLLY_PUBLIC_HEADERS}
 )
+
+set(SINGLE_HEADER_OUTPUT "${CMAKE_BINARY_DIR}/gen/controlly.h")
+
+add_custom_command(
+  OUTPUT ${SINGLE_HEADER_OUTPUT}
+  COMMAND python3 ${PROJECT_SOURCE_DIR}/convert_to_headerlib.py
+  DEPENDS
+    ${PROJECT_SOURCE_DIR}/convert_to_headerlib.py
+    ${CONTROLLY_PRIVATE_SOURCES}
+    ${CONTROLLY_PUBLIC_HEADERS}
+
+  WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+  COMMENT "Generating single-header library: dist/controlly.h"
+  VERBATIM
+)
+
+add_custom_target(controlly_single_header ALL DEPENDS ${SINGLE_HEADER_OUTPUT})

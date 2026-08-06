@@ -1,5 +1,10 @@
-#include <controlly/arena.h>
-#include <controlly/tf.h>
+#ifdef HEADERLIB_TEST
+    #include "controlly.h"
+#else
+    #include <controlly/arena.h>
+    #include <controlly/tf.h>
+#endif
+
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
