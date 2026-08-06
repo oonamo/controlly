@@ -1,3 +1,4 @@
+#include <controlly/arena.h>
 #include <controlly/core.h>
 
 const char *Control_GetErrorString(ControlResult result)

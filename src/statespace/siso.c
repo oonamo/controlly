@@ -1,8 +1,10 @@
-#include "../internal_common.h"
-#include "ss_internal.h"
 #include <controlly/core.h>
 #include <controlly/matrix.h>
 #include <controlly/statespace.h>
+#include <controlly/tf.h>
+#include <stddef.h>
+#include "../internal_common.h"
+#include "ss_internal.h"
 
 static ControlResult __gen_sys_matrix_InPersistent(ControlHandle                 *ctx,
                                                    ControlSystemMatrix           *out,

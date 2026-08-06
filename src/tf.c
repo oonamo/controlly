@@ -1,9 +1,10 @@
-#include "internal_common.h"
 #include <controlly/arena.h>
 #include <controlly/core.h>
 #include <controlly/matrix.h>
 #include <controlly/tf.h>
+#include <stdbool.h>
 #include <stddef.h>
+#include "internal_common.h"
 
 #define REQUIRE_VALID_TF(ctx, tf_ptr, msg)                                                         \
     CONTROL_REQUIRE(ctx, Control_TF_IsValid(tf_ptr), CONTROL_ERROR_INVALID_ARGUMENT, msg)

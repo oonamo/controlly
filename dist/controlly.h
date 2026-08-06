@@ -947,6 +947,7 @@ extern "C"
 #endif
 
 
+
 #include <stdbool.h>
 
 /**
@@ -1128,6 +1129,7 @@ void __Control_StateSpace_StepMIMO(ControlStateSpace *ss, float dt);
 
 
 
+
 const char *Control_GetErrorString(ControlResult result)
 {
     switch (result)
@@ -1231,6 +1233,9 @@ void *Control_Arena_Alloc(ControlArena *a, size_t size)
 
 
 
+
+#include <stdbool.h>
+#include <stddef.h>
 
 
 // TODO: Add testing
@@ -1485,6 +1490,7 @@ bool Control_Vec_IsValid(const ControlVec *v)
 
 
 
+
 void Control_StateSpace_StepContinuous(ControlHandle *ctx, ControlStateSpace *ss, float dt)
 {
     CONTROL_UNUSED(ctx);
@@ -1506,6 +1512,7 @@ void Control_StateSpace_StepContinuous(ControlHandle *ctx, ControlStateSpace *ss
 */
 
 
+#include <stddef.h>
 
 
 #ifndef MAX_SYSTEM_ORDER
@@ -1575,6 +1582,8 @@ void __Control_StateSpace_StepMIMO(ControlStateSpace *ss, float dt)
 
 
 
+
+#include <stddef.h>
 
 
 
@@ -1729,8 +1738,9 @@ void __Control_StateSpace_StepSISO(ControlStateSpace *ss, float dt)
 
 
 
-
+#include <stdbool.h>
 #include <stddef.h>
+
 
 #define REQUIRE_VALID_TF(ctx, tf_ptr, msg)                                                         \
     CONTROL_REQUIRE(ctx, Control_TF_IsValid(tf_ptr), CONTROL_ERROR_INVALID_ARGUMENT, msg)
@@ -2002,7 +2012,9 @@ ControlResult Control_TF_Persist(ControlHandle                 *ctx,
 
 
 
+#include <stdbool.h>
 #include <stddef.h>
+
 
 void Control_PID_Init(
     ControlPIDController *pid, float kp, float ki, float kd, const ControlPIDConfig *config)

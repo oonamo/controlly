@@ -1,8 +1,10 @@
-#include "../internal_common.h"
 #include <controlly/controllers/pid.h>
+#include <controlly/core.h>
 #include <controlly/matrix.h>
 #include <controlly/tf.h>
+#include <stdbool.h>
 #include <stddef.h>
+#include "../internal_common.h"
 
 void Control_PID_Init(
     ControlPIDController *pid, float kp, float ki, float kd, const ControlPIDConfig *config)

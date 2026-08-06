@@ -1,5 +1,6 @@
-#include "ss_internal.h"
 #include <controlly/statespace.h>
+#include <stddef.h>
+#include "ss_internal.h"
 
 #ifndef MAX_SYSTEM_ORDER
     #define MAX_SYSTEM_ORDER 10

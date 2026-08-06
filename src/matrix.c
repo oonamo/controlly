@@ -1,6 +1,9 @@
-#include "internal_common.h"
+#include <controlly/arena.h>
 #include <controlly/core.h>
 #include <controlly/matrix.h>
+#include <stdbool.h>
+#include <stddef.h>
+#include "internal_common.h"
 
 // TODO: Add testing
 //  1. Does it currently support aliasing?

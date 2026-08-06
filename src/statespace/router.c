@@ -1,6 +1,7 @@
+#include <controlly/core.h>
+#include <controlly/statespace.h>
 #include "../internal_common.h"
 #include "ss_internal.h"
-#include <controlly/statespace.h>
 
 void Control_StateSpace_StepContinuous(ControlHandle *ctx, ControlStateSpace *ss, float dt)
 {

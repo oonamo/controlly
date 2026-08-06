@@ -13,6 +13,7 @@ extern "C"
 {
 #endif
 
+#include <controlly/core.h>
 #include <controlly/tf.h>
 #include <stdbool.h>
 
