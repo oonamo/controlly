@@ -1,5 +1,5 @@
-#include <controlly/core.h>
 #include <controlly/arena.h>
+#include <controlly/core.h>
 #include <controlly/matrix.h>
 #include <controlly/statespace.h>
 #include <controlly/tf.h>
@@ -64,12 +64,22 @@ void             *persistent_mem = NULL;
 void             *scratch_mem    = NULL;
 
 // If any call to the Controlly library fails, this function will be called before returning
-void Control_ExitOnFailure(ControlResult result, const char *message, void *user_data)
+void Control_ExitOnFailure(ControlResult result,
+                           const char   *message,
+                           const char   *verbose_data,
+                           void         *user_data)
 {
     (void)user_data;
     if (result != CONTROL_OK)
     {
-        TraceLog(LOG_FATAL, "Exiting, Reason: %s", message);
+        if (verbose_data != NULL)
+        {
+            TraceLog(LOG_FATAL, "Controlly Error [%s]: %s", verbose_data, message);
+        }
+        else
+        {
+            TraceLog(LOG_FATAL, "Controlly Error: %s", message);
+        }
         exit(EXIT_FAILURE);
     }
 }

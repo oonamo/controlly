@@ -18,7 +18,7 @@ CONTROLLY_PRIVATE_API ControlResult __Control_Vec_CreateInArena(ControlHandle *c
     out->coeffs   = NULL;
 
     out->coeffs = (float *)Control_Arena_Alloc(a, capacity * sizeof(float));
-    CONTROL_REQUIRE(ctx, out->coeffs, CONTROL_ERROR_OUT_OF_MEMORY, "out of memory");
+    CONTROL_REQUIRE(ctx, out->coeffs, CONTROL_ERROR_OUT_OF_MEMORY);
 
     out->capacity = capacity;
     return CONTROL_OK;
@@ -42,7 +42,7 @@ static ControlResult __Control_Poly_CreateInArena(
 ControlResult Control_Poly_Canonicalize(ControlHandle *ctx, ControlVec *out, const ControlVec *v)
 {
     CHECK_CTX(ctx);
-    CHECK_NOT_NULL(ctx, out && v, "Null pointer was passed");
+    CHECK_NOT_NULL(ctx, out && v);
 
     size_t i = 0;
 
@@ -65,7 +65,7 @@ ControlResult
 Control_Poly_AllocScratch(ControlHandle *ctx, ControlVec *out, const float *coeffs, size_t size)
 {
     CHECK_CTX(ctx);
-    CHECK_NOT_NULL(ctx, out && coeffs, "Null pointer was passed");
+    CHECK_NOT_NULL(ctx, out && coeffs);
 
     return __Control_Poly_CreateInArena(ctx, out, ctx->scratch, coeffs, size);
 }
@@ -74,7 +74,7 @@ ControlResult
 Control_Poly_AllocPersistent(ControlHandle *ctx, ControlVec *out, const float *coeffs, size_t size)
 {
     CHECK_CTX(ctx);
-    CHECK_NOT_NULL(ctx, out && coeffs, "Null pointer was passed");
+    CHECK_NOT_NULL(ctx, out && coeffs);
 
     return __Control_Poly_CreateInArena(ctx, out, ctx->persistent, coeffs, size);
 }
@@ -83,7 +83,7 @@ ControlResult
 Control_Poly_Add(ControlHandle *ctx, ControlVec *out, const ControlVec *a, const ControlVec *b)
 {
     CHECK_CTX(ctx);
-    CHECK_NOT_NULL(ctx, out && a && b, "Null pointer was passed");
+    CHECK_NOT_NULL(ctx, out && a && b);
 
     size_t max_size = a->size > b->size ? a->size : b->size;
 
@@ -118,7 +118,7 @@ ControlResult
 Control_Poly_Multiply(ControlHandle *ctx, ControlVec *out, const ControlVec *a, const ControlVec *b)
 {
     CHECK_CTX(ctx);
-    CHECK_NOT_NULL(ctx, out && a && b, "Null pointer was passed");
+    CHECK_NOT_NULL(ctx, out && a && b);
 
     size_t new_size = a->size + b->size - 1;
     if (out->coeffs == NULL || out->capacity < new_size)
@@ -150,7 +150,7 @@ ControlResult Control_TF_FromPoly(ControlHandle           *ctx,
                                   const ControlVec        *dem)
 {
     CHECK_CTX(ctx);
-    CHECK_NOT_NULL(ctx, out && num && dem, "Out pointer is NULL");
+    CHECK_NOT_NULL(ctx, out && num && dem);
 
     // TODO: Check if we can use allocated memory if abailable
     out->num = *num;
@@ -164,7 +164,7 @@ ControlResult Control_TF_Multiply(ControlHandle                 *ctx,
                                   const ControlTransferFunction *G2)
 {
     CHECK_CTX(ctx);
-    CHECK_NOT_NULL(ctx, out, "Out pointer is NULL");
+    CHECK_NOT_NULL(ctx, out);
 
     CONTROL_TRY(Control_TF_Validate(ctx, G1));
     CONTROL_TRY(Control_TF_Validate(ctx, G2));
@@ -191,17 +191,15 @@ inline bool Control_TF_IsValid(const ControlTransferFunction *tf)
 ControlResult Control_TF_Validate(ControlHandle *ctx, const ControlTransferFunction *tf)
 {
     CHECK_CTX(ctx);
-    CHECK_NOT_NULL(ctx, tf, "Transfer function pointer is NULL");
+    CHECK_NOT_NULL(ctx, tf);
 
     CONTROL_REQUIRE(ctx,
                     tf->num.coeffs && tf->den.coeffs,
-                    CONTROL_ERROR_INVALID_ARGUMENT,
-                    "Transfer function pointer is null");
+                    CONTROL_ERROR_INVALID_ARGUMENT);
 
     CONTROL_REQUIRE(ctx,
                     tf->den.size != 0 && tf->den.coeffs[0] != 0.0f,
-                    CONTROL_ERROR_DIVIDE_BY_ZERO,
-                    "Transfer function denominator is zero");
+                    CONTROL_ERROR_DIVIDE_BY_ZERO);
 
     return CONTROL_OK;
 }
@@ -213,7 +211,7 @@ ControlResult Control_TF_ClosedLoop(ControlHandle                 *ctx,
                                     ControlFeedbackType            unity)
 {
     CHECK_CTX(ctx);
-    CHECK_NOT_NULL(ctx, out, "Null pointer was passed");
+    CHECK_NOT_NULL(ctx, out);
     CONTROL_TRY(Control_TF_Validate(ctx, G));
 
     /*
@@ -254,7 +252,7 @@ ControlResult Control_TF_Persist(ControlHandle                 *ctx,
                                  const ControlTransferFunction *tf)
 {
     CHECK_CTX(ctx);
-    CHECK_NOT_NULL(ctx, out, "Out parameter was NULL");
+    CHECK_NOT_NULL(ctx, out);
 
     // NOTE: We do not validate, invalid state can be copied
     // CONTROL_TRY(Control_TF_Validate(ctx, tf));

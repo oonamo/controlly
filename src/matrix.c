@@ -11,7 +11,7 @@ __Control_Vec_AllocInArena(ControlHandle *ctx, ControlVec *out, ControlArena *a,
 
     out->size   = 0;
     out->coeffs = (float *)Control_Arena_Alloc(a, size * sizeof(float));
-    CONTROL_REQUIRE(ctx, out->coeffs, CONTROL_ERROR_OUT_OF_MEMORY, "out of memory");
+    CONTROL_REQUIRE(ctx, out->coeffs, CONTROL_ERROR_OUT_OF_MEMORY);
 
     out->capacity = size;
 
@@ -66,7 +66,7 @@ ControlResult __Control_Matrix_Alloc(
     ControlHandle *ctx, ControlMatrix *out, ControlArena *a, size_t rows, size_t cols)
 {
     out->data = (float *)Control_Arena_Alloc(a, rows * cols * sizeof(float));
-    CONTROL_REQUIRE(ctx, out->data, CONTROL_ERROR_OUT_OF_MEMORY, "out of memory");
+    CONTROL_REQUIRE(ctx, out->data, CONTROL_ERROR_OUT_OF_MEMORY);
 
     // TODO: Does this need to be set to 0.0f?
     for (size_t i = 0; i < rows; i++)
@@ -131,7 +131,7 @@ ControlResult __Control_Vec_CreateInArenaRaw(ControlHandle *ctx,
 {
     out->size   = 0;
     out->coeffs = (float *)Control_Arena_Alloc(a, capacity * sizeof(float));
-    CONTROL_REQUIRE(ctx, out->coeffs, CONTROL_ERROR_OUT_OF_MEMORY, "Out of memory");
+    CONTROL_REQUIRE(ctx, out->coeffs, CONTROL_ERROR_OUT_OF_MEMORY);
 
     out->capacity = capacity;
     return CONTROL_OK;
@@ -143,9 +143,9 @@ ControlResult Control_Matrix_MultiplyVec(ControlHandle       *ctx,
                                          const ControlVec    *v)
 {
     CHECK_CTX(ctx);
-    CHECK_NOT_NULL(ctx, out && m && v, "Passed null pointers");
+    CHECK_NOT_NULL(ctx, out && m && v);
     CONTROL_REQUIRE(
-        ctx, m->cols == v->size, CONTROL_ERROR_DIMENSION_MISMATCH, "Dimension mismatch");
+        ctx, m->cols == v->size, CONTROL_ERROR_DIMENSION_MISMATCH);
 
     size_t new_size = m->rows;
 
@@ -183,9 +183,9 @@ ControlResult
 Control_Vec_Add(ControlHandle *ctx, ControlVec *out, const ControlVec *lhs, const ControlVec *rhs)
 {
     CHECK_CTX(ctx);
-    CHECK_NOT_NULL(ctx, out && lhs && rhs, "Passed null pointers");
+    CHECK_NOT_NULL(ctx, out && lhs && rhs);
     CONTROL_REQUIRE(
-        ctx, lhs->size == rhs->size, CONTROL_ERROR_DIMENSION_MISMATCH, "dimension mismatch");
+        ctx, lhs->size == rhs->size, CONTROL_ERROR_DIMENSION_MISMATCH);
 
     size_t size = lhs->size;
     if (out->capacity < size)
@@ -217,7 +217,7 @@ ControlResult
 Control_Vec_Scale(ControlHandle *ctx, ControlVec *out, const ControlVec *v, float scalar)
 {
     CHECK_CTX(ctx);
-    CHECK_NOT_NULL(ctx, out && v, "Passed null pointers");
+    CHECK_NOT_NULL(ctx, out && v);
 
     if (out->capacity < v->size)
     {

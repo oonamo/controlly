@@ -1,5 +1,11 @@
 add_library(controlly STATIC)
 
+option(CONTROLLY_VERBOSE_ERRORS "Enable function names in error callbacks" OFF)
+
+if(CONTROLLY_VERBOSE_ERRORS)
+  target_compile_definitions(controlly PUBLIC CONTROLLY_VERBOSE_ERRORS)
+endif()
+
 set_target_properties(controlly PROPERTIES
   C_STANDARD 99
   C_STANDARD_REQUIRED ON

@@ -61,6 +61,7 @@ target_sources(test_runner PRIVATE
   test_matrix.c
   test_arena.c
   test_pid.c
+  test_errors.c
   matlab_test_data.h
 )
 

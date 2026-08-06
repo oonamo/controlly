@@ -12,6 +12,7 @@ static void runAllTests(void)
     RUN_TEST_GROUP(PID);
     RUN_TEST_GROUP(Matrix);
     RUN_TEST_GROUP(Arena);
+    RUN_TEST_GROUP(ErrorHandler);
 }
 
 int main(int argc, const char *argv[])
