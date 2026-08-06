@@ -27,4 +27,6 @@ CommentPragmas: '^/\*'
 IndentPPDirectives: BeforeHash
 
 ReflowComments: true
+
+IndentExternBlock: NoIndent
 ...

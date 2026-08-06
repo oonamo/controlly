@@ -8,6 +8,11 @@
 #ifndef _CONTROLLY_CORE_H
 #define _CONTROLLY_CORE_H
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 #include <controlly/arena.h>
 #include <stddef.h>
 
@@ -158,4 +163,7 @@ void Control_System_Init(ControlHandle *ctx, ControlArena *p, ControlArena *s);
  */
 void Control_System_DeInit(ControlHandle *ctx);
 
+#ifdef __cplusplus
+}
+#endif
 #endif // _CONTROLLY_CORE_H

@@ -7,6 +7,14 @@
 #ifndef _CONTROLLY_STATESPACE_H
 #define _CONTROLLY_STATESPACE_H
 
+
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
+
+
 #include <controlly/core.h>
 #include <controlly/matrix.h>
 #include <controlly/tf.h>
@@ -73,4 +81,7 @@ ControlResult Control_StateSpace_FromTF(ControlHandle                 *ctx,
                                         ControlStateSpace             *out,
                                         const ControlTransferFunction *tf);
 
+#ifdef __cplusplus
+}
+#endif
 #endif // _CONTROLLY_STATESPACE_H

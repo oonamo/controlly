@@ -8,6 +8,11 @@
 #ifndef _CONTROLLY_PID_H
 #define _CONTROLLY_PID_H
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 #include <controlly/tf.h>
 #include <stdbool.h>
 
@@ -81,7 +86,8 @@ float Control_PID_Update(ControlPIDController *pid, float target, float measurem
  *
  * @note Allocates from the \p ctx->persistent arena.
  *       **Zero-Allocation Path:** If the `out` transfer function already possesses
- *       sufficient capacity in both its numerator and denominator vectors, no memory is allocated.
+ *       sufficient capacity in both its numerator and denominator vectors, no memory is
+ * allocated.
  *
  * @param[in,out] ctx Pointer to the initialized control context.
  * @param[out]    out Pointer to the destination transfer function.
@@ -94,4 +100,7 @@ float Control_PID_Update(ControlPIDController *pid, float target, float measurem
 ControlResult
 Control_PID_ToTF(ControlHandle *ctx, ControlTransferFunction *out, const ControlPIDController *pid);
 
+#ifdef __cplusplus
+}
+#endif
 #endif // _CONTROLLY_PID_H

@@ -7,6 +7,12 @@
  */
 #ifndef _CONTROLLY_TF_H
 #define _CONTROLLY_TF_H
+
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 #include <controlly/core.h>
 #include <controlly/matrix.h>
 #include <stdbool.h>
@@ -248,8 +254,8 @@ bool Control_TF_IsValid(const ControlTransferFunction *tf);
  * @return
  *        - CONTROL_OK if valid.
  *        - CONTROL_ERROR_CTX_UNINITIALIZED if the system context is uninitialized.
- *        - CONTROL_ERROR_INVALID_ARGUMENT if pointers are null, sizes are zero, or coefficents are
- * NULL.
+ *        - CONTROL_ERROR_INVALID_ARGUMENT if pointers are null, sizes are zero, or coefficents
+ * are NULL.
  *        - CONTROL_ERROR_DIVIDE_BY_ZERO if the leading denominator coefficient is zero.
  */
 ControlResult Control_TF_Validate(ControlHandle *ctx, const ControlTransferFunction *tf);
@@ -280,4 +286,7 @@ ControlResult Control_TF_Persist(ControlHandle                 *ctx,
                                  ControlTransferFunction       *out,
                                  const ControlTransferFunction *tf);
 
+#ifdef __cplusplus
+}
+#endif
 #endif // _CONTROLLY_TF_H

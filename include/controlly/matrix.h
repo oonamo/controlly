@@ -8,6 +8,11 @@
 #ifndef _CONTROLLY_MATRIX_H
 #define _CONTROLLY_MATRIX_H
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 #include <controlly/core.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -237,4 +242,7 @@ bool Control_Matrix_IsValid(const ControlMatrix *m);
  */
 bool Control_Vec_IsValid(const ControlVec *v);
 
+#ifdef __cplusplus
+}
+#endif
 #endif // _CONTROLLY_MATRIX_H
