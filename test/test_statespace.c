@@ -1,10 +1,14 @@
-#include <controlly/tf.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unity.h>
 #include <unity_fixture.h>
 
-#include <controlly/statespace.h>
+#ifdef HEADERLIB_TEST
+    #include "controlly.h"
+#else
+    #include <controlly/statespace.h>
+    #include <controlly/tf.h>
+#endif
 
 TEST_GROUP(StateSpace);
 

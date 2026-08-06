@@ -1,4 +1,8 @@
-#include <controlly/tf.h>
+#ifdef HEADERLIB_TEST
+    #include "controlly.h"
+#else
+    #include <controlly/tf.h>
+#endif
 #include <stdint.h>
 #include <unity.h>
 #include <unity_fixture.h>

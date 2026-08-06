@@ -52,7 +52,7 @@ target_compile_definitions(unity
   UNITY_FIXTURE_NO_EXTRAS
 )
 
-target_sources(test_runner PRIVATE
+set(TEST_SOURCES
   test_main.c
   test_polymath.c
   test_transferfunction.c
@@ -65,7 +65,21 @@ target_sources(test_runner PRIVATE
   matlab_test_data.h
 )
 
+target_sources(test_runner PRIVATE ${TEST_SOURCES})
+
 target_link_libraries(test_runner PRIVATE controlly unity)
 
 # Add verbosity to unit tests
 add_test(NAME UnitTests COMMAND test_runner -v)
+
+add_executable(test_single_header)
+
+target_sources(test_single_header PRIVATE
+    ${TEST_SOURCES}
+    singleheader.c
+)
+add_dependencies(test_single_header controlly_single_header)
+target_link_libraries(test_single_header PRIVATE unity)
+target_compile_definitions(test_single_header PRIVATE HEADERLIB_TEST)
+target_include_directories(test_single_header PRIVATE ${PROJECT_SOURCE_DIR}/dist)
+add_test(NAME UnitTestsSingleHeader COMMAND test_single_header -v)
