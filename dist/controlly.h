@@ -16,6 +16,12 @@
  */
 #ifndef _CONTROLLY_ARENA_H
 #define _CONTROLLY_ARENA_H
+
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 #include <stddef.h>
 #include <stdint.h>
 
@@ -69,8 +75,8 @@ void Control_Arena_Clear(ControlArena *arena);
 /**
  * @brief Calculates the remaining bytes in the arena.
  *
- * @warning On initialization, the result of `Control_Arena_RemainingSpace(arena)` will be less then
- * the original backing buffer capacity due to the internal header.
+ * @warning On initialization, the result of `Control_Arena_RemainingSpace(arena)` will be less
+ * then the original backing buffer capacity due to the internal header.
  *
  * @param[in] arena Pointer to the arena.
  *
@@ -88,6 +94,11 @@ size_t Control_Arena_RemainingSpace(ControlArena *arena);
  * enough capacity.
  */
 void *Control_Arena_Alloc(ControlArena *arena, size_t size);
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif // _CONTROLLY_ARENA_H
 
 /*
@@ -105,6 +116,11 @@ void *Control_Arena_Alloc(ControlArena *arena, size_t size);
  */
 #ifndef _CONTROLLY_CORE_H
 #define _CONTROLLY_CORE_H
+
+#ifdef __cplusplus
+extern "C"
+{
+#endif
 
 
 #include <stddef.h>
@@ -256,6 +272,9 @@ void Control_System_Init(ControlHandle *ctx, ControlArena *p, ControlArena *s);
  */
 void Control_System_DeInit(ControlHandle *ctx);
 
+#ifdef __cplusplus
+}
+#endif
 #endif // _CONTROLLY_CORE_H
 
 /*
@@ -273,6 +292,11 @@ void Control_System_DeInit(ControlHandle *ctx);
  */
 #ifndef _CONTROLLY_MATRIX_H
 #define _CONTROLLY_MATRIX_H
+
+#ifdef __cplusplus
+extern "C"
+{
+#endif
 
 
 #include <stdbool.h>
@@ -503,6 +527,9 @@ bool Control_Matrix_IsValid(const ControlMatrix *m);
  */
 bool Control_Vec_IsValid(const ControlVec *v);
 
+#ifdef __cplusplus
+}
+#endif
 #endif // _CONTROLLY_MATRIX_H
 
 /*
@@ -520,6 +547,12 @@ bool Control_Vec_IsValid(const ControlVec *v);
  */
 #ifndef _CONTROLLY_TF_H
 #define _CONTROLLY_TF_H
+
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 
 
 #include <stdbool.h>
@@ -761,8 +794,8 @@ bool Control_TF_IsValid(const ControlTransferFunction *tf);
  * @return
  *        - CONTROL_OK if valid.
  *        - CONTROL_ERROR_CTX_UNINITIALIZED if the system context is uninitialized.
- *        - CONTROL_ERROR_INVALID_ARGUMENT if pointers are null, sizes are zero, or coefficents are
- * NULL.
+ *        - CONTROL_ERROR_INVALID_ARGUMENT if pointers are null, sizes are zero, or coefficents
+ * are NULL.
  *        - CONTROL_ERROR_DIVIDE_BY_ZERO if the leading denominator coefficient is zero.
  */
 ControlResult Control_TF_Validate(ControlHandle *ctx, const ControlTransferFunction *tf);
@@ -793,6 +826,9 @@ ControlResult Control_TF_Persist(ControlHandle                 *ctx,
                                  ControlTransferFunction       *out,
                                  const ControlTransferFunction *tf);
 
+#ifdef __cplusplus
+}
+#endif
 #endif // _CONTROLLY_TF_H
 
 /*
@@ -809,6 +845,14 @@ ControlResult Control_TF_Persist(ControlHandle                 *ctx,
  */
 #ifndef _CONTROLLY_STATESPACE_H
 #define _CONTROLLY_STATESPACE_H
+
+
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
+
 
 
 
@@ -876,6 +920,9 @@ ControlResult Control_StateSpace_FromTF(ControlHandle                 *ctx,
                                         ControlStateSpace             *out,
                                         const ControlTransferFunction *tf);
 
+#ifdef __cplusplus
+}
+#endif
 #endif // _CONTROLLY_STATESPACE_H
 
 /*
@@ -893,6 +940,11 @@ ControlResult Control_StateSpace_FromTF(ControlHandle                 *ctx,
  */
 #ifndef _CONTROLLY_PID_H
 #define _CONTROLLY_PID_H
+
+#ifdef __cplusplus
+extern "C"
+{
+#endif
 
 
 #include <stdbool.h>
@@ -967,7 +1019,8 @@ float Control_PID_Update(ControlPIDController *pid, float target, float measurem
  *
  * @note Allocates from the \p ctx->persistent arena.
  *       **Zero-Allocation Path:** If the `out` transfer function already possesses
- *       sufficient capacity in both its numerator and denominator vectors, no memory is allocated.
+ *       sufficient capacity in both its numerator and denominator vectors, no memory is
+ * allocated.
  *
  * @param[in,out] ctx Pointer to the initialized control context.
  * @param[out]    out Pointer to the destination transfer function.
@@ -980,6 +1033,9 @@ float Control_PID_Update(ControlPIDController *pid, float target, float measurem
 ControlResult
 Control_PID_ToTF(ControlHandle *ctx, ControlTransferFunction *out, const ControlPIDController *pid);
 
+#ifdef __cplusplus
+}
+#endif
 #endif // _CONTROLLY_PID_H
 
 
@@ -1045,15 +1101,24 @@ Control_PID_ToTF(ControlHandle *ctx, ControlTransferFunction *out, const Control
  * ----------------------------------------
 */
 
-#ifndef _SS_INTERNAL
-#define _SS_INTERNAL
+#ifndef _SS_INTERNAL_H
+#define _SS_INTERNAL_H
+
+#ifdef __cplusplus
+extern "C"
+{
+#endif
 
 
 
 void __Control_StateSpace_StepSISO(ControlStateSpace *ss, float dt);
 void __Control_StateSpace_StepMIMO(ControlStateSpace *ss, float dt);
 
+#ifdef __cplusplus
+}
 #endif
+
+#endif // _SS_INTERNAL_H
 
 /*
  * ----------------------------------------

@@ -85,3 +85,29 @@ target_link_libraries(test_single_header PRIVATE unity)
 target_compile_definitions(test_single_header PRIVATE HEADERLIB_TEST)
 target_include_directories(test_single_header PRIVATE ${PROJECT_SOURCE_DIR}/dist)
 add_test(NAME UnitTestsSingleHeader COMMAND test_single_header -v)
+
+# ========================================
+# CXX Tests
+# ========================================
+
+enable_language(CXX)
+
+# ----------------------------------------
+# Modular Testing
+# ----------------------------------------
+
+add_executable(test_cpp_modular test_cpp.cpp)
+target_link_libraries(test_cpp_modular PRIVATE controlly)
+
+add_test(NAME CppLinkage_Modular COMMAND test_cpp_modular)
+
+
+# ----------------------------------------
+# Single Header Testing
+# ----------------------------------------
+add_executable(test_cpp_single test_cpp.cpp)
+target_link_libraries(test_cpp_single PRIVATE controlly)
+target_compile_definitions(test_cpp_single PRIVATE HEADERLIB_TEST)
+target_include_directories(test_cpp_single PRIVATE ${PROJECT_SOURCE_DIR}/dist)
+
+add_test(NAME CppLinkage_Single COMMAND test_cpp_single)
