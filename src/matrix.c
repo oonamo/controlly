@@ -25,8 +25,8 @@ __Control_Vec_AllocInArena(ControlHandle *ctx, ControlVec *out, ControlArena *a,
 
 ControlResult Control_Vec_AllocScratch(ControlHandle *ctx, ControlVec *out, size_t size)
 {
-    CHECK_CTX(ctx);
-    CHECK_OUT(ctx, out);
+    CONTROL_CHECK_CTX(ctx);
+    CONTROL_CHECK_OUT(ctx, out);
 
     CONTROL_TRY(__Control_Vec_AllocInArena(ctx, out, ctx->scratch, size));
     return CONTROL_OK;
@@ -34,8 +34,8 @@ ControlResult Control_Vec_AllocScratch(ControlHandle *ctx, ControlVec *out, size
 ControlResult Control_Vec_AllocPersistent(ControlHandle *ctx, ControlVec *out, size_t size)
 
 {
-    CHECK_CTX(ctx);
-    CHECK_OUT(ctx, out);
+    CONTROL_CHECK_CTX(ctx);
+    CONTROL_CHECK_OUT(ctx, out);
 
     CONTROL_TRY(__Control_Vec_AllocInArena(ctx, out, ctx->persistent, size));
     return CONTROL_OK;
@@ -43,8 +43,8 @@ ControlResult Control_Vec_AllocPersistent(ControlHandle *ctx, ControlVec *out, s
 
 ControlResult Control_Vec_Persist(ControlHandle *ctx, ControlVec *out, const ControlVec *v)
 {
-    CHECK_CTX(ctx);
-    CHECK_OUT(ctx, out);
+    CONTROL_CHECK_CTX(ctx);
+    CONTROL_CHECK_OUT(ctx, out);
 
     if (out->capacity < v->size)
     {
@@ -85,8 +85,8 @@ ControlResult __Control_Matrix_Alloc(
 ControlResult
 Control_Matrix_AllocScratch(ControlHandle *ctx, ControlMatrix *out, size_t rows, size_t cols)
 {
-    CHECK_CTX(ctx);
-    CHECK_OUT(ctx, out);
+    CONTROL_CHECK_CTX(ctx);
+    CONTROL_CHECK_OUT(ctx, out);
 
     CONTROL_TRY(__Control_Matrix_Alloc(ctx, out, ctx->scratch, rows, cols));
     return CONTROL_OK;
@@ -95,8 +95,8 @@ Control_Matrix_AllocScratch(ControlHandle *ctx, ControlMatrix *out, size_t rows,
 ControlResult
 Control_Matrix_AllocPersistent(ControlHandle *ctx, ControlMatrix *out, size_t rows, size_t cols)
 {
-    CHECK_CTX(ctx);
-    CHECK_OUT(ctx, out);
+    CONTROL_CHECK_CTX(ctx);
+    CONTROL_CHECK_OUT(ctx, out);
 
     CONTROL_TRY(__Control_Matrix_Alloc(ctx, out, ctx->persistent, rows, cols));
     return CONTROL_OK;
@@ -104,8 +104,8 @@ Control_Matrix_AllocPersistent(ControlHandle *ctx, ControlMatrix *out, size_t ro
 
 ControlResult Control_Matrix_Persist(ControlHandle *ctx, ControlMatrix *out, const ControlMatrix *m)
 {
-    CHECK_CTX(ctx);
-    CHECK_OUT(ctx, out);
+    CONTROL_CHECK_CTX(ctx);
+    CONTROL_CHECK_OUT(ctx, out);
 
     if (out->rows != m->rows || out->cols != m->cols)
     {
@@ -142,8 +142,8 @@ ControlResult Control_Matrix_MultiplyVec(ControlHandle       *ctx,
                                          const ControlMatrix *m,
                                          const ControlVec    *v)
 {
-    CHECK_CTX(ctx);
-    CHECK_NOT_NULL(ctx, out && m && v);
+    CONTROL_CHECK_CTX(ctx);
+    CONTROL_CHECK_NOT_NULL(ctx, out && m && v);
     CONTROL_REQUIRE(
         ctx, m->cols == v->size, CONTROL_ERROR_DIMENSION_MISMATCH);
 
@@ -182,8 +182,8 @@ ControlResult Control_Matrix_MultiplyVec(ControlHandle       *ctx,
 ControlResult
 Control_Vec_Add(ControlHandle *ctx, ControlVec *out, const ControlVec *lhs, const ControlVec *rhs)
 {
-    CHECK_CTX(ctx);
-    CHECK_NOT_NULL(ctx, out && lhs && rhs);
+    CONTROL_CHECK_CTX(ctx);
+    CONTROL_CHECK_NOT_NULL(ctx, out && lhs && rhs);
     CONTROL_REQUIRE(
         ctx, lhs->size == rhs->size, CONTROL_ERROR_DIMENSION_MISMATCH);
 
@@ -216,8 +216,8 @@ Control_Vec_Add(ControlHandle *ctx, ControlVec *out, const ControlVec *lhs, cons
 ControlResult
 Control_Vec_Scale(ControlHandle *ctx, ControlVec *out, const ControlVec *v, float scalar)
 {
-    CHECK_CTX(ctx);
-    CHECK_NOT_NULL(ctx, out && v);
+    CONTROL_CHECK_CTX(ctx);
+    CONTROL_CHECK_NOT_NULL(ctx, out && v);
 
     if (out->capacity < v->size)
     {
