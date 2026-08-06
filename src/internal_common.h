@@ -3,7 +3,7 @@
 
 #define CONTROL_UNUSED(x) (void)(x)
 
-#define ALIGN_UP(size, align) (((size_t)(size) + ((size_t)(align) - 1)) & ~((size_t)(align) - 1))
+#define CONTROL_ALIGN_UP(size, align) (((size_t)(size) + ((size_t)(align) - 1)) & ~((size_t)(align) - 1))
 
 #define CONTROL_THROW(ctx, code)                                                                   \
     do                                                                                             \
@@ -27,11 +27,11 @@
         }                                                                                          \
     } while (0)
 
-#define CHECK_CTX(ctx) CONTROL_REQUIRE((ctx), (ctx), CONTROL_ERROR_CTX_UNINITIALIZED);
+#define CONTROL_CHECK_CTX(ctx) CONTROL_REQUIRE((ctx), (ctx), CONTROL_ERROR_CTX_UNINITIALIZED);
 
-#define CHECK_OUT(ctx, out) CONTROL_REQUIRE((ctx), (out), CONTROL_ERROR_NULL_PTR)
+#define CONTROL_CHECK_OUT(ctx, out) CONTROL_REQUIRE((ctx), (out), CONTROL_ERROR_NULL_PTR)
 
-#define CHECK_NOT_NULL(ctx, ptr) CONTROL_REQUIRE((ctx), (ptr), CONTROL_ERROR_NULL_PTR)
+#define CONTROL_CHECK_NOT_NULL(ctx, ptr) CONTROL_REQUIRE((ctx), (ptr), CONTROL_ERROR_NULL_PTR)
 
 #define CONTROL_TRY(expr)                                                                          \
     do                                                                                             \

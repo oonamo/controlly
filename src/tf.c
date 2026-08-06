@@ -41,8 +41,8 @@ static ControlResult __Control_Poly_CreateInArena(
 
 ControlResult Control_Poly_Canonicalize(ControlHandle *ctx, ControlVec *out, const ControlVec *v)
 {
-    CHECK_CTX(ctx);
-    CHECK_NOT_NULL(ctx, out && v);
+    CONTROL_CHECK_CTX(ctx);
+    CONTROL_CHECK_NOT_NULL(ctx, out && v);
 
     size_t i = 0;
 
@@ -64,8 +64,8 @@ ControlResult Control_Poly_Canonicalize(ControlHandle *ctx, ControlVec *out, con
 ControlResult
 Control_Poly_AllocScratch(ControlHandle *ctx, ControlVec *out, const float *coeffs, size_t size)
 {
-    CHECK_CTX(ctx);
-    CHECK_NOT_NULL(ctx, out && coeffs);
+    CONTROL_CHECK_CTX(ctx);
+    CONTROL_CHECK_NOT_NULL(ctx, out && coeffs);
 
     return __Control_Poly_CreateInArena(ctx, out, ctx->scratch, coeffs, size);
 }
@@ -73,8 +73,8 @@ Control_Poly_AllocScratch(ControlHandle *ctx, ControlVec *out, const float *coef
 ControlResult
 Control_Poly_AllocPersistent(ControlHandle *ctx, ControlVec *out, const float *coeffs, size_t size)
 {
-    CHECK_CTX(ctx);
-    CHECK_NOT_NULL(ctx, out && coeffs);
+    CONTROL_CHECK_CTX(ctx);
+    CONTROL_CHECK_NOT_NULL(ctx, out && coeffs);
 
     return __Control_Poly_CreateInArena(ctx, out, ctx->persistent, coeffs, size);
 }
@@ -82,8 +82,8 @@ Control_Poly_AllocPersistent(ControlHandle *ctx, ControlVec *out, const float *c
 ControlResult
 Control_Poly_Add(ControlHandle *ctx, ControlVec *out, const ControlVec *a, const ControlVec *b)
 {
-    CHECK_CTX(ctx);
-    CHECK_NOT_NULL(ctx, out && a && b);
+    CONTROL_CHECK_CTX(ctx);
+    CONTROL_CHECK_NOT_NULL(ctx, out && a && b);
 
     size_t max_size = a->size > b->size ? a->size : b->size;
 
@@ -117,8 +117,8 @@ Control_Poly_Add(ControlHandle *ctx, ControlVec *out, const ControlVec *a, const
 ControlResult
 Control_Poly_Multiply(ControlHandle *ctx, ControlVec *out, const ControlVec *a, const ControlVec *b)
 {
-    CHECK_CTX(ctx);
-    CHECK_NOT_NULL(ctx, out && a && b);
+    CONTROL_CHECK_CTX(ctx);
+    CONTROL_CHECK_NOT_NULL(ctx, out && a && b);
 
     size_t new_size = a->size + b->size - 1;
     if (out->coeffs == NULL || out->capacity < new_size)
@@ -149,8 +149,8 @@ ControlResult Control_TF_FromPoly(ControlHandle           *ctx,
                                   const ControlVec        *num,
                                   const ControlVec        *dem)
 {
-    CHECK_CTX(ctx);
-    CHECK_NOT_NULL(ctx, out && num && dem);
+    CONTROL_CHECK_CTX(ctx);
+    CONTROL_CHECK_NOT_NULL(ctx, out && num && dem);
 
     // TODO: Check if we can use allocated memory if abailable
     out->num = *num;
@@ -163,8 +163,8 @@ ControlResult Control_TF_Multiply(ControlHandle                 *ctx,
                                   const ControlTransferFunction *G1,
                                   const ControlTransferFunction *G2)
 {
-    CHECK_CTX(ctx);
-    CHECK_NOT_NULL(ctx, out);
+    CONTROL_CHECK_CTX(ctx);
+    CONTROL_CHECK_NOT_NULL(ctx, out);
 
     CONTROL_TRY(Control_TF_Validate(ctx, G1));
     CONTROL_TRY(Control_TF_Validate(ctx, G2));
@@ -190,8 +190,8 @@ inline bool Control_TF_IsValid(const ControlTransferFunction *tf)
 
 ControlResult Control_TF_Validate(ControlHandle *ctx, const ControlTransferFunction *tf)
 {
-    CHECK_CTX(ctx);
-    CHECK_NOT_NULL(ctx, tf);
+    CONTROL_CHECK_CTX(ctx);
+    CONTROL_CHECK_NOT_NULL(ctx, tf);
 
     CONTROL_REQUIRE(ctx,
                     tf->num.coeffs && tf->den.coeffs,
@@ -210,8 +210,8 @@ ControlResult Control_TF_ClosedLoop(ControlHandle                 *ctx,
                                     float                          gain,
                                     ControlFeedbackType            unity)
 {
-    CHECK_CTX(ctx);
-    CHECK_NOT_NULL(ctx, out);
+    CONTROL_CHECK_CTX(ctx);
+    CONTROL_CHECK_NOT_NULL(ctx, out);
     CONTROL_TRY(Control_TF_Validate(ctx, G));
 
     /*
@@ -251,8 +251,8 @@ ControlResult Control_TF_Persist(ControlHandle                 *ctx,
                                  ControlTransferFunction       *out,
                                  const ControlTransferFunction *tf)
 {
-    CHECK_CTX(ctx);
-    CHECK_NOT_NULL(ctx, out);
+    CONTROL_CHECK_CTX(ctx);
+    CONTROL_CHECK_NOT_NULL(ctx, out);
 
     // NOTE: We do not validate, invalid state can be copied
     // CONTROL_TRY(Control_TF_Validate(ctx, tf));

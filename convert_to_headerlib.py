@@ -8,11 +8,11 @@ HEADER_FILES = [
     "include/controlly/tf.h",
     "include/controlly/statespace.h",
     "include/controlly/controllers/pid.h",
-    "src/internal_common.h",
-    "src/statespace/ss_internal.h"
 ]
 
 SOURCE_FILES = [
+    "src/internal_common.h",
+    "src/statespace/ss_internal.h",
     "src/core.c",
     "src/arena.c",
     "src/matrix.c",
@@ -24,6 +24,17 @@ SOURCE_FILES = [
 ]
 
 OUTPUT_FILE = "dist/controlly.h"
+
+INTERNAL_MACROS = [
+    "CONTROL_UNUSED",
+    "CONTROL_ALIGN_UP",
+    "CONTROL_THROW",
+    "CONTROL_REQUIRE",
+    "CONTROL_CHECK_CTX",
+    "CONTROL_CHECK_OUT",
+    "CONTROL_CHECK_NOT_NULL",
+    "CONTROL_TRY",
+]
 
 
 def strip_includes(content):
@@ -37,13 +48,21 @@ with open(OUTPUT_FILE, "w") as out:
 
     for header in HEADER_FILES:
         with open(header, "r") as f:
+            out.write("/*\n * ========================================\n")
+            out.write(f" * {os.path.basename(header)}\n")
+            out.write(" * ========================================\n*/\n\n")
             out.write(strip_includes(f.read()) + "\n")
 
     out.write("\n#ifdef CONTROLLY_IMPLEMENTATION\n\n")
     for source in SOURCE_FILES:
         with open(source, "r") as f:
-            out.write(f"/* -- {os.path.basename(source)} -- */\n")
+            out.write("/*\n * ----------------------------------------\n")
+            out.write(f" * {os.path.basename(source)}\n")
+            out.write(" * ----------------------------------------\n*/\n\n")
             out.write(strip_includes(f.read()) + "\n")
+
+    for macro in INTERNAL_MACROS:
+        out.write(f"#undef {macro}\n")
 
     out.write("\n#endif /* CONTROLLY_IMPLEMENTATION */\n")
 

@@ -1,5 +1,11 @@
 /* Controlly - Automated Header Library Conversion */
 
+/*
+ * ========================================
+ * arena.h
+ * ========================================
+*/
+
 /**
  * @file arena.h
  * @brief Lightweight memory implementation
@@ -83,6 +89,12 @@ size_t Control_Arena_RemainingSpace(ControlArena *arena);
  */
 void *Control_Arena_Alloc(ControlArena *arena, size_t size);
 #endif // _CONTROLLY_ARENA_H
+
+/*
+ * ========================================
+ * core.h
+ * ========================================
+*/
 
 /**
  * @file core.h
@@ -245,6 +257,12 @@ void Control_System_Init(ControlHandle *ctx, ControlArena *p, ControlArena *s);
 void Control_System_DeInit(ControlHandle *ctx);
 
 #endif // _CONTROLLY_CORE_H
+
+/*
+ * ========================================
+ * matrix.h
+ * ========================================
+*/
 
 /**
  * @file matrix.h
@@ -486,6 +504,12 @@ bool Control_Matrix_IsValid(const ControlMatrix *m);
 bool Control_Vec_IsValid(const ControlVec *v);
 
 #endif // _CONTROLLY_MATRIX_H
+
+/*
+ * ========================================
+ * tf.h
+ * ========================================
+*/
 
 /**
  * @file tf.h
@@ -771,6 +795,12 @@ ControlResult Control_TF_Persist(ControlHandle                 *ctx,
 
 #endif // _CONTROLLY_TF_H
 
+/*
+ * ========================================
+ * statespace.h
+ * ========================================
+*/
+
 /**
  * @file statespace.h
  * @brief State space module of Controlly
@@ -847,6 +877,12 @@ ControlResult Control_StateSpace_FromTF(ControlHandle                 *ctx,
                                         const ControlTransferFunction *tf);
 
 #endif // _CONTROLLY_STATESPACE_H
+
+/*
+ * ========================================
+ * pid.h
+ * ========================================
+*/
 
 /**
  * @file pid.h
@@ -946,12 +982,21 @@ Control_PID_ToTF(ControlHandle *ctx, ControlTransferFunction *out, const Control
 
 #endif // _CONTROLLY_PID_H
 
+
+#ifdef CONTROLLY_IMPLEMENTATION
+
+/*
+ * ----------------------------------------
+ * internal_common.h
+ * ----------------------------------------
+*/
+
 #ifndef _INTERNAL_COMMON
 #define _INTERNAL_COMMON
 
 #define CONTROL_UNUSED(x) (void)(x)
 
-#define ALIGN_UP(size, align) (((size_t)(size) + ((size_t)(align) - 1)) & ~((size_t)(align) - 1))
+#define CONTROL_ALIGN_UP(size, align) (((size_t)(size) + ((size_t)(align) - 1)) & ~((size_t)(align) - 1))
 
 #define CONTROL_THROW(ctx, code)                                                                   \
     do                                                                                             \
@@ -975,11 +1020,11 @@ Control_PID_ToTF(ControlHandle *ctx, ControlTransferFunction *out, const Control
         }                                                                                          \
     } while (0)
 
-#define CHECK_CTX(ctx) CONTROL_REQUIRE((ctx), (ctx), CONTROL_ERROR_CTX_UNINITIALIZED);
+#define CONTROL_CHECK_CTX(ctx) CONTROL_REQUIRE((ctx), (ctx), CONTROL_ERROR_CTX_UNINITIALIZED);
 
-#define CHECK_OUT(ctx, out) CONTROL_REQUIRE((ctx), (out), CONTROL_ERROR_NULL_PTR)
+#define CONTROL_CHECK_OUT(ctx, out) CONTROL_REQUIRE((ctx), (out), CONTROL_ERROR_NULL_PTR)
 
-#define CHECK_NOT_NULL(ctx, ptr) CONTROL_REQUIRE((ctx), (ptr), CONTROL_ERROR_NULL_PTR)
+#define CONTROL_CHECK_NOT_NULL(ctx, ptr) CONTROL_REQUIRE((ctx), (ptr), CONTROL_ERROR_NULL_PTR)
 
 #define CONTROL_TRY(expr)                                                                          \
     do                                                                                             \
@@ -994,6 +1039,12 @@ Control_PID_ToTF(ControlHandle *ctx, ControlTransferFunction *out, const Control
 
 #endif
 
+/*
+ * ----------------------------------------
+ * ss_internal.h
+ * ----------------------------------------
+*/
+
 #ifndef _SS_INTERNAL
 #define _SS_INTERNAL
 
@@ -1004,10 +1055,12 @@ void __Control_StateSpace_StepMIMO(ControlStateSpace *ss, float dt);
 
 #endif
 
+/*
+ * ----------------------------------------
+ * core.c
+ * ----------------------------------------
+*/
 
-#ifdef CONTROLLY_IMPLEMENTATION
-
-/* -- core.c -- */
 
 
 const char *Control_GetErrorString(ControlResult result)
@@ -1047,7 +1100,12 @@ void Control_System_DeInit(ControlHandle *ctx)
     Control_Arena_Clear(ctx->persistent);
 }
 
-/* -- arena.c -- */
+/*
+ * ----------------------------------------
+ * arena.c
+ * ----------------------------------------
+*/
+
 
 
 
@@ -1087,7 +1145,7 @@ void *Control_Arena_Alloc(ControlArena *a, size_t size)
         return NULL;
     }
 
-    size_t align_size = ALIGN_UP(size, CONTROLLY_ARENA_ALIGN_SIZE);
+    size_t align_size = CONTROL_ALIGN_UP(size, CONTROLLY_ARENA_ALIGN_SIZE);
     if (a->_offset + align_size <= a->_capacity)
     {
         void *ptr = &a->_buffer[a->_offset];
@@ -1098,7 +1156,12 @@ void *Control_Arena_Alloc(ControlArena *a, size_t size)
     return NULL;
 }
 
-/* -- matrix.c -- */
+/*
+ * ----------------------------------------
+ * matrix.c
+ * ----------------------------------------
+*/
+
 
 
 
@@ -1126,8 +1189,8 @@ __Control_Vec_AllocInArena(ControlHandle *ctx, ControlVec *out, ControlArena *a,
 
 ControlResult Control_Vec_AllocScratch(ControlHandle *ctx, ControlVec *out, size_t size)
 {
-    CHECK_CTX(ctx);
-    CHECK_OUT(ctx, out);
+    CONTROL_CHECK_CTX(ctx);
+    CONTROL_CHECK_OUT(ctx, out);
 
     CONTROL_TRY(__Control_Vec_AllocInArena(ctx, out, ctx->scratch, size));
     return CONTROL_OK;
@@ -1135,8 +1198,8 @@ ControlResult Control_Vec_AllocScratch(ControlHandle *ctx, ControlVec *out, size
 ControlResult Control_Vec_AllocPersistent(ControlHandle *ctx, ControlVec *out, size_t size)
 
 {
-    CHECK_CTX(ctx);
-    CHECK_OUT(ctx, out);
+    CONTROL_CHECK_CTX(ctx);
+    CONTROL_CHECK_OUT(ctx, out);
 
     CONTROL_TRY(__Control_Vec_AllocInArena(ctx, out, ctx->persistent, size));
     return CONTROL_OK;
@@ -1144,8 +1207,8 @@ ControlResult Control_Vec_AllocPersistent(ControlHandle *ctx, ControlVec *out, s
 
 ControlResult Control_Vec_Persist(ControlHandle *ctx, ControlVec *out, const ControlVec *v)
 {
-    CHECK_CTX(ctx);
-    CHECK_OUT(ctx, out);
+    CONTROL_CHECK_CTX(ctx);
+    CONTROL_CHECK_OUT(ctx, out);
 
     if (out->capacity < v->size)
     {
@@ -1186,8 +1249,8 @@ ControlResult __Control_Matrix_Alloc(
 ControlResult
 Control_Matrix_AllocScratch(ControlHandle *ctx, ControlMatrix *out, size_t rows, size_t cols)
 {
-    CHECK_CTX(ctx);
-    CHECK_OUT(ctx, out);
+    CONTROL_CHECK_CTX(ctx);
+    CONTROL_CHECK_OUT(ctx, out);
 
     CONTROL_TRY(__Control_Matrix_Alloc(ctx, out, ctx->scratch, rows, cols));
     return CONTROL_OK;
@@ -1196,8 +1259,8 @@ Control_Matrix_AllocScratch(ControlHandle *ctx, ControlMatrix *out, size_t rows,
 ControlResult
 Control_Matrix_AllocPersistent(ControlHandle *ctx, ControlMatrix *out, size_t rows, size_t cols)
 {
-    CHECK_CTX(ctx);
-    CHECK_OUT(ctx, out);
+    CONTROL_CHECK_CTX(ctx);
+    CONTROL_CHECK_OUT(ctx, out);
 
     CONTROL_TRY(__Control_Matrix_Alloc(ctx, out, ctx->persistent, rows, cols));
     return CONTROL_OK;
@@ -1205,8 +1268,8 @@ Control_Matrix_AllocPersistent(ControlHandle *ctx, ControlMatrix *out, size_t ro
 
 ControlResult Control_Matrix_Persist(ControlHandle *ctx, ControlMatrix *out, const ControlMatrix *m)
 {
-    CHECK_CTX(ctx);
-    CHECK_OUT(ctx, out);
+    CONTROL_CHECK_CTX(ctx);
+    CONTROL_CHECK_OUT(ctx, out);
 
     if (out->rows != m->rows || out->cols != m->cols)
     {
@@ -1243,8 +1306,8 @@ ControlResult Control_Matrix_MultiplyVec(ControlHandle       *ctx,
                                          const ControlMatrix *m,
                                          const ControlVec    *v)
 {
-    CHECK_CTX(ctx);
-    CHECK_NOT_NULL(ctx, out && m && v);
+    CONTROL_CHECK_CTX(ctx);
+    CONTROL_CHECK_NOT_NULL(ctx, out && m && v);
     CONTROL_REQUIRE(
         ctx, m->cols == v->size, CONTROL_ERROR_DIMENSION_MISMATCH);
 
@@ -1283,8 +1346,8 @@ ControlResult Control_Matrix_MultiplyVec(ControlHandle       *ctx,
 ControlResult
 Control_Vec_Add(ControlHandle *ctx, ControlVec *out, const ControlVec *lhs, const ControlVec *rhs)
 {
-    CHECK_CTX(ctx);
-    CHECK_NOT_NULL(ctx, out && lhs && rhs);
+    CONTROL_CHECK_CTX(ctx);
+    CONTROL_CHECK_NOT_NULL(ctx, out && lhs && rhs);
     CONTROL_REQUIRE(
         ctx, lhs->size == rhs->size, CONTROL_ERROR_DIMENSION_MISMATCH);
 
@@ -1317,8 +1380,8 @@ Control_Vec_Add(ControlHandle *ctx, ControlVec *out, const ControlVec *lhs, cons
 ControlResult
 Control_Vec_Scale(ControlHandle *ctx, ControlVec *out, const ControlVec *v, float scalar)
 {
-    CHECK_CTX(ctx);
-    CHECK_NOT_NULL(ctx, out && v);
+    CONTROL_CHECK_CTX(ctx);
+    CONTROL_CHECK_NOT_NULL(ctx, out && v);
 
     if (out->capacity < v->size)
     {
@@ -1345,7 +1408,12 @@ bool Control_Vec_IsValid(const ControlVec *v)
     return v != NULL && v->coeffs != NULL;
 }
 
-/* -- router.c -- */
+/*
+ * ----------------------------------------
+ * router.c
+ * ----------------------------------------
+*/
+
 
 
 
@@ -1364,7 +1432,12 @@ void Control_StateSpace_StepContinuous(ControlHandle *ctx, ControlStateSpace *ss
     }
 }
 
-/* -- mimo.c -- */
+/*
+ * ----------------------------------------
+ * mimo.c
+ * ----------------------------------------
+*/
+
 
 
 
@@ -1424,7 +1497,14 @@ void __Control_StateSpace_StepMIMO(ControlStateSpace *ss, float dt)
     }
 }
 
-/* -- siso.c -- */
+#undef MAX_SYSTEM_ORDER
+
+/*
+ * ----------------------------------------
+ * siso.c
+ * ----------------------------------------
+*/
+
 
 
 
@@ -1515,8 +1595,8 @@ ControlResult Control_StateSpace_FromTF(ControlHandle                 *ctx,
                                         ControlStateSpace             *out,
                                         const ControlTransferFunction *tf)
 {
-    CHECK_CTX(ctx);
-    CHECK_NOT_NULL(ctx, out && tf);
+    CONTROL_CHECK_CTX(ctx);
+    CONTROL_CHECK_NOT_NULL(ctx, out && tf);
     CONTROL_TRY(__gen_sys_matrix_InPersistent(ctx, &out->A, tf));
     CONTROL_TRY(__gen_input_matrix_InPersistent(ctx, &out->B, tf));
     CONTROL_TRY(__gen_output_matrix_InPersistent(ctx, &out->C, tf));
@@ -1570,7 +1650,14 @@ void __Control_StateSpace_StepSISO(ControlStateSpace *ss, float dt)
     }
 }
 
-/* -- tf.c -- */
+#undef MAX_SYSTEM_ORDER
+
+/*
+ * ----------------------------------------
+ * tf.c
+ * ----------------------------------------
+*/
+
 
 
 
@@ -1614,8 +1701,8 @@ static ControlResult __Control_Poly_CreateInArena(
 
 ControlResult Control_Poly_Canonicalize(ControlHandle *ctx, ControlVec *out, const ControlVec *v)
 {
-    CHECK_CTX(ctx);
-    CHECK_NOT_NULL(ctx, out && v);
+    CONTROL_CHECK_CTX(ctx);
+    CONTROL_CHECK_NOT_NULL(ctx, out && v);
 
     size_t i = 0;
 
@@ -1637,8 +1724,8 @@ ControlResult Control_Poly_Canonicalize(ControlHandle *ctx, ControlVec *out, con
 ControlResult
 Control_Poly_AllocScratch(ControlHandle *ctx, ControlVec *out, const float *coeffs, size_t size)
 {
-    CHECK_CTX(ctx);
-    CHECK_NOT_NULL(ctx, out && coeffs);
+    CONTROL_CHECK_CTX(ctx);
+    CONTROL_CHECK_NOT_NULL(ctx, out && coeffs);
 
     return __Control_Poly_CreateInArena(ctx, out, ctx->scratch, coeffs, size);
 }
@@ -1646,8 +1733,8 @@ Control_Poly_AllocScratch(ControlHandle *ctx, ControlVec *out, const float *coef
 ControlResult
 Control_Poly_AllocPersistent(ControlHandle *ctx, ControlVec *out, const float *coeffs, size_t size)
 {
-    CHECK_CTX(ctx);
-    CHECK_NOT_NULL(ctx, out && coeffs);
+    CONTROL_CHECK_CTX(ctx);
+    CONTROL_CHECK_NOT_NULL(ctx, out && coeffs);
 
     return __Control_Poly_CreateInArena(ctx, out, ctx->persistent, coeffs, size);
 }
@@ -1655,8 +1742,8 @@ Control_Poly_AllocPersistent(ControlHandle *ctx, ControlVec *out, const float *c
 ControlResult
 Control_Poly_Add(ControlHandle *ctx, ControlVec *out, const ControlVec *a, const ControlVec *b)
 {
-    CHECK_CTX(ctx);
-    CHECK_NOT_NULL(ctx, out && a && b);
+    CONTROL_CHECK_CTX(ctx);
+    CONTROL_CHECK_NOT_NULL(ctx, out && a && b);
 
     size_t max_size = a->size > b->size ? a->size : b->size;
 
@@ -1690,8 +1777,8 @@ Control_Poly_Add(ControlHandle *ctx, ControlVec *out, const ControlVec *a, const
 ControlResult
 Control_Poly_Multiply(ControlHandle *ctx, ControlVec *out, const ControlVec *a, const ControlVec *b)
 {
-    CHECK_CTX(ctx);
-    CHECK_NOT_NULL(ctx, out && a && b);
+    CONTROL_CHECK_CTX(ctx);
+    CONTROL_CHECK_NOT_NULL(ctx, out && a && b);
 
     size_t new_size = a->size + b->size - 1;
     if (out->coeffs == NULL || out->capacity < new_size)
@@ -1722,8 +1809,8 @@ ControlResult Control_TF_FromPoly(ControlHandle           *ctx,
                                   const ControlVec        *num,
                                   const ControlVec        *dem)
 {
-    CHECK_CTX(ctx);
-    CHECK_NOT_NULL(ctx, out && num && dem);
+    CONTROL_CHECK_CTX(ctx);
+    CONTROL_CHECK_NOT_NULL(ctx, out && num && dem);
 
     // TODO: Check if we can use allocated memory if abailable
     out->num = *num;
@@ -1736,8 +1823,8 @@ ControlResult Control_TF_Multiply(ControlHandle                 *ctx,
                                   const ControlTransferFunction *G1,
                                   const ControlTransferFunction *G2)
 {
-    CHECK_CTX(ctx);
-    CHECK_NOT_NULL(ctx, out);
+    CONTROL_CHECK_CTX(ctx);
+    CONTROL_CHECK_NOT_NULL(ctx, out);
 
     CONTROL_TRY(Control_TF_Validate(ctx, G1));
     CONTROL_TRY(Control_TF_Validate(ctx, G2));
@@ -1763,8 +1850,8 @@ inline bool Control_TF_IsValid(const ControlTransferFunction *tf)
 
 ControlResult Control_TF_Validate(ControlHandle *ctx, const ControlTransferFunction *tf)
 {
-    CHECK_CTX(ctx);
-    CHECK_NOT_NULL(ctx, tf);
+    CONTROL_CHECK_CTX(ctx);
+    CONTROL_CHECK_NOT_NULL(ctx, tf);
 
     CONTROL_REQUIRE(ctx,
                     tf->num.coeffs && tf->den.coeffs,
@@ -1783,8 +1870,8 @@ ControlResult Control_TF_ClosedLoop(ControlHandle                 *ctx,
                                     float                          gain,
                                     ControlFeedbackType            unity)
 {
-    CHECK_CTX(ctx);
-    CHECK_NOT_NULL(ctx, out);
+    CONTROL_CHECK_CTX(ctx);
+    CONTROL_CHECK_NOT_NULL(ctx, out);
     CONTROL_TRY(Control_TF_Validate(ctx, G));
 
     /*
@@ -1824,8 +1911,8 @@ ControlResult Control_TF_Persist(ControlHandle                 *ctx,
                                  ControlTransferFunction       *out,
                                  const ControlTransferFunction *tf)
 {
-    CHECK_CTX(ctx);
-    CHECK_NOT_NULL(ctx, out);
+    CONTROL_CHECK_CTX(ctx);
+    CONTROL_CHECK_NOT_NULL(ctx, out);
 
     // NOTE: We do not validate, invalid state can be copied
     // CONTROL_TRY(Control_TF_Validate(ctx, tf));
@@ -1838,7 +1925,12 @@ ControlResult Control_TF_Persist(ControlHandle                 *ctx,
     return CONTROL_OK;
 }
 
-/* -- pid.c -- */
+/*
+ * ----------------------------------------
+ * pid.c
+ * ----------------------------------------
+*/
+
 
 
 
@@ -1930,5 +2022,13 @@ Control_PID_ToTF(ControlHandle *ctx, ControlTransferFunction *out, const Control
     return CONTROL_OK;
 }
 
+#undef CONTROL_UNUSED
+#undef CONTROL_ALIGN_UP
+#undef CONTROL_THROW
+#undef CONTROL_REQUIRE
+#undef CONTROL_CHECK_CTX
+#undef CONTROL_CHECK_OUT
+#undef CONTROL_CHECK_NOT_NULL
+#undef CONTROL_TRY
 
 #endif /* CONTROLLY_IMPLEMENTATION */

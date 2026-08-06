@@ -62,6 +62,7 @@ set(TEST_SOURCES
   test_arena.c
   test_pid.c
   test_errors.c
+  test_singleheader.c
   matlab_test_data.h
 )
 
@@ -77,6 +78,7 @@ add_executable(test_single_header)
 target_sources(test_single_header PRIVATE
     ${TEST_SOURCES}
     singleheader.c
+    odr_dummy.c
 )
 add_dependencies(test_single_header controlly_single_header)
 target_link_libraries(test_single_header PRIVATE unity)
