@@ -36,32 +36,75 @@ typedef enum
     CONTROL_ERROR_DIMENSION_MISMATCH, /*!< Mismatched dimensions error */
 } ControlResult;
 
+/**
+ * @defgroup ErrorMessages Customizable Error Strings
+ * @brief Default string literals passed to the error callback
+ *
+ * These macros define the default strings used when a library error occurs.
+ * Override them at compile time for verbosity, storage, or performance reasons.
+ * @{
+ */
+
+/** @brief String for CONTROL_OK  */
 #ifndef CONTROLLY_ERROR_OK_MSG
     #define CONTROLLY_ERROR_OK_MSG "Operation success"
 #endif
+
+/** @brief String for CONTROL_ERROR_CTX_UNINITIALIZED  */
 #ifndef CONTROLLY_ERROR_CTX_UNINITIALIZED_MSG
     #define CONTROLLY_ERROR_CTX_UNINITIALIZED_MSG "Context was unintialized"
 #endif
+
+/** @brief String for CONTROL_ERROR_OUT_OF_MEMORY  */
 #ifndef CONTROLLY_ERROR_OUT_OF_MEMORY_MSG
     #define CONTROLLY_ERROR_OUT_OF_MEMORY_MSG "Out of memory"
 #endif
+
+/** @brief String for CONTROL_ERROR_DIVIDE_BY_ZERO  */
 #ifndef CONTROLLY_ERROR_DIVIDE_BY_ZERO_MSG
     #define CONTROLLY_ERROR_DIVIDE_BY_ZERO_MSG "Division by zero"
 #endif
+
+/** @brief String for CONTROL_ERROR_INVALID_ARGUMENT  */
 #ifndef CONTROLLY_ERROR_INVALID_ARGUMENT_MSG
     #define CONTROLLY_ERROR_INVALID_ARGUMENT_MSG "An invalid argument was passed"
 #endif
+
+/** @brief String for CONTROL_ERROR_NULL_PTR  */
 #ifndef CONTROLLY_ERROR_NULL_PTR_MSG
     #define CONTROLLY_ERROR_NULL_PTR_MSG "A null pointer was passed"
 #endif
+
+/** @brief String for CONTROL_ERROR_FEATURE_DISABLED  */
 #ifndef CONTROLLY_ERROR_FEATURE_DISABLED_MSG
     #define CONTROLLY_ERROR_FEATURE_DISABLED_MSG "Disabled feature was used"
 #endif
+
+/** @brief String for CONTROL_ERROR_DIMENSION_MISMATCH  */
 #ifndef CONTROLLY_ERROR_DIMENSION_MISMATCH_MSG
     #define CONTROLLY_ERROR_DIMENSION_MISMATCH_MSG "Dimensions are mismatched"
 #endif
+
+/** @brief String for CONTROL_ERROR_UNKNOWN  */
 #ifndef CONTROLLY_ERROR_UNKNOWN_MSG
     #define CONTROLLY_ERROR_UNKNOWN_MSG "An unknown error occured"
+#endif
+
+/** @} */ // End of ErrorMessages group
+
+/**
+ * @def CONTROLLY_VERBOSE_ERROR_FMT
+ * @brief Contextual data to forward to Context's on_error function via the verbose_data parameter
+ *
+ * If @c CONTROLLY_VERBOSE_ERRORS is enabled, this defaults to the standard C macro @c __func__
+ * If @c CONTROLLY_VERBOSE_ERRORS is disabled, this is set to NULL
+ */
+#ifdef CONTROLLY_VERBOSE_ERRORS
+    #ifndef CONTROLLY_VERBOSE_ERROR_FMT
+        #define CONTROLLY_VERBOSE_ERROR_FMT __func__
+    #endif
+#else
+    #define CONTROLLY_VERBOSE_ERROR_FMT NULL
 #endif
 
 /**
@@ -86,9 +129,8 @@ typedef void (*ControlErrorCallback)(ControlResult code,
                                      const char   *verbose_data,
                                      void         *user_data);
 
-/*
+/**
  * @brief Structure for Controlly context
- *
  */
 typedef struct
 {
