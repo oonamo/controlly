@@ -4,7 +4,7 @@
 
 <img width="852" height="474" alt="controlly_second_order" src="https://github.com/user-attachments/assets/f653b1d9-479b-43c9-9a54-c6def1d9cf09" />
 
-Controlly is a standalone library designed for both hosted and embedded targets in mind.
+Controlly is a standalone library designed for both hosted and embedded targets.
 
 By utilizing a custom dual-arena memory allocator, Controlly completely eliminates memory fragmentation and guarantees deterministic execution times for your control loops, making it strictly safe for all environments.
 
@@ -107,7 +107,7 @@ void SystemSetup(ControlHandle* ctx, float natural_freq, float damping_ratio)
     Control_Poly_AllocScratch(ctx, &den, d_coeffs, 3);
 
     ControlTransferFunction tf = {0};
-    Control_TF_FromPoly(ctx, &tf, &num, &dem);
+    Control_TF_FromPoly(ctx, &tf, &num, &den);
 
     Control_StateSpace_FromTF(ctx, &sys, &tf);
 
@@ -115,9 +115,9 @@ void SystemSetup(ControlHandle* ctx, float natural_freq, float damping_ratio)
     float initial_y[1] = {100.0f};
     float initial_u[1] = {0.0f};
 
-    Control_Poly_AllocPersistent(ctx, &sys.x, intial_x, 2);
-    Control_Poly_AllocPersistent(ctx, &sys.y, intial_y, 1);
-    Control_Poly_AllocPersistent(ctx, &sys.u, intial_u, 1);
+    Control_Poly_AllocPersistent(ctx, &sys.x, initial_x, 2);
+    Control_Poly_AllocPersistent(ctx, &sys.y, initial_y, 1);
+    Control_Poly_AllocPersistent(ctx, &sys.u, initial_u, 1);
 
     Control_Arena_Clear(ctx->scratch);
 }
@@ -126,7 +126,7 @@ float Loop(ControlHandle* ctx, float dt, float target_reference)
 {
     sys.u.coeffs[0] = target_reference;
 
-    Control_StateSpace_StepContinous(ctx, &sys, dt);
+    Control_StateSpace_StepContinuous(ctx, &sys, dt);
 
     float output = sys.y.coeffs[0];
 
@@ -136,6 +136,8 @@ float Loop(ControlHandle* ctx, float dt, float target_reference)
 
 ### 3. Custom Error Handling
 ```c
+#include <stdlib.h>
+
 void Control_ExitOnFailure(ControlResult result,
                            const char   *message,
                            const char   *verbose_data,
