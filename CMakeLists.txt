@@ -1,6 +1,19 @@
 cmake_minimum_required(VERSION 3.23)
-project(controlly C)
 
+if(ESP_PLATFORM)
+  file(GLOB_RECURSE CONTROLLY_SOURCES "src/*.c")
+
+  idf_component_register(
+    SRCS ${CONTROLLY_SOURCES}
+    INCLUDE_DIRS "include"
+  )
+
+  message("Using as idf_component")
+
+  return()
+endif()
+
+project(controlly C)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 if(MSVC)
