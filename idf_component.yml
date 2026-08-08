@@ -1,0 +1,3 @@
+version: "0.0.1"
+description: "A lean, zero-dependency C control systems library"
+url: "https://github.com/oonamo/controlly"
