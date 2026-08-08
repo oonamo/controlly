@@ -49,7 +49,39 @@ TEST(SingleHeader, InternalMacrosAreNotAvailable)
     TEST_PASS_MESSAGE("No internal macros were leaked");
 }
 
+TEST(SingleHeader, CannotIncludeInternalHeaders)
+{
+#ifndef HEADERLIB_TEST
+    TEST_IGNORE_MESSAGE("Modular build - Skipping single-header header leaking test");
+#endif
+#if !defined(__has_include)
+    TEST_IGNORE_MESSAGE("Compiler does not have '__has_include', cannot test");
+#endif
+
+#if __has_include(<controlly/arena.h>)
+    TEST_FAIL_MESSAGE("Leaked arena.h");
+#endif
+#if __has_include(<controlly/core.h>)
+    TEST_FAIL_MESSAGE("Leaked arena.h");
+#endif
+#if __has_include(<controlly/matrix.h>)
+    TEST_FAIL_MESSAGE("Leaked arena.h");
+#endif
+#if __has_include(<controlly/tf.h>)
+    TEST_FAIL_MESSAGE("Leaked arena.h");
+#endif
+#if __has_include(<controlly/statespace.h>)
+    TEST_FAIL_MESSAGE("Leaked arena.h");
+#endif
+#if __has_include(<controlly/controllers/pid.h>)
+    TEST_FAIL_MESSAGE("Leaked arena.h");
+#endif
+
+    TEST_PASS_MESSAGE("No headers were leaked");
+}
+
 TEST_GROUP_RUNNER(SingleHeader)
 {
     RUN_TEST_CASE(SingleHeader, InternalMacrosAreNotAvailable);
+    RUN_TEST_CASE(SingleHeader, CannotIncludeInternalHeaders);
 }
