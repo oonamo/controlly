@@ -62,19 +62,19 @@ TEST(SingleHeader, CannotIncludeInternalHeaders)
     TEST_FAIL_MESSAGE("Leaked arena.h");
 #endif
 #if __has_include(<controlly/core.h>)
-    TEST_FAIL_MESSAGE("Leaked arena.h");
+    TEST_FAIL_MESSAGE("Leaked core.h");
 #endif
 #if __has_include(<controlly/matrix.h>)
-    TEST_FAIL_MESSAGE("Leaked arena.h");
+    TEST_FAIL_MESSAGE("Leaked matrix.h");
 #endif
 #if __has_include(<controlly/tf.h>)
-    TEST_FAIL_MESSAGE("Leaked arena.h");
+    TEST_FAIL_MESSAGE("Leaked tf.h");
 #endif
 #if __has_include(<controlly/statespace.h>)
-    TEST_FAIL_MESSAGE("Leaked arena.h");
+    TEST_FAIL_MESSAGE("Leaked statespace.h");
 #endif
 #if __has_include(<controlly/controllers/pid.h>)
-    TEST_FAIL_MESSAGE("Leaked arena.h");
+    TEST_FAIL_MESSAGE("Leaked controllers/pid.h");
 #endif
 
     TEST_PASS_MESSAGE("No headers were leaked");
