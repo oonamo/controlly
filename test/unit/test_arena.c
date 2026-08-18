@@ -122,6 +122,5 @@ TEST_GROUP_RUNNER(Arena)
     RUN_TEST_CASE(Arena, AllocReturnsNullWhenExhausted);
     RUN_TEST_CASE(Arena, ClearResetsCapacityAndReusesMemory);
     RUN_TEST_CASE(Arena, HandlesAllocOfZero);
-    RUN_TEST_CASE(Arena, HandlesAllocOfZero);
     RUN_TEST_CASE(Arena, CreationFailsIfCapacityIsTooSmall);
 }
