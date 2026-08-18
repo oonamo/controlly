@@ -272,21 +272,29 @@ void ControlLoop()
 
 /// [DOC_END: drone_example]
 
+#define DRONE_RADIUS 20.0f
+
 void DrawVisuals()
 {
     BeginDrawing();
     {
         ClearBackground(RAYWHITE);
-        DrawCircleV(chaser.pos, 20.0f, BLUE);
-        DrawCircleV(watcher.pos, 20.0f, RED);
+        DrawCircleV(chaser.pos, DRONE_RADIUS, BLUE);
+        DrawCircleV(watcher.pos, DRONE_RADIUS, RED);
 
-        float watcher_sensor = watcher.ss.y.coeffs[0];
-        float actual_error   = Vector2Distance(watcher.target, watcher.pos) - TARGET_RADIUS;
-        float delta          = fabs(watcher_sensor - actual_error);
+        float actual_error = Vector2Distance(watcher.target, watcher.pos) - TARGET_RADIUS;
 
-        DrawText(TextFormat("ERRORS: %.2f/%.2f", watcher_sensor, actual_error), 0, 0, 20, RED);
-        DrawText(TextFormat("DELTA: %f", delta), 0, 40, 20, RED);
-        DrawText(TextFormat("POS: (%f, %f)", watcher.pos.x, watcher.pos.y), 0, 60, 20, BLUE);
+        const char *watcher_text       = TextFormat("ERROR: %.2f", actual_error);
+        int         watcher_text_width = MeasureText(watcher_text, (int)DRONE_RADIUS);
+
+        int watcher_start_pos = watcher.pos.x - watcher_text_width / 2.0;
+        DrawText(watcher_text, watcher_start_pos, watcher.pos.y - 40, 20, RED);
+
+        const char *chaser_text       = TextFormat("ERROR: %.2f", actual_error);
+        int         chaser_text_width = MeasureText(chaser_text, (int)DRONE_RADIUS);
+
+        int chaser_start_pos = chaser.pos.x - chaser_text_width / 2.0;
+        DrawText(chaser_text, chaser_start_pos, chaser.pos.y - 40, 20, BLUE);
 
         DrawCircleLinesV(GetMousePosition(), TARGET_RADIUS, RED);
     }

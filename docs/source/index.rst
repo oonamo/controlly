@@ -20,6 +20,7 @@ Controlly is a determinsitic, Zero-Dependency C-based control systems library de
 
    examples/pid
    examples/statespace_second_order
+   examples/drones
 
 
 .. toctree::

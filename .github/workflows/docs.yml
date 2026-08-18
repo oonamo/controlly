@@ -73,6 +73,10 @@ jobs:
           cp ./examples/raylib/pid_leader_follower.wasm ../docs/source/_static/wasm/
           cp ./examples/raylib/pid_leader_follower.html ../docs/source/_static/wasm/
 
+          cp ./examples/raylib/drones.js ../docs/source/_static/wasm/
+          cp ./examples/raylib/drones.wasm ../docs/source/_static/wasm/
+          cp ./examples/raylib/drones.html ../docs/source/_static/wasm/
+
       - name: Run Doxygen
         run: doxygen ./Doxyfile
 
