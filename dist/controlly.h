@@ -1738,9 +1738,9 @@ void __Control_StateSpace_StepSISO(ControlStateSpace *ss, float dt)
 
 
 
+
 #include <stdbool.h>
 #include <stddef.h>
-
 
 #define REQUIRE_VALID_TF(ctx, tf_ptr, msg)                                                         \
     CONTROL_REQUIRE(ctx, Control_TF_IsValid(tf_ptr), CONTROL_ERROR_INVALID_ARGUMENT, msg)
@@ -1930,13 +1930,10 @@ ControlResult Control_TF_Validate(ControlHandle *ctx, const ControlTransferFunct
     CONTROL_CHECK_CTX(ctx);
     CONTROL_CHECK_NOT_NULL(ctx, tf);
 
-    CONTROL_REQUIRE(ctx,
-                    tf->num.coeffs && tf->den.coeffs,
-                    CONTROL_ERROR_INVALID_ARGUMENT);
+    CONTROL_REQUIRE(ctx, tf->num.coeffs && tf->den.coeffs, CONTROL_ERROR_INVALID_ARGUMENT);
 
-    CONTROL_REQUIRE(ctx,
-                    tf->den.size != 0 && tf->den.coeffs[0] != 0.0f,
-                    CONTROL_ERROR_DIVIDE_BY_ZERO);
+    CONTROL_REQUIRE(
+        ctx, tf->den.size != 0 && tf->den.coeffs[0] != 0.0f, CONTROL_ERROR_DIVIDE_BY_ZERO);
 
     return CONTROL_OK;
 }

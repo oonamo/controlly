@@ -22,6 +22,7 @@ FetchContent_MakeAvailable(raygui)
 set(EXAMPLE_SOURCES
   "statespace_second_order/statespace_second_order.c"
   "pid_leader_follower/pid_leader_follower.c"
+  "pid_drones/drones.c"
 )
 
 foreach(SRC_FILE IN LISTS EXAMPLE_SOURCES)
