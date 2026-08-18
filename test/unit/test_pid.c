@@ -1,3 +1,4 @@
+#include <math.h>
 #include <unity.h>
 #include <unity_fixture.h>
 
@@ -83,9 +84,43 @@ TEST(PID, DerivativeTermOnly)
     TEST_ASSERT_FLOAT_WITHIN(0.001f, -40.0f, out3);
 }
 
+TEST(PID, AntiWindupClampsToMax)
+{
+    float dt = 0.1f;
+
+    cfg.enable_anti_windup = true;
+    cfg.max_out            = 10.0f;
+    cfg.min_out            = -INFINITY;
+    Control_PID_Init(&pid, 1.0f, 0.0f, 0.0f, &cfg);
+
+    // error = 20.0f - 0.0f = 20.0f
+    // out = 20.0f * kp = max(10.0f, 20.0f) = 10.0f
+    float out = Control_PID_Update(&pid, 20.0f, 0, dt);
+
+    TEST_ASSERT_FLOAT_WITHIN(0.001f, 10.0f, out);
+}
+
+TEST(PID, AntiWindupClampsToMin)
+{
+    float dt = 0.1f;
+
+    cfg.enable_anti_windup = true;
+    cfg.max_out            = INFINITY;
+    cfg.min_out            = 10.0f;
+    Control_PID_Init(&pid, 1.0f, 0.0f, 0.0f, &cfg);
+
+    // error = 1.0f - 0.0f = 1.0f
+    // out = 1.0f * kp = 1.0f >>> 10.0f
+    float out = Control_PID_Update(&pid, 1.0f, 0, dt);
+
+    TEST_ASSERT_FLOAT_WITHIN(0.001f, 10.0f, out);
+}
+
 TEST_GROUP_RUNNER(PID)
 {
     RUN_TEST_CASE(PID, ProportionalTermOnly);
     RUN_TEST_CASE(PID, IntegralTermOnly);
     RUN_TEST_CASE(PID, DerivativeTermOnly);
+    RUN_TEST_CASE(PID, AntiWindupClampsToMax);
+    RUN_TEST_CASE(PID, AntiWindupClampsToMin);
 }
